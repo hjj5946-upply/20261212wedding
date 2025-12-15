@@ -1,19 +1,41 @@
 import type { WeddingConfig } from "../config/wedding";
+import { Button } from "../components/Button";
+import { Section } from "../components/Section";
+import { asset } from "../utils/asset";
+
 type Props = { data: WeddingConfig };
 
 export function LocationSection({ data }: Props) {
+  const { venueName, venueAddress, naverMapUrl } = data.ceremony;
+
+  const mapImageUrl = asset("images/casa_map.webp");
+
   return (
-    <section className="px-5 py-12 border-t border-neutral-100">
+    <Section className="px-5 py-12 border-t border-neutral-100">
       <div className="mx-auto max-w-md">
         <h2 className="text-lg font-semibold">Location</h2>
-        <p className="mt-2 text-sm text-neutral-600">
-          (다음 스프린트에서 길찾기 버튼/지도 추가)
-        </p>
-        <div className="mt-4 rounded-2xl border border-neutral-200 p-4 text-sm">
-          <div className="font-medium">{data.ceremony.venueName}</div>
-          <div className="mt-1 text-neutral-600">{data.ceremony.venueAddress}</div>
+
+        <a
+          href={mapImageUrl}
+          target="_blank"
+          rel="noreferrer"
+          className="mt-4 block overflow-hidden rounded-2xl border border-neutral-200"
+          aria-label="약도 원본 이미지 열기"
+        >
+          <img src={mapImageUrl} alt="웨딩홀 약도" className="w-full" />
+        </a>
+
+        <div className="mt-4 text-sm">
+          <div className="font-medium">{venueName}</div>
+          <div className="mt-1 text-neutral-600">{venueAddress}</div>
+        </div>
+
+        <div className="mt-6">
+          <a href={naverMapUrl} target="_blank" rel="noreferrer">
+            <Button variant="secondary">네이버 지도에서 보기</Button>
+          </a>
         </div>
       </div>
-    </section>
+    </Section>
   );
 }
