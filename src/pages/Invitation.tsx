@@ -2,6 +2,8 @@ import { useState } from "react";
 import { WEDDING } from "../config/wedding";
 
 import { HeroSection } from "../sections/HeroSection";
+import { MessageSection } from "../sections/MessageSection";
+import { CoupleIntroSection } from "../sections/CoupleIntroSection";
 import { StorySection } from "../sections/StorySection";
 import { GallerySection } from "../sections/GallerySection";
 import { InfoSection } from "../sections/InfoSection";
@@ -98,6 +100,8 @@ export function Invitation() {
 
       {/* 본문 */}
       <HeroSection data={data} />
+      <MessageSection data={data} />
+      <CoupleIntroSection data={data} />
       <StorySection data={data} />
       <GallerySection data={data} />
       <InfoSection data={data} />

@@ -16,19 +16,38 @@ export type AccountInfo = {
     giftNotice: string;
   };
   
+  export type StoryTimeline = {
+    icon: string;
+    date: string;
+    title: string;
+    description: string;
+  };
+
+  export type CoupleInfo = {
+    name: string;
+    role: string;
+    mbti?: string;
+    hobby?: string;
+    favorite?: string;
+    introduction?: string;
+  };
+
   export type WeddingConfig = {
     site: {
       baseUrl: string;
       ogImageUrl: string;
     };
     copy: WeddingCopy;
-  
+
     couple: {
       groomName: string;
       brideName: string;
       tagline: string;
     };
-  
+
+    groomInfo?: CoupleInfo;
+    brideInfo?: CoupleInfo;
+
     ceremony: {
       dateText: string;
       dateISO: string;
@@ -37,16 +56,17 @@ export type AccountInfo = {
       venueDetail?: string;
       naverMapUrl: string;
     };
-  
+
     contacts: {
       groomPhone?: string;
       bridePhone?: string;
       kakaoTalkLink?: string;
     };
-  
+
     groomAccounts: AccountInfo[];
     brideAccounts: AccountInfo[];
     gallery: { src: string; alt?: string }[];
+    story: StoryTimeline[];
   };
   
   export const WEDDING: WeddingConfig = {
@@ -70,6 +90,24 @@ export type AccountInfo = {
       groomName: "준",
       brideName: "쏭",
       tagline: "소중한 분들을 초대합니다.",
+    },
+
+    groomInfo: {
+      name: "준",
+      role: "신랑",
+      mbti: "ENFP",
+      hobby: "카메라, 여행",
+      favorite: "커피, 영화 감상",
+      introduction: "언제나 긍정적이고 밝은 에너지를 가진 사람입니다.",
+    },
+
+    brideInfo: {
+      name: "쏭",
+      role: "신부",
+      mbti: "ISFJ",
+      hobby: "독서, 베이킹",
+      favorite: "맛집 탐방, 음악 감상",
+      introduction: "따뜻하고 세심한 마음을 가진 사람입니다.",
     },
   
     ceremony: {
@@ -96,5 +134,38 @@ export type AccountInfo = {
     ],
   
     gallery: [],
+
+    story: [
+      {
+        icon: "✨",
+        date: "2023년 봄",
+        title: "첫 만남",
+        description: "서로의 인연이 시작된 특별한 순간",
+      },
+      {
+        icon: "💕",
+        date: "2023년 여름",
+        title: "설레는 시작",
+        description: "함께하는 시간이 늘어가고, 서로에게 특별한 사람이 되어가던 때",
+      },
+      {
+        icon: "🌸",
+        date: "2024년",
+        title: "함께한 날들",
+        description: "웃음과 행복이 가득했던 우리의 이야기",
+      },
+      {
+        icon: "💍",
+        date: "2025년",
+        title: "프러포즈",
+        description: "평생을 함께하기로 약속한 날",
+      },
+      {
+        icon: "🎊",
+        date: "2026.12.12",
+        title: "결혼식",
+        description: "새로운 시작을 함께 축하해주세요",
+      },
+    ],
   };
   
