@@ -7,7 +7,7 @@ type Props = { data: WeddingConfig };
 
 type AttendStatus = "attend" | "maybe" | "decline";
 
-export function RsvpSection({}: Props) {
+export function RsvpSection({ data }: Props) {
   const [status, setStatus] = useState<AttendStatus>("attend");
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
@@ -59,7 +59,7 @@ export function RsvpSection({}: Props) {
       />
 
       <div className="mx-auto max-w-md">
-        <h2 className="text-lg font-semibold">RSVP</h2>
+        <h2 className="text-lg font-semibold">{data.copy.rsvpTitle}</h2>
         <p className="mt-2 text-sm text-neutral-600">
           참석 여부를 남겨주시면 준비에 큰 도움이 됩니다.
         </p>

@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import type { WeddingConfig } from "../config/wedding";
 import { ShareButton } from "../components/ShareButton";
 import { Section } from "../components/Section";
@@ -20,11 +20,7 @@ function calculateDday(targetDate: string): number {
 
 export function HeroSection({ data }: Props) {
   const shareUrl = data.site?.baseUrl ?? window.location.origin;
-  const [dday, setDday] = useState<number>(calculateDday(data.ceremony.dateISO));
-
-  useEffect(() => {
-    setDday(calculateDday(data.ceremony.dateISO));
-  }, [data.ceremony.dateISO]);
+  const [dday] = useState<number>(() => calculateDday(data.ceremony.dateISO));
 
   const renderDday = () => {
     if (dday === 0) {
