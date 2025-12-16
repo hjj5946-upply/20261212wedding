@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { WEDDING } from "../config/wedding";
 
 import { HeroSection } from "../sections/HeroSection";
@@ -25,6 +25,7 @@ export function Invitation() {
   const data = WEDDING;
 
   const [mapSelectOpen, setMapSelectOpen] = useState(false);
+  const [showCTA, setShowCTA] = useState(false);
 
   const [toast, setToast] = useState<{ open: boolean; msg: string }>({
     open: false,
@@ -73,6 +74,23 @@ export function Invitation() {
     if (error) throw error;
   };
 
+  useEffect(() => {
+    const el = document.getElementById("location"); // 여기 기준 섹션
+    if (!el) return;
+  
+    const io = new IntersectionObserver(
+      ([entry]) => {
+        setShowCTA(entry.isIntersecting);
+      },
+      {
+        threshold: 0.15, // 15% 들어오면 표시
+      }
+    );
+  
+    io.observe(el);
+    return () => io.disconnect();
+  }, []);  
+
   return (
     <main className="min-h-screen bg-white text-neutral-900 pb-28">
 
@@ -105,7 +123,7 @@ export function Invitation() {
       <FooterSection data={data} />
 
       {/* 플로팅 CTA */}
-      <FloatingCTA onShare={onShare} onOpenMap={onOpenMap} />
+      <FloatingCTA visible={showCTA} onShare={onShare} onOpenMap={onOpenMap} />
     </main>
   );
 }
