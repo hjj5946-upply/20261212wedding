@@ -1,0 +1,139 @@
+import { useEffect, useState } from "react";
+import type { WeddingConfig, AccountInfo } from "../config/wedding";
+import { Section } from "../components/Section";
+import { Button } from "../components/Button";
+
+type Props = {
+  data: WeddingConfig;
+  onCopy: (text: string) => void; // Invitation의 copyText 사용(Toast 1곳 유지)
+};
+
+function maskAccountNumber(num: string) {
+  const digits = num.replace(/\D/g, "");
+  if (digits.length <= 6) return num;
+
+  let i = 0;
+  const keep = digits.length - 6;
+  return num.replace(/\d/g, (m) => {
+    const out = i < keep ? m : "*";
+    i += 1;
+    return out;
+  });
+}
+
+function AccountList({
+  accounts,
+  onCopy,
+}: {
+  accounts: AccountInfo[];
+  onCopy: (text: string) => void;
+}) {
+  const [revealIndex, setRevealIndex] = useState<number | null>(null);
+
+  useEffect(() => {
+    if (revealIndex === null) return;
+    const t = setTimeout(() => setRevealIndex(null), 10000);
+    return () => clearTimeout(t);
+  }, [revealIndex]);
+
+  return (
+    <div className="space-y-3">
+      {accounts.map((a, idx) => {
+        const isRevealed = revealIndex === idx;
+        const shownNumber = isRevealed ? a.number : maskAccountNumber(a.number);
+        const copyText = `${a.bank} ${a.number} (${a.holder})`;
+
+        return (
+          <div key={idx} className="rounded-2xl border border-neutral-200 p-4">
+            <div className="text-sm font-medium">{a.holder}</div>
+
+            <div className="mt-1 text-sm text-neutral-700">
+              {a.bank} {shownNumber}
+            </div>
+
+            {a.memo ? (
+              <div className="mt-1 text-xs text-neutral-500">{a.memo}</div>
+            ) : null}
+
+            <div className="mt-3 grid grid-cols-2 gap-2">
+              <Button
+                variant="secondary"
+                fullWidth
+                type="button"
+                onClick={() => setRevealIndex(isRevealed ? null : idx)}
+              >
+                {isRevealed ? "가리기" : "계좌 보기"}
+              </Button>
+
+              <Button
+                variant="primary"
+                fullWidth
+                type="button"
+                onClick={() => onCopy(copyText)}
+              >
+                복사
+              </Button>
+            </div>
+
+            {isRevealed ? (
+              <div className="mt-2 text-[11px] text-neutral-400">
+                보안상 10초 후 자동으로 가려집니다.
+              </div>
+            ) : null}
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
+export function GiftAccountsSection({ data, onCopy }: Props) {
+  const [open, setOpen] = useState<null | "groom" | "bride">(null);
+
+  return (
+    <Section className="px-5 py-12 border-t border-neutral-100">
+      <div className="mx-auto max-w-md">
+        <h2 className="text-lg font-semibold">{data.copy.giftTitle}</h2>
+        <p className="mt-2 text-sm text-neutral-500">{data.copy.giftNotice}</p>
+
+        <div className="mt-6 space-y-3">
+          {/* 신랑 */}
+          <div className="rounded-2xl border border-neutral-200 overflow-hidden">
+            <button
+              type="button"
+              className="w-full px-4 py-4 flex items-center justify-between bg-white"
+              onClick={() => setOpen(open === "groom" ? null : "groom")}
+              aria-expanded={open === "groom"}
+            >
+              <span className="text-sm font-medium text-neutral-900">신랑측 계좌</span>
+              <span className="text-sm text-neutral-400">{open === "groom" ? "−" : "+"}</span>
+            </button>
+            {open === "groom" ? (
+              <div className="px-4 pb-4">
+                <AccountList accounts={data.groomAccounts} onCopy={onCopy} />
+              </div>
+            ) : null}
+          </div>
+
+          {/* 신부 */}
+          <div className="rounded-2xl border border-neutral-200 overflow-hidden">
+            <button
+              type="button"
+              className="w-full px-4 py-4 flex items-center justify-between bg-white"
+              onClick={() => setOpen(open === "bride" ? null : "bride")}
+              aria-expanded={open === "bride"}
+            >
+              <span className="text-sm font-medium text-neutral-900">신부측 계좌</span>
+              <span className="text-sm text-neutral-400">{open === "bride" ? "−" : "+"}</span>
+            </button>
+            {open === "bride" ? (
+              <div className="px-4 pb-4">
+                <AccountList accounts={data.brideAccounts} onCopy={onCopy} />
+              </div>
+            ) : null}
+          </div>
+        </div>
+      </div>
+    </Section>
+  );
+}

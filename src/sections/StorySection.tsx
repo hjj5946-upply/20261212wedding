@@ -1,45 +1,45 @@
 import type { WeddingConfig } from "../config/wedding";
 import { Section } from "../components/Section";
+import { SectionHeader } from "../components/SectionHeader";
 
 type Props = { data: WeddingConfig };
 
 export function StorySection({ data }: Props) {
+  if (!data.story || data.story.length === 0) return null;
+
   return (
-    <Section className="px-5 py-16 bg-gradient-to-b from-white to-wedding-cream-50">
-      <div className="mx-auto max-w-2xl">
-        <div className="text-center mb-12">
-          <h2 className="text-3xl font-bold text-neutral-800">Our Story</h2>
-          <p className="mt-2 text-sm text-neutral-500">우리의 이야기</p>
-        </div>
+    <Section id="story" className="px-5 py-12 border-t border-neutral-100">
+      <div className="mx-auto max-w-md">
+        <SectionHeader title={data.copy.storyTitle} subtitle="우리의 이야기" />
 
-        <div className="relative">
-          {/* 타임라인 세로선 */}
-          <div className="absolute left-8 top-0 bottom-0 w-0.5 bg-gradient-to-b from-wedding-pink-200 via-wedding-peach-200 to-wedding-cream-200" />
-
-          {/* 타임라인 아이템들 */}
-          <div className="space-y-8">
-            {data.story.map((item, index) => (
-              <div key={index} className="relative pl-20">
-                {/* 아이콘 */}
-                <div className="absolute left-0 flex items-center justify-center w-16 h-16 bg-white rounded-full border-4 border-wedding-pink-100 shadow-md">
-                  <span className="text-2xl">{item.icon}</span>
+        <div className="space-y-3">
+          {data.story.map((item, idx) => (
+            <div
+              key={`${item.date}-${idx}`}
+              className="rounded-2xl border border-neutral-200 bg-white p-5"
+            >
+              <div className="flex items-start gap-3">
+                <div className="flex h-10 w-10 items-center justify-center rounded-2xl border border-neutral-200 bg-wedding-ivory-50">
+                  <span className="text-xl">{item.icon}</span>
                 </div>
 
-                {/* 콘텐츠 */}
-                <div className="bg-white rounded-2xl p-6 shadow-sm border border-wedding-cream-200 hover:shadow-md transition-shadow">
-                  <div className="text-xs text-wedding-pink-500 font-medium mb-1">
+                <div className="flex-1">
+                  <div className="text-xs font-medium text-neutral-500">
                     {item.date}
                   </div>
-                  <h3 className="text-lg font-bold text-neutral-800 mb-2">
+                  <div className="mt-1 text-base font-semibold text-neutral-900">
                     {item.title}
-                  </h3>
-                  <p className="text-sm text-neutral-600 leading-relaxed">
+                  </div>
+                  <div className="mt-2 text-sm leading-6 text-neutral-700">
                     {item.description}
-                  </p>
+                  </div>
                 </div>
               </div>
-            ))}
-          </div>
+
+              <div className="mt-4 h-px w-full bg-neutral-100" />
+              <div className="mt-3 h-px w-10 bg-wedding-gold-200" />
+            </div>
+          ))}
         </div>
       </div>
     </Section>

@@ -55,6 +55,8 @@ export type AccountInfo = {
       venueAddress: string;
       venueDetail?: string;
       naverMapUrl: string;
+      kakaoMapUrl: string;
+      tmapUrl: string;
     };
 
     contacts: {
@@ -116,13 +118,14 @@ export type AccountInfo = {
       venueName: "까사그랑데 센트로",
       venueAddress: "서울특별시 광진구 능동로 87 건대입구역자이엘라 6층",
       venueDetail: "",
-      naverMapUrl:
-        "https://map.naver.com/p/search/%EA%B9%8C%EC%82%AC%EA%B7%B8%EB%9E%91%EB%8D%B0?c=17.08,0,0,0,dh",
+      naverMapUrl:"https://map.naver.com/p/search/%EA%B9%8C%EC%82%AC%EA%B7%B8%EB%9E%91%EB%8D%B0?c=17.08,0,0,0,dh",
+      kakaoMapUrl:"https://map.kakao.com/",
+      tmapUrl:"https://www.tmap.co.kr/my_tmap/my_map_tip/map_tip.do#"
     },
   
     contacts: {
-      groomPhone: "01022805946",
-      bridePhone: "01037964209",
+      groomPhone: "",
+      bridePhone: "",
       kakaoTalkLink: "",
     },
   
