@@ -74,7 +74,7 @@ export function HeroSection({ data, onShare }: Props) {
 
       {/* 하단 정보 카드 */}
       <div className="absolute bottom-0 left-0 right-0 z-10 px-5 pb-8">
-        <div className="mx-auto max-w-md rounded-3xl bg-white/60 backdrop-blur border border-neutral-200 p-6 text-center">
+        <div className="mx-auto max-w-md rounded-3xl bg-white/50 backdrop-blur border border-neutral-200 p-6 text-center">
           <div className="text-xs tracking-widest text-neutral-500">
             WEDDING INVITATION
           </div>
