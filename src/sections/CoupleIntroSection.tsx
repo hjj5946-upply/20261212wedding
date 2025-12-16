@@ -1,66 +1,56 @@
 import type { WeddingConfig, CoupleInfo } from "../config/wedding";
 import { Section } from "../components/Section";
+import { SectionHeader } from "../components/SectionHeader";
 
 type Props = { data: WeddingConfig };
 
-function CoupleCard({ info, side }: { info: CoupleInfo; side: "left" | "right" }) {
+function InfoRow({ label, value }: { label: string; value?: string }) {
+  if (!value) return null;
   return (
-    <div
-      className={`bg-white rounded-2xl p-6 shadow-md border-2 ${
-        side === "left" ? "border-wedding-pink-200" : "border-wedding-peach-200"
-      } hover:shadow-lg transition-all`}
-    >
-      <div className="text-center mb-4">
-        <h3 className="text-2xl font-bold text-neutral-800">{info.name}</h3>
-        <p className="text-sm text-neutral-500">{info.role}</p>
+    <div className="flex items-start gap-3 text-sm">
+      <span className="min-w-[64px] text-wedding-gold-300 font-semibold">
+        {label}
+      </span>
+      <span className="text-neutral-700">{value}</span>
+    </div>
+  );
+}
+
+function CoupleCard({ info }: { info: CoupleInfo }) {
+  return (
+    <div className="rounded-2xl border border-neutral-200 bg-white p-5 shadow-sm">
+      <div className="text-center">
+        <h3 className="text-xl font-semibold text-neutral-900">{info.name}</h3>
+        <p className="mt-1 text-xs text-neutral-500">{info.role}</p>
+        <div className="mx-auto mt-4 h-px w-12 bg-wedding-gold-200" />
       </div>
 
-      {info.introduction && (
-        <p className="text-sm text-neutral-600 text-center mb-4 italic">
-          "{info.introduction}"
+      {info.introduction ? (
+        <p className="mt-4 text-sm leading-6 text-neutral-700 text-center">
+          {info.introduction}
         </p>
-      )}
+      ) : null}
 
-      <div className="space-y-3 text-sm">
-        {info.mbti && (
-          <div className="flex items-start gap-2">
-            <span className="text-wedding-pink-500 font-semibold min-w-[60px]">MBTI</span>
-            <span className="text-neutral-700">{info.mbti}</span>
-          </div>
-        )}
-        {info.hobby && (
-          <div className="flex items-start gap-2">
-            <span className="text-wedding-pink-500 font-semibold min-w-[60px]">취미</span>
-            <span className="text-neutral-700">{info.hobby}</span>
-          </div>
-        )}
-        {info.favorite && (
-          <div className="flex items-start gap-2">
-            <span className="text-wedding-pink-500 font-semibold min-w-[60px]">좋아하는 것</span>
-            <span className="text-neutral-700">{info.favorite}</span>
-          </div>
-        )}
+      <div className="mt-5 space-y-3">
+        <InfoRow label="MBTI" value={info.mbti} />
+        <InfoRow label="취미" value={info.hobby} />
+        <InfoRow label="좋아하는 것" value={info.favorite} />
       </div>
     </div>
   );
 }
 
 export function CoupleIntroSection({ data }: Props) {
-  if (!data.groomInfo && !data.brideInfo) {
-    return null;
-  }
+  if (!data.groomInfo && !data.brideInfo) return null;
 
   return (
-    <Section className="px-5 py-16 bg-gradient-to-b from-wedding-cream-50 to-white">
-      <div className="mx-auto max-w-4xl">
-        <div className="text-center mb-12">
-          <h2 className="text-3xl font-bold text-neutral-800">우리를 소개합니다</h2>
-          <p className="mt-2 text-sm text-neutral-500">Get to know us</p>
-        </div>
+    <Section id="couple" className="px-5 py-12 border-t border-neutral-100">
+      <div className="mx-auto max-w-md">
+        <SectionHeader title="우리를 소개합니다" subtitle="Get to know us" />
 
-        <div className="grid md:grid-cols-2 gap-6">
-          {data.groomInfo && <CoupleCard info={data.groomInfo} side="left" />}
-          {data.brideInfo && <CoupleCard info={data.brideInfo} side="right" />}
+        <div className="grid gap-4 md:grid-cols-2">
+          {data.groomInfo ? <CoupleCard info={data.groomInfo} /> : null}
+          {data.brideInfo ? <CoupleCard info={data.brideInfo} /> : null}
         </div>
       </div>
     </Section>
