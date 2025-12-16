@@ -107,7 +107,7 @@ export function Invitation() {
           setMapSelectOpen(false);
           openMapByType(type);
         }}
-      />s
+      />
 
       {/* 본문 */}
       <HeroSection data={data} onShare={onShare} />
