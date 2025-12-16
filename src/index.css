@@ -9,6 +9,7 @@
     font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, Roboto, sans-serif;
     background: #ffffff;
     color: #111827;
+    touch-action: manipulation;
   }
 }
 

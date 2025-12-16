@@ -90,8 +90,8 @@ export type AccountInfo = {
     },
   
     couple: {
-      groomName: "준",
-      brideName: "쏭",
+      groomName: "홍정준",
+      brideName: "신송희",
       tagline: "소중한 분들을 초대합니다.",
     },
 
