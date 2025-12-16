@@ -11,7 +11,7 @@ export function FooterSection({ data }: Props) {
           {data.couple.groomName} &amp; {data.couple.brideName}
         </div>
         <div className="mx-auto mt-4 h-px w-14 bg-wedding-gold-200" />
-        <div className="mt-4 text-xs text-neutral-500">© 2026 Wedding Invitation</div>
+        <div className="mt-4 text-xs text-neutral-500">© 2026 HJJ Wedding Invitation</div>
       </div>
     </Section>
   );

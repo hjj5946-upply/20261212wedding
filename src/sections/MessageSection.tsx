@@ -21,7 +21,7 @@ export function MessageSection({ data }: Props) {
           <div className="mx-auto my-6 h-px w-16 bg-wedding-gold-200" />
 
           <p className="text-sm leading-7 text-neutral-700">
-            {data.couple.groomName}와 {data.couple.brideName}는
+            {data.couple.groomName}과 {data.couple.brideName}는
             <br />
             서로 다른 두 사람이 만나
             <br />

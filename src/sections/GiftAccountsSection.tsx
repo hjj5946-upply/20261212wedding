@@ -56,7 +56,6 @@ function AccountList({
             ) : null}
 
             <div className="mt-3 space-y-2">
-              {/* 1줄: 계좌 보기 / 복사 */}
               <div className="grid grid-cols-2 gap-2">
                 <Button
                   variant="secondary"
@@ -75,7 +74,6 @@ function AccountList({
                 </Button>
               </div>
 
-              {/* 2줄: 카카오페이 (꽉 채움) */}
               <Button
                 variant="secondary"
                 type="button"
