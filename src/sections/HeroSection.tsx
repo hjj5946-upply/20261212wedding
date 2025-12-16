@@ -1,80 +1,116 @@
-import { useState, useEffect } from "react";
+import { useEffect, useMemo, useState } from "react";
 import type { WeddingConfig } from "../config/wedding";
-import { ShareButton } from "../components/ShareButton";
-import { Section } from "../components/Section";
+import { Button } from "../components/Button";
+import { asset } from "../utils/asset";
 
-type Props = { data: WeddingConfig; onShare: () => void };
+type Props = {
+  data: WeddingConfig;
+  onShare: () => void;
+};
 
-function calculateDday(targetDate: string): number {
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
+function startOfDay(d: Date) {
+  const x = new Date(d);
+  x.setHours(0, 0, 0, 0);
+  return x;
+}
 
-  // dateISO가 들어와도 날짜 기준으로만 계산(경계 이슈 완화)
-  const ymd = targetDate.slice(0, 10); // "YYYY-MM-DD"
-  const target = new Date(`${ymd}T00:00:00`);
-  target.setHours(0, 0, 0, 0);
-
-  const diffTime = target.getTime() - today.getTime();
-  const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-  return diffDays;
+function msToHMS(ms: number) {
+  const total = Math.max(0, Math.floor(ms / 1000));
+  const h = Math.floor(total / 3600);
+  const m = Math.floor((total % 3600) / 60);
+  const s = total % 60;
+  return { h, m, s };
 }
 
 export function HeroSection({ data, onShare }: Props) {
-  const [dday, setDday] = useState<number>(calculateDday(data.ceremony.dateISO));
+  const target = useMemo(() => new Date(data.ceremony.dateISO), [data.ceremony.dateISO]);
+  const [now, setNow] = useState(() => new Date());
 
   useEffect(() => {
-    setDday(calculateDday(data.ceremony.dateISO));
-  }, [data.ceremony.dateISO]);
+    const t = setInterval(() => setNow(new Date()), 1000);
+    return () => clearInterval(t);
+  }, []);
 
-  const renderDday = () => {
-    if (dday === 0) {
-      return (
-        <div className="inline-flex items-center gap-2 rounded-full border border-wedding-gold-200 bg-wedding-gold-50 px-4 py-2">
-          <span className="text-xl">✨</span>
-          <span className="text-sm font-semibold text-neutral-900">
-            오늘이 그날!
-          </span>
-        </div>
-      );
-    }
-    if (dday > 0) {
-      return (
-        <div className="inline-flex items-center gap-2 rounded-full border border-wedding-gray-200 bg-white px-4 py-2">
-          <span className="text-sm font-semibold text-neutral-800">D-{dday}</span>
-        </div>
-      );
-    }
-    return (
-      <div className="inline-flex items-center gap-2 rounded-full border border-wedding-gray-200 bg-wedding-ivory-50 px-4 py-2">
-        <span className="text-sm text-neutral-500">D+{Math.abs(dday)}</span>
-      </div>
-    );
-  };
+  const ddayDays = useMemo(() => {
+    const diff =
+      startOfDay(target).getTime() - startOfDay(now).getTime();
+    return Math.ceil(diff / (1000 * 60 * 60 * 24));
+  }, [now, target]);
+
+  const msLeft = target.getTime() - now.getTime();
+  const within48h = msLeft > 0 && msLeft <= 48 * 60 * 60 * 1000;
+  const hms = msToHMS(msLeft);
+
+  const heroImg = asset("images/main_img.jpg");
 
   return (
-    <Section
-      id="hero"
-      className="bg-gradient-to-b from-wedding-ivory-50 to-white px-5 pb-12 pt-16"
-    >
-      <div className="mx-auto max-w-md text-center">
-        <div className="mb-4">{renderDday()}</div>
+    <section className="relative h-screen w-full overflow-hidden">
+      {/* 배경 이미지 */}
+      <img
+        src={heroImg}
+        alt="Wedding"
+        className="absolute inset-0 h-full w-full object-cover"
+      />
 
-        <p className="text-sm text-neutral-500">{data.ceremony.dateText}</p>
+      {/* 가독성용 오버레이 */}
+      <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-black/10 to-black/40" />
 
-        <h1 className="mt-3 text-4xl font-bold tracking-tight text-neutral-900">
-          {data.couple.groomName} &amp; {data.couple.brideName}
-        </h1>
+      {/* 상단 D-day */}
+      <div className="absolute top-6 left-1/2 -translate-x-1/2 z-10">
+        <div className="rounded-full bg-white/80 px-4 py-2 backdrop-blur border border-neutral-200">
+          {msLeft <= 0 ? (
+            <span className="text-sm font-semibold">오늘이 그날!</span>
+          ) : within48h ? (
+            <span className="text-sm font-semibold">
+              D-{ddayDays} · {String(hms.h).padStart(2, "0")}:
+              {String(hms.m).padStart(2, "0")}:
+              {String(hms.s).padStart(2, "0")}
+            </span>
+          ) : (
+            <span className="text-sm font-semibold">D-{ddayDays}</span>
+          )}
+        </div>
+      </div>
 
-        <div className="mx-auto mt-4 h-px w-14 bg-wedding-gold-200" />
+      {/* 하단 정보 카드 */}
+      <div className="absolute bottom-0 left-0 right-0 z-10 px-5 pb-8">
+        <div className="mx-auto max-w-md rounded-3xl bg-white/60 backdrop-blur border border-neutral-200 p-6 text-center">
+          <div className="text-xs tracking-widest text-neutral-500">
+            WEDDING INVITATION
+          </div>
 
-        <p className="mt-4 text-base text-neutral-700">{data.couple.tagline}</p>
+          <h1 className="mt-3 text-3xl font-semibold text-neutral-900">
+            {data.couple.groomName}
+            <span className="mx-2 text-neutral-300">&amp;</span>
+            {data.couple.brideName}
+          </h1>
 
-        <div className="mt-6">
-          <ShareButton onClick={onShare} />
+          <div className="mx-auto mt-4 h-px w-12 bg-wedding-gold-200" />
+
+          <p className="mt-4 text-sm leading-6 text-neutral-700">
+            소중한 분들을 모시고
+            <br />
+            저희의 새로운 시작을 함께하려 합니다.
+          </p>
+
+          <div className="mt-5 text-sm text-neutral-700">
+            <div className="font-medium">{data.ceremony.dateText}</div>
+            <div className="mt-1 text-neutral-600">
+              {data.ceremony.venueName}
+            </div>
+          </div>
+
+          <div className="mt-6">
+            <Button fullWidth variant="secondary" onClick={onShare}>
+              청첩장 공유하기
+            </Button>
+          </div>
         </div>
 
-        <div className="mt-8 text-xs text-neutral-400">↓ Scroll</div>
+        <div className="mt-4 text-center text-xs text-white/80">
+          ↓ 아래로 스크롤
+        </div>
       </div>
-    </Section>
+    </section>
   );
 }

@@ -6,17 +6,23 @@ import { SectionHeader } from "../components/SectionHeader";
 
 type Props = {
   data: WeddingConfig;
-  onToast: (msg: string) => void; // ✅ Invitation 토스트 재사용
+  onToast: (msg: string) => void;
+  onSubmit: (payload: {
+    status: "attend" | "maybe" | "decline";
+    name: string;
+    phone?: string;
+    count: number;
+    memo?: string;
+  }) => Promise<void>;
 };
 
 type AttendStatus = "attend" | "maybe" | "decline";
 
-export function RsvpSection({ data, onToast }: Props) {
+export function RsvpSection({ data, onToast, onSubmit }: Props) {
   const [status, setStatus] = useState<AttendStatus>("attend");
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
   const [count, setCount] = useState(1);
-  const [meal, setMeal] = useState<"yes" | "no">("yes");
   const [memo, setMemo] = useState("");
 
   const [submitting, setSubmitting] = useState(false);
@@ -29,22 +35,23 @@ export function RsvpSection({ data, onToast }: Props) {
       onToast("이름(2글자 이상)과 인원 정보를 확인해 주세요.");
       return;
     }
+
     setSubmitting(true);
-
-    // ✅ 목업 처리 (추후 supabase insert로 교체)
-    await new Promise((r) => setTimeout(r, 600));
-
-    setSubmitting(false);
-    setDone(true);
-    onToast("RSVP가 접수되었습니다.");
-    console.log("RSVP payload(mock):", {
-      status,
-      name: name.trim(),
-      phone: phone.trim(),
-      count,
-      meal,
-      memo: memo.trim(),
-    });
+    try {
+      await onSubmit({
+        status,
+        name: name.trim(),
+        phone: phone.trim() || undefined,
+        count,
+        memo: memo.trim() || undefined,
+      });
+      setDone(true);
+      onToast("RSVP가 접수되었습니다.");
+    } catch {
+      onToast("저장에 실패했습니다. 잠시 후 다시 시도해 주세요.");
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (
@@ -52,7 +59,7 @@ export function RsvpSection({ data, onToast }: Props) {
       <div className="mx-auto max-w-md">
         <SectionHeader
           title={data.copy.rsvpTitle}
-          subtitle="참석 여부를 남겨주시면 준비에 큰 도움이 됩니다."
+          subtitle="참석 여부와 인원을 남겨주시면 준비에 큰 도움이 됩니다."
         />
 
         <div className="rounded-2xl border border-neutral-200 bg-white p-5">
@@ -134,17 +141,6 @@ export function RsvpSection({ data, onToast }: Props) {
               </div>
             </Field>
 
-            <Field label="식사 여부(선택)">
-              <div className="grid grid-cols-2 gap-2">
-                <ToggleChip active={meal === "yes"} onClick={() => setMeal("yes")} disabled={done}>
-                  식사함
-                </ToggleChip>
-                <ToggleChip active={meal === "no"} onClick={() => setMeal("no")} disabled={done}>
-                  식사 안함
-                </ToggleChip>
-              </div>
-            </Field>
-
             <Field label="메모(선택)">
               <textarea
                 value={memo}
@@ -168,7 +164,7 @@ export function RsvpSection({ data, onToast }: Props) {
             </Button>
 
             <p className="mt-3 text-xs text-neutral-500">
-              * 현재는 저장 방식 결정 전이라 “목업 제출”로만 동작합니다.
+              * 제출 후 수정이 필요하면 신랑/신부에게 별도 연락 부탁드립니다.
             </p>
           </div>
         </div>

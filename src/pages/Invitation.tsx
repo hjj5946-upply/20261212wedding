@@ -16,6 +16,10 @@ import { Toast } from "../components/Toast";
 import { MapSelectModal } from "../components/MapSelectModal";
 import { shareOrCopyLink } from "../utils/share";
 import { GiftAccountsSection } from "../sections/GiftAccountsSection";
+import { GuestbookSection } from "../sections/GuestbookSection";
+
+import { supabase } from "../lib/supabase";
+
 
 export function Invitation() {
   const data = WEDDING;
@@ -55,6 +59,20 @@ export function Invitation() {
     window.open(url, "_blank", "noreferrer");
   };
 
+  const submitRsvp = async (payload: {
+    status: "attend" | "maybe" | "decline";
+    name: string;
+    phone?: string;
+    count: number;
+    memo?: string;
+  }) => {
+    const { error } = await supabase.from("rsvps").insert({
+      ...payload,
+      user_agent: navigator.userAgent,
+    });
+    if (error) throw error;
+  };
+
   return (
     <main className="min-h-screen bg-white text-neutral-900 pb-28">
 
@@ -71,7 +89,7 @@ export function Invitation() {
           setMapSelectOpen(false);
           openMapByType(type);
         }}
-      />
+      />s
 
       {/* 본문 */}
       <HeroSection data={data} onShare={onShare} />
@@ -82,7 +100,8 @@ export function Invitation() {
       <InfoSection data={data} />
       <GiftAccountsSection data={data} onCopy={copyText} />
       <LocationSection data={data} onOpenMap={onOpenMap} onCopy={copyText} />
-      <RsvpSection data={data} onToast={(msg) => setToast({ open: true, msg })}/>
+      <RsvpSection data={data} onToast={(msg) => setToast({ open: true, msg })} onSubmit={submitRsvp} />
+      <GuestbookSection onToast={(msg) => setToast({ open: true, msg })} />
       <FooterSection data={data} />
 
       {/* 플로팅 CTA */}
