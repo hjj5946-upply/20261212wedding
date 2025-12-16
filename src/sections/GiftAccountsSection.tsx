@@ -55,25 +55,41 @@ function AccountList({
               <div className="mt-1 text-xs text-neutral-500">{a.memo}</div>
             ) : null}
 
-            <div className="mt-3 grid grid-cols-2 gap-2">
+            <div className="mt-3 space-y-2">
+              {/* 1줄: 계좌 보기 / 복사 */}
+              <div className="grid grid-cols-2 gap-2">
+                <Button
+                  variant="secondary"
+                  type="button"
+                  onClick={() => setRevealIndex(isRevealed ? null : idx)}
+                >
+                  {isRevealed ? "가리기" : "계좌 보기"}
+                </Button>
+
+                <Button
+                  variant="primary"
+                  type="button"
+                  onClick={() => onCopy(copyText)}
+                >
+                  복사
+                </Button>
+              </div>
+
+              {/* 2줄: 카카오페이 (꽉 채움) */}
               <Button
                 variant="secondary"
-                fullWidth
                 type="button"
-                onClick={() => setRevealIndex(isRevealed ? null : idx)}
+                className="w-full bg-[#FEE800] text-black border border-neutral-200"
+                onClick={async () => {
+                  await onCopy(copyText);
+                  const url = a.kakaoPayUrl || "https://www.kakaopay.com/";
+                  window.open(url, "_blank", "noreferrer");
+                }}
               >
-                {isRevealed ? "가리기" : "계좌 보기"}
-              </Button>
-
-              <Button
-                variant="primary"
-                fullWidth
-                type="button"
-                onClick={() => onCopy(copyText)}
-              >
-                복사
+                카카오페이로 송금
               </Button>
             </div>
+
 
             {isRevealed ? (
               <div className="mt-2 text-[11px] text-neutral-400">

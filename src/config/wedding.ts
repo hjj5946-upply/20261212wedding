@@ -3,6 +3,7 @@ export type AccountInfo = {
     number: string;
     holder: string;
     memo?: string;
+    kakaoPayUrl?: string;
   };
   
   export type WeddingCopy = {
@@ -130,10 +131,10 @@ export type AccountInfo = {
     },
   
     groomAccounts: [
-        { bank: "카카오뱅크", number: "3333-04-039583", holder: "홍정준" },
+        { bank: "카카오뱅크", number: "3333-08-2171295", holder: "홍정준", kakaoPayUrl: "https://link.kakaopay.com/__/kAMNmIW" },
     ],
     brideAccounts: [
-        { bank: "카카오뱅크", number: "000-000-000000", holder: "신송희" },
+        { bank: "카카오뱅크", number: "3333-06-7583309", holder: "신송희", kakaoPayUrl: "https://link.kakaopay.com/__/kAMNmIW" },
     ],
   
     gallery: [],
