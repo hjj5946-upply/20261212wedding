@@ -60,13 +60,15 @@ export function InfoSection({ data }: Props) {
   const rootRef = useRef<HTMLDivElement | null>(null);
   const [inView, setInView] = useState(false);
 
-  const [step, setStep] = useState<0 | 1 | 2 | 3 | 4 | 5>(0);
+  // 0: 대기, 1: 인트로 재생, 5: 본문
+  const [step, setStep] = useState<0 | 1 | 5>(0);
 
   const year = weddingDate.getFullYear();
   const month = weddingDate.getMonth() + 1;
   const day = weddingDate.getDate();
 
-  const cal = useMemo(() => buildCalendarGrid(year, month), []);
+  // ✅ year/month가 바뀌면 달력도 다시 생성되어야 함
+  const cal = useMemo(() => buildCalendarGrid(year, month), [year, month]);
   const weekdaysKo = ["일", "월", "화", "수", "목", "금", "토"];
 
   const { days, hours, minutes, seconds } = useMemo(
@@ -74,19 +76,20 @@ export function InfoSection({ data }: Props) {
     [weddingDate, now]
   );
 
+  // 섹션 진입/이탈 감지 (다시 들어오면 인트로 재시작)
   useEffect(() => {
     const el = rootRef.current;
     if (!el) return;
 
-    const io = new IntersectionObserver(
-      ([entry]) => setInView(entry.isIntersecting),
-      { threshold: 0.55 }
-    );
+    const io = new IntersectionObserver(([entry]) => setInView(entry.isIntersecting), {
+      threshold: 0.55,
+    });
 
     io.observe(el);
     return () => io.disconnect();
   }, []);
 
+  // ✅ 인트로 길이를 "문자 수 기반"으로 계산해서 끝나자마자 본문으로 전환
   useEffect(() => {
     if (!inView) {
       setStep(0);
@@ -95,19 +98,23 @@ export function InfoSection({ data }: Props) {
 
     setStep(1);
 
-    const t1 = window.setTimeout(() => setStep(2), 650);
-    const t2 = window.setTimeout(() => setStep(3), 1300);
-    const t3 = window.setTimeout(() => setStep(4), 2050);
-    const t4 = window.setTimeout(() => setStep(5), 3000);
+    const topText = "SAT   PM 13:20";
+    const bottomText = `${year}. ${pad2(month)}. ${pad2(day)}.`;
 
-    return () => {
-      window.clearTimeout(t1);
-      window.clearTimeout(t2);
-      window.clearTimeout(t3);
-      window.clearTimeout(t4);
-    };
-  }, [inView]);
+    const topStepMs = 65;
+    const bottomStepMs = 55;
+    const charDur = 600; // StaggerText duration-600과 일치
+    const buffer = 160;  // 아주 짧은 숨
 
+    const topTotal = (topText.length - 1) * topStepMs + charDur;
+    const bottomTotal = (bottomText.length - 1) * bottomStepMs + charDur;
+    const introTotal = Math.max(topTotal, bottomTotal) + buffer;
+
+    const t = window.setTimeout(() => setStep(5), introTotal);
+    return () => window.clearTimeout(t);
+  }, [inView, year, month, day]);
+
+  // 본문 표시(step=5)부터 초 단위 갱신
   useEffect(() => {
     if (step !== 5) return;
     setNow(new Date());
@@ -118,57 +125,45 @@ export function InfoSection({ data }: Props) {
   const titleLogoSrc: string | null = null;
   const titleText = "WEDDING DAY";
 
-  // 배경: 인트로만 그린 / 본문은 화이트
-  const bgClass = step >= 1 && step < 5 ? "bg-emerald-200" : "bg-white";
-
   return (
     <Section className="p-0">
       <div
         ref={rootRef}
         className={[
           "relative w-screen min-h-screen overflow-hidden",
-          "transition-colors duration-1000",
-          bgClass,
+          "bg-white", // ✅ 내용화면은 처음부터 끝까지 흰색 베이스
         ].join(" ")}
       >
-        {/* 인트로 */}
+        {/* ✅ 인트로: 그린 배경은 오버레이에만 존재 */}
         <div
           className={[
             "absolute inset-0 flex items-center justify-center pointer-events-none",
-            "transition-opacity duration-900",
-            step >= 1 && step < 5 ? "opacity-100" : "opacity-0",
+            "bg-emerald-200",
+            "transition-opacity duration-700 ease-out", // ✅ 효과 끝나면 바로 스르르 사라짐
+            step === 1 ? "opacity-100" : "opacity-0",
           ].join(" ")}
         >
           <div className="text-center">
-            <div
-              className={[
-                "text-sm tracking-[0.35em] text-neutral-800",
-                "transition-all duration-800 ease-out",
-                step >= 4 ? "opacity-100 translate-y-0" : "opacity-0 translate-y-2",
-              ].join(" ")}
-            >
-              SAT&nbsp;&nbsp;&nbsp;PM 13:20
+            <div className="text-xl tracking-[0.20em] text-neutral-800">
+              <StaggerText text={"SAT   PM 13:20"} direction="down" start={step === 1} stepMs={65} />
             </div>
 
-            <div className="mt-4 flex items-baseline justify-center gap-2">
-              <DropText active={step >= 1} className="text-4xl font-semibold tracking-[0.06em] text-neutral-900">
-                {year}.
-              </DropText>
-              <DropText active={step >= 2} className="text-4xl font-semibold tracking-[0.06em] text-neutral-900">
-                {pad2(month)}.
-              </DropText>
-              <DropText active={step >= 3} className="text-4xl font-semibold tracking-[0.06em] text-neutral-900">
-                {pad2(day)}
-              </DropText>
+            <div className="mt-5 text-4xl font-semibold tracking-[0.06em] text-neutral-900">
+              <StaggerText
+                text={`${year}. ${pad2(month)}. ${pad2(day)}.`}
+                direction="up"
+                start={step === 1}
+                stepMs={55}
+              />
             </div>
           </div>
         </div>
 
-        {/* 본문 */}
+        {/* ✅ 본문: 흰 배경 위에서 스르르 나타남 */}
         <div
           className={[
             "relative min-h-screen flex flex-col items-center justify-center",
-            "transition-all duration-1100 ease-out",
+            "transition-all duration-800 ease-out", // ✅ 1100 -> 800 (더 자연스럽게 빠름)
             step === 5 ? "opacity-100 translate-y-0" : "opacity-0 translate-y-3",
           ].join(" ")}
         >
@@ -176,48 +171,30 @@ export function InfoSection({ data }: Props) {
             {/* 타이틀 */}
             <div className="flex justify-center">
               {titleLogoSrc ? (
-                <img
-                  src={titleLogoSrc}
-                  alt="wedding day"
-                  className="h-12 w-auto"
-                  loading="lazy"
-                  draggable={false}
-                />
+                <img src={titleLogoSrc} alt="wedding day" className="h-12 w-auto" loading="lazy" draggable={false} />
               ) : (
-                <div className="text-2xl font-semibold tracking-[0.22em] text-neutral-900">
-                  {titleText}
-                </div>
+                <div className="text-2xl font-semibold tracking-[0.22em] text-neutral-900">{titleText}</div>
               )}
             </div>
 
-            <div className="mt-10 text-sm text-neutral-700">
-              2026년 12월 12일 토요일 | 오후 1시 20분
-            </div>
-            <div className="mt-2 text-sm text-neutral-500">
-              Saturday, Dec 12 . 2026 | PM 13:20
-            </div>
+            <div className="mt-10 text-sm text-neutral-700">2026년 12월 12일 토요일 | 오후 1시 20분</div>
+            <div className="mt-2 text-sm text-neutral-500">Saturday, Dec 12 . 2026 | PM 13:20</div>
 
             {/* 달력 */}
             <div className="mt-12 mx-auto w-full">
-              {/* ✅ 2) 스프링만 가로로 꽉 */}
+              {/* 스프링 */}
               <div className="mb-4 flex justify-center gap-2">
                 {Array.from({ length: 19 }).map((_, i) => (
-                  <span
-                    key={i}
-                    className="inline-block h-2 w-3 rounded-full border border-neutral-300 bg-white"
-                  />
+                  <span key={i} className="inline-block h-2 w-3 rounded-full border border-neutral-300 bg-white" />
                 ))}
               </div>
 
-              {/* ✅ 4) 헤더: 2026. 12만 중앙정렬 */}
+              {/* 헤더 */}
               <div className="text-sm font-medium text-neutral-900 text-center">
                 {year}. {pad2(month)}
               </div>
 
-              {/* 아래 구분선만 유지 */}
-              {/* <div className="mt-3 h-px w-full bg-neutral-200" /> */}
-
-              {/* ✅ 4) 요일 한글 */}
+              {/* 요일 */}
               <div className="mt-3 grid grid-cols-7 gap-1 text-[12px]">
                 {weekdaysKo.map((w, idx) => (
                   <div
@@ -232,31 +209,20 @@ export function InfoSection({ data }: Props) {
                 ))}
               </div>
 
-              {/* ✅ 1) 날짜 셀: 배경색 완전 제거(흰바탕) */}
+              {/* 날짜 셀 (배경 없음) */}
               <div className="mt-1 grid grid-cols-7 gap-1">
                 {cal.cells.map((c, idx) => {
                   const isHit = c.day === day;
                   const textCls = dateTextClass(c.weekday, c.day);
 
                   return (
-                    <div
-                      key={idx}
-                      className="h-9 rounded-lg flex items-center justify-center text-sm"
-                    >
-                      <span
-                        className={[
-                          c.day ? textCls : "text-transparent",
-                          // 결혼 날짜만 하이라이트는 유지(원하면 이것도 제거 가능)
-                          isHit ? "font-semibold" : "",
-                        ].join(" ")}
-                      >
+                    <div key={idx} className="relative h-9 rounded-lg flex items-center justify-center text-sm">
+                      <span className={[c.day ? textCls : "text-transparent", isHit ? "font-semibold" : ""].join(" ")}>
                         {c.day ?? "."}
                       </span>
 
-                      {/* 결혼 날짜만 은은한 표시(배경 없이 '링' 느낌) */}
-                      {isHit && (
-                        <span className="absolute h-8 w-8 rounded-full border border-emerald-400/60" />
-                      )}
+                      {/* 결혼 날짜 링 */}
+                      {isHit && <span className="absolute h-8 w-8 rounded-full border border-emerald-400/60" />}
                     </div>
                   );
                 })}
@@ -266,7 +232,7 @@ export function InfoSection({ data }: Props) {
               <div className="mt-3 h-px w-full bg-neutral-200" />
             </div>
 
-            {/* ✅ 3) 카드: 회색 + 그림자 */}
+            {/* D-day 카드: 흰색 + border + shadow */}
             <div className="mt-10 grid grid-cols-4 gap-3">
               <CountdownCard label="DAYS" value={days} />
               <CountdownCard label="HOURS" value={hours} />
@@ -275,8 +241,7 @@ export function InfoSection({ data }: Props) {
             </div>
 
             <div className="mt-14 text-sm text-neutral-700">
-              정준 ♥ 송희 결혼식이{" "}
-              <span className="font-semibold text-neutral-900">{days}</span>일 남았습니다.
+              정준 ♥ 송희 결혼식이 <span className="font-semibold text-neutral-900">{days}</span>일 남았습니다.
             </div>
           </div>
         </div>
@@ -285,35 +250,50 @@ export function InfoSection({ data }: Props) {
   );
 }
 
-function DropText({
-  active,
-  className,
-  children,
-}: {
-  active: boolean;
-  className?: string;
-  children: React.ReactNode;
-}) {
+function CountdownCard({ label, value }: { label: string; value: number }) {
   return (
-    <div
-      className={[
-        className ?? "",
-        "transition-all duration-800 ease-out",
-        active ? "opacity-100 translate-y-0" : "opacity-0 -translate-y-12",
-      ].join(" ")}
-    >
-      {children}
+    <div className="rounded-2xl bg-white p-3 text-center border border-neutral-200 shadow-sm">
+      <div className="text-[11px] tracking-widest text-neutral-600">{label}</div>
+      <div className="mt-2 text-2xl font-semibold text-neutral-900">{String(value).padStart(2, "0")}</div>
     </div>
   );
 }
 
-function CountdownCard({ label, value }: { label: string; value: number }) {
+function StaggerText({
+  text,
+  direction,
+  start,
+  stepMs = 70,
+  className,
+}: {
+  text: string;
+  direction: "down" | "up";
+  start: boolean;
+  stepMs?: number;
+  className?: string;
+}) {
+  const chars = Array.from(text);
+
   return (
-    <div className="rounded-2xl bg-neutral-100 p-3 text-center shadow-md">
-      <div className="text-[11px] tracking-widest text-neutral-600">{label}</div>
-      <div className="mt-2 text-2xl font-semibold text-neutral-900">
-        {String(value).padStart(2, "0")}
-      </div>
-    </div>
+    <span className={["inline-flex", className ?? ""].join(" ")}>
+      {chars.map((ch, i) => (
+        <span
+          key={i}
+          className={[
+            "inline-block",
+            "transition-all ease-out",
+            "duration-600",
+            start
+              ? "opacity-100 translate-y-0"
+              : direction === "down"
+                ? "opacity-0 -translate-y-5"
+                : "opacity-0 translate-y-5",
+          ].join(" ")}
+          style={{ transitionDelay: `${i * stepMs}ms` }}
+        >
+          {ch === " " ? "\u00A0" : ch}
+        </span>
+      ))}
+    </span>
   );
 }
