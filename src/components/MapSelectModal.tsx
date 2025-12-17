@@ -7,21 +7,56 @@ function MapButton({
   kind: "naver" | "kakao" | "tmap";
   onClick: () => void;
 }) {
-  const meta = {
-    naver: { label: "네이버 지도", bg: "#03C75A", fg: "#fff", icon: "/images/naver_map.png" },
-    kakao: { label: "카카오맵", bg: "#FEE500", fg: "#000", icon: "/images/kakao_map.png" },
-    tmap: { label: "티맵", bg: "#111827", fg: "#fff", icon: "/images/tmap.png" },
-  }[kind];
+  if (kind === "naver") {
+    return (
+      <button
+        type="button"
+        onClick={onClick}
+        className="w-full h-12 rounded-2xl bg-[#03C75A] flex items-center justify-center active:scale-[0.99]"
+        aria-label="네이버 지도"
+      >
+        <img
+          src="/images/navermap.png"
+          alt="네이버 지도"
+          className="h-5 w-auto object-contain" // 🔹 네이버 로고 조금 작게
+        />
+      </button>
+    );
+  }
 
+  if (kind === "kakao") {
+    return (
+      <button
+        type="button"
+        onClick={onClick}
+        className="w-full h-12 rounded-2xl bg-[#FEE500] flex items-center justify-center gap-2 active:scale-[0.99]"
+        aria-label="카카오맵"
+      >
+        <img
+          src="/images/kakaomap.png"
+          alt="카카오맵"
+          className="h-6 w-auto object-contain"
+        />
+        <span className="text-sm font-semibold text-black">
+          카카오맵
+        </span>
+      </button>
+    );
+  }
+
+  // tmap
   return (
     <button
       type="button"
       onClick={onClick}
-      className="w-full rounded-2xl border border-neutral-200 px-4 py-3 flex items-center justify-center gap-2 active:scale-[0.99]"
-      style={{ backgroundColor: meta.bg, color: meta.fg }}
+      className="w-full h-12 rounded-2xl bg-white border border-neutral-300 flex items-center justify-center active:scale-[0.99]"
+      aria-label="티맵"
     >
-      <img src={meta.icon} alt="" className="h-5 w-auto" />
-      <span className="text-sm font-semibold">{meta.label}</span>
+      <img
+        src="/images/tmap.png"
+        alt="티맵"
+        className="h-6 w-auto object-contain"
+      />
     </button>
   );
 }
