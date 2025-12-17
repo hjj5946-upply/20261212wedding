@@ -135,18 +135,26 @@ export function Invitation() {
   };
 
   useEffect(() => {
+    const infoSection = document.getElementById("info");
+
+    if (!infoSection) {
+      return; 
+    }
+
     const handleScroll = () => {
       const scrollY = window.scrollY;
-      // 300px 이상 스크롤하면 표시, 미만이면 숨김
-      setShowCTA(scrollY > 300);
+      const infoTop = infoSection.offsetTop;
+
+      setShowCTA(scrollY > infoTop - 200);
     };
 
     window.addEventListener("scroll", handleScroll);
-    // 초기 상태 확인
-    handleScroll();
 
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, []);  
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+    };
+    
+  }, []);
 
   return (
     <main className="min-h-screen bg-white text-neutral-900 pb-28">
