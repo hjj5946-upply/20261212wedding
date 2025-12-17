@@ -135,10 +135,14 @@ export function Invitation() {
   };
 
   useEffect(() => {
+    const infoSection = document.getElementById("info");
+    if (!infoSection) return;
+
     const handleScroll = () => {
       const scrollY = window.scrollY;
-      // 300px 이상 스크롤하면 표시, 미만이면 숨김
-      setShowCTA(scrollY > 300);
+      const infoTop = infoSection.offsetTop;
+      // 웨딩 인포 섹션 위치 도달 시 표시, 미만이면 숨김
+      setShowCTA(scrollY > infoTop - 200);
     };
 
     window.addEventListener("scroll", handleScroll);
