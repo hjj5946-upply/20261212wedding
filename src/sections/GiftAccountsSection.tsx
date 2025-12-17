@@ -106,9 +106,14 @@ export function GiftAccountsSection({ data, onCopy }: Props) {
 
   return (
     <Section id="gift" className="px-5 py-12 border-t border-neutral-100">
-      <div className="mx-auto max-w-md">
-        <h2 className="text-lg font-semibold">{data.copy.giftTitle}</h2>
-        <p className="mt-2 text-sm text-neutral-500">{data.copy.giftNotice}</p>
+      <div className="mx-auto max-w-md text-center">
+      <div className="text-xs tracking-wide text-neutral-400">Account</div>
+        <h2 className="mt-1 text-lg font-semibold">마음 전하는 곳</h2>
+        <p className="mt-3 text-sm text-neutral-500 leading-relaxed">
+          참석이 어려우신 분들을 위해 계좌 정보를 안내드립니다.
+          <br />
+          축하의 마음만으로도 충분히 감사드립니다.
+        </p>
 
         <div className="mt-6 space-y-3">
           {/* 신랑 */}

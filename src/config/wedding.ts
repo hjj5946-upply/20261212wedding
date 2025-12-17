@@ -31,6 +31,7 @@ export type AccountInfo = {
     hobby?: string;
     favorite?: string;
     introduction?: string;
+    photoUrl?: string;
   };
 
   export type WeddingConfig = {
@@ -98,9 +99,9 @@ export type AccountInfo = {
     groomInfo: {
       name: "준",
       role: "신랑",
-      mbti: "ENFP",
+      mbti: "ISTJ",
       hobby: "카메라, 여행",
-      favorite: "커피, 영화 감상",
+      favorite: "여행, 게임",
       introduction: "언제나 긍정적이고 밝은 에너지를 가진 사람입니다.",
     },
 
@@ -109,7 +110,7 @@ export type AccountInfo = {
       role: "신부",
       mbti: "ISFJ",
       hobby: "독서, 베이킹",
-      favorite: "맛집 탐방, 음악 감상",
+      favorite: "여행, 음악 감상, 게임",
       introduction: "따뜻하고 세심한 마음을 가진 사람입니다.",
     },
   
