@@ -77,14 +77,18 @@ function AccountList({
               <Button
                 variant="secondary"
                 type="button"
-                className="w-full bg-[#FEE800] text-black border border-neutral-200"
+                className="w-full h-10 !bg-[#FEE800] !border !border-neutral-200 flex items-center justify-center"
                 onClick={async () => {
                   await onCopy(copyText);
                   const url = a.kakaoPayUrl || "https://www.kakaopay.com/";
                   window.open(url, "_blank", "noreferrer");
                 }}
               >
-                카카오페이로 송금
+                <img
+                  src="/images/kakao_pay.png"
+                  alt="카카오페이"
+                  className="h-6 w-auto"
+                />
               </Button>
             </div>
 

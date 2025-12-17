@@ -59,6 +59,8 @@ export type AccountInfo = {
       naverMapUrl: string;
       kakaoMapUrl: string;
       tmapUrl: string;
+      venueLat?: number;
+      venueLng?: number;
     };
 
     contacts: {
@@ -119,6 +121,8 @@ export type AccountInfo = {
       dateISO: "2026-12-12T13:20:00+09:00",
       venueName: "까사그랑데 센트로",
       venueAddress: "서울특별시 광진구 능동로 87 건대입구역자이엘라 6층",
+      venueLat: 37.539146,
+      venueLng: 127.069655,
       venueDetail: "",
       naverMapUrl:"https://map.naver.com/p/search/%EA%B9%8C%EC%82%AC%EA%B7%B8%EB%9E%91%EB%8D%B0?c=17.08,0,0,0,dh",
       kakaoMapUrl:"https://map.kakao.com/",
