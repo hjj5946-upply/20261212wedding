@@ -135,20 +135,17 @@ export function Invitation() {
   };
 
   useEffect(() => {
-    const el = document.getElementById("location"); // 여기 기준 섹션
-    if (!el) return;
-  
-    const io = new IntersectionObserver(
-      ([entry]) => {
-        setShowCTA(entry.isIntersecting);
-      },
-      {
-        threshold: 0.15, // 15% 들어오면 표시
-      }
-    );
-  
-    io.observe(el);
-    return () => io.disconnect();
+    const handleScroll = () => {
+      const scrollY = window.scrollY;
+      // 300px 이상 스크롤하면 표시, 미만이면 숨김
+      setShowCTA(scrollY > 300);
+    };
+
+    window.addEventListener("scroll", handleScroll);
+    // 초기 상태 확인
+    handleScroll();
+
+    return () => window.removeEventListener("scroll", handleScroll);
   }, []);  
 
   return (
