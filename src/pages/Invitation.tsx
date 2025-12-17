@@ -14,15 +14,22 @@ import { FooterSection } from "../sections/FooterSection";
 import { FloatingCTA } from "../components/FloatingCTA";
 import { Toast } from "../components/Toast";
 import { MapSelectModal } from "../components/MapSelectModal";
-import { shareOrCopyLink } from "../utils/share";
 import { GiftAccountsSection } from "../sections/GiftAccountsSection";
 import { GuestbookSection } from "../sections/GuestbookSection";
 
 import { supabase } from "../lib/supabase";
 import { BgmFloating } from "../components/BgmFloating";
 import { getBgmEnabled, initBgm, playBgm } from "../utils/bgm";
+import { buildMapLinks, openDeepLinkOrFallback } from "../utils/mapNavigation";
 
 export function Invitation() {
+  const handleNavigate = (type: "naver" | "kakao" | "tmap") => {
+    const { venueLat, venueLng, venueName } = data.ceremony;
+  
+    const { deep, web } = buildMapLinks(type, venueLat!, venueLng!, venueName);
+    openDeepLinkOrFallback(deep, web);
+  };
+
   useEffect(() => {
     if (!getBgmEnabled()) {
       console.log("[BGM] disabled by localStorage. key=bgm_enabled_v1");
@@ -85,26 +92,30 @@ export function Invitation() {
 
   const onShare = async () => {
     const url = window.location.href;
-    const title = `${data.couple.groomName} ♥ ${data.couple.brideName} 결혼식`;
-    const text = `${data.ceremony.dateText} | ${data.ceremony.venueName}`;
+    const title = document.title || "모바일 청첩장";
+    const text = "소중한 분들을 초대합니다.";
   
-    const result = await shareOrCopyLink({ title, text, url });
+    // ✅ Web Share API 지원 여부
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title,
+          text,
+          url,
+        });
+        return;
+      } catch {
+        // 사용자가 공유 취소한 경우 → 아무 처리 안 함
+        return;
+      }
+    }
   
-    if (result === "copied") setToast({ open: true, msg: "링크를 복사했습니다" });
-    if (result === "failed") setToast({ open: true, msg: "공유에 실패했습니다" });
+    // ❌ 미지원 브라우저 폴백: URL 복사
+    await navigator.clipboard.writeText(url);
+    setToast({ open: true, msg: "링크가 복사되었습니다." });
   };
 
   const onOpenMap = () => setMapSelectOpen(true);
-
-  const openMapByType = (type: "naver" | "kakao" | "tmap") => {
-    const c = data.ceremony;
-    const url =
-      type === "naver" ? c.naverMapUrl :
-      type === "kakao" ? c.kakaoMapUrl :
-      c.tmapUrl;
-
-    window.open(url, "_blank", "noreferrer");
-  };
 
   const submitRsvp = async (payload: {
     status: "attend" | "maybe" | "decline";
@@ -148,9 +159,9 @@ export function Invitation() {
       <MapSelectModal
         open={mapSelectOpen}
         onClose={() => setMapSelectOpen(false)}
-        onSelect={(type) => {
+        onNavigate={(type) => {
           setMapSelectOpen(false);
-          openMapByType(type);
+          handleNavigate(type);
         }}
       />
 
@@ -163,7 +174,7 @@ export function Invitation() {
       <GallerySection data={data} />
       <GiftAccountsSection data={data} onCopy={copyText} />
       <LocationSection data={data} onOpenMap={onOpenMap} onCopy={copyText} />
-      <RsvpSection data={data} onToast={(msg) => setToast({ open: true, msg })} onSubmit={submitRsvp} />
+      <RsvpSection onToast={(msg) => setToast({ open: true, msg })} onSubmit={submitRsvp} />
       <GuestbookSection onToast={(msg) => setToast({ open: true, msg })} />
       <FooterSection data={data} />
 

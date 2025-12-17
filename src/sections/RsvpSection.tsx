@@ -1,11 +1,8 @@
 import { useState } from "react";
-import type { WeddingConfig } from "../config/wedding";
 import { Button } from "../components/Button";
 import { Section } from "../components/Section";
-import { SectionHeader } from "../components/SectionHeader";
 
 type Props = {
-  data: WeddingConfig;
   onToast: (msg: string) => void;
   onSubmit: (payload: {
     status: "attend" | "maybe" | "decline";
@@ -18,7 +15,7 @@ type Props = {
 
 type AttendStatus = "attend" | "maybe" | "decline";
 
-export function RsvpSection({ data, onToast, onSubmit }: Props) {
+export function RsvpSection({ onToast, onSubmit }: Props) {
   const [status, setStatus] = useState<AttendStatus>("attend");
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
@@ -57,10 +54,15 @@ export function RsvpSection({ data, onToast, onSubmit }: Props) {
   return (
     <Section id="rsvp" className="px-5 py-12 border-t border-neutral-100">
       <div className="mx-auto max-w-md">
-        <SectionHeader
-          title={data.copy.rsvpTitle}
-          subtitle="참석 여부와 인원을 남겨주시면 준비에 큰 도움이 됩니다."
-        />
+      <div className="text-center mb-6">
+        <div className="text-xs tracking-wide text-neutral-400">RSVP</div>
+        <h2 className="mt-1 text-lg font-semibold text-neutral-900">
+          참석 의사 전달
+        </h2>
+        <p className="mt-2 text-sm text-neutral-500">
+          참석 여부와 인원을 남겨주시면 준비에 큰 도움이 됩니다.
+        </p>
+      </div>
 
         <div className="rounded-2xl border border-neutral-200 bg-white p-5">
           {/* 상태 선택 */}
