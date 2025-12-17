@@ -406,8 +406,8 @@ export function HeroSectionB({ data }: Props) {
   const hms = msToHMS(msLeft);
   const chipText = formatChip(msLeft, ddayDays, hms);
 
-  // const photoImg = asset("images/main_img.jpg");
-  const photoImg = asset("images/main_img2.webp");
+  const photoImg = asset("images/main_img.jpg");
+  // const photoImg = asset("images/main_img2.webp");
   const ribbonImg = asset("images/ribbon.png");
 
   return (
