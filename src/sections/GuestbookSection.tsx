@@ -1,7 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { supabase } from "../lib/supabase";
 import { Section } from "../components/Section";
-import { SectionHeader } from "../components/SectionHeader";
 import { Button } from "../components/Button";
 
 type Props = {
@@ -147,7 +146,11 @@ export function GuestbookSection({ onToast }: Props) {
   return (
     <Section id="guestbook" className="px-5 py-12 border-t border-neutral-100">
       <div className="mx-auto max-w-md">
-        <SectionHeader title="방명록" subtitle="축하 메시지를 남겨주세요." />
+        <div className="text-center mb-6">
+          <div className="text-xs tracking-wide text-neutral-400">GuestBook</div>
+          <h2 className="mt-1 text-lg font-semibold text-neutral-900">방명록</h2>
+          <p className="mt-2 text-sm text-neutral-500">축하 메시지를 남겨주세요.</p>
+        </div>  
 
         {/* 작성 */}
         <div className="rounded-2xl border border-neutral-200 bg-white p-5">
