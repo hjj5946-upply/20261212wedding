@@ -25,7 +25,7 @@ export function FloatingCTA({
             공유
           </Button>
           <Button variant="secondary" onClick={onOpenMap}>
-            지도
+            길찾기
           </Button>
         </div>
       </div>
