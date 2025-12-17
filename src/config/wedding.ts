@@ -148,8 +148,8 @@ export type AccountInfo = {
       {
         icon: "✨",
         date: "2017년 여름",
-        title: "첫 만남",
-        description: "서로의 인연이 시작된 특별한 순간",
+        title: "첫 인연",
+        description: "서로의 처음 만난 그 순간",
       },
       {
         icon: "💕",
@@ -172,8 +172,8 @@ export type AccountInfo = {
       {
         icon: "🎊",
         date: "2026.12.12",
-        title: "결혼식",
-        description: "새로운 시작을 함께 축하해주세요",
+        title: "결혼",
+        description: "새로운 이야기를 함께 그려 나아가는 날",
       },
     ],
   };

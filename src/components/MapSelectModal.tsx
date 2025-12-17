@@ -1,5 +1,7 @@
 import { Modal } from "./Modal";
 
+const BASE = import.meta.env.BASE_URL;
+
 function MapButton({
   kind,
   onClick,
@@ -16,9 +18,9 @@ function MapButton({
         aria-label="네이버 지도"
       >
         <img
-          src="/images/navermap.png"
+          src={`${BASE}images/navermap.png`}
           alt="네이버 지도"
-          className="h-5 w-auto object-contain" // 🔹 네이버 로고 조금 작게
+          className="h-5 w-auto object-contain"
         />
       </button>
     );
@@ -33,18 +35,15 @@ function MapButton({
         aria-label="카카오맵"
       >
         <img
-          src="/images/kakaomap.png"
+          src={`${BASE}images/kakaomap.png`}
           alt="카카오맵"
           className="h-6 w-auto object-contain"
         />
-        <span className="text-sm font-semibold text-black">
-          카카오맵
-        </span>
+        <span className="text-sm font-semibold text-black">카카오맵</span>
       </button>
     );
   }
 
-  // tmap
   return (
     <button
       type="button"
@@ -53,7 +52,7 @@ function MapButton({
       aria-label="티맵"
     >
       <img
-        src="/images/tmap.png"
+        src={`${BASE}images/tmap.png`}
         alt="티맵"
         className="h-6 w-auto object-contain"
       />

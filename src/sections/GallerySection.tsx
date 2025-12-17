@@ -12,7 +12,7 @@ export function GallerySection({ data }: Props) {
     const n = data.gallery?.length ?? 0;
     const count = Math.max(n, 12);
     return Array.from({ length: count }).map((_, idx) => ({
-      src: "/images/main_img2.webp",
+      src: "/images/main_img.jpg",
       alt: data.gallery?.[idx]?.alt ?? `gallery-${idx + 1}`,
     }));
   }, [data.gallery]);

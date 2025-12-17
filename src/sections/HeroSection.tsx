@@ -319,7 +319,7 @@ export function HeroSectionB({ data }: Props) {
     const flakes: Flake[] = Array.from({ length: count }).map(() => ({
       x: rand(0, cw),
       y: rand(0, ch),
-      r: rand(0.8, 3.6),
+      r: rand(0.8, 3.2), //알갱이 크기
       vy: rand(20, 55),
       vx: rand(-12, 12),
       swing: rand(18, 65),
@@ -355,8 +355,8 @@ export function HeroSectionB({ data }: Props) {
       ctx.fill();
   
       ctx.beginPath();
-      ctx.arc(f.x, f.y, f.r * 2.4, 0, Math.PI * 2);
-      ctx.fillStyle = "rgba(255,255,255,0.16)";
+      ctx.arc(f.x, f.y, f.r * 1.5, 0, Math.PI * 2);
+      ctx.fillStyle = "rgba(255,255,255,0.15)";
       ctx.fill();
     };
   

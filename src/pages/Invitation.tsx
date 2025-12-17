@@ -27,7 +27,7 @@ export function Invitation() {
     const { venueLat, venueLng, venueName } = data.ceremony;
   
     const { deep, web } = buildMapLinks(type, venueLat!, venueLng!, venueName);
-    openDeepLinkOrFallback(deep, web);
+    openDeepLinkOrFallback(type, deep, web);
   };
 
   useEffect(() => {
