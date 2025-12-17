@@ -105,7 +105,7 @@ export function GiftAccountsSection({ data, onCopy }: Props) {
   const [open, setOpen] = useState<null | "groom" | "bride">(null);
 
   return (
-    <Section className="px-5 py-12 border-t border-neutral-100">
+    <Section id="gift" className="px-5 py-12 border-t border-neutral-100">
       <div className="mx-auto max-w-md">
         <h2 className="text-lg font-semibold">{data.copy.giftTitle}</h2>
         <p className="mt-2 text-sm text-neutral-500">{data.copy.giftNotice}</p>
