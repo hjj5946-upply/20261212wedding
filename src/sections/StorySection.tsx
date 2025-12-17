@@ -29,7 +29,7 @@ function StoryPhoto({ title }: { title: string }) {
     <div className="h-full overflow-hidden rounded-2xl border border-neutral-200 bg-white shadow-sm">
       <div className="h-full w-full">
         <img
-          src="/images/main_img2.webp"
+          src="/images/main_img.jpg"
           alt={title}
           className="h-full w-full object-cover"
           loading="lazy"
