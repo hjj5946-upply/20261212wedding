@@ -7,7 +7,6 @@ type Props = { data: WeddingConfig };
 type ViewMode = "grid" | "single";
 
 export function GallerySection({ data }: Props) {
-  // ✅ 임시: 무조건 main_img2.webp 사용
   const images = useMemo(() => {
     const n = data.gallery?.length ?? 0;
     const count = Math.max(n, 12);

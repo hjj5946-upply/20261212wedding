@@ -1,28 +1,43 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 
-/**
- * 웨딩 인트로 화면 프로토타입
- *
- * 4가지 스타일:
- * - 'montage' (A): 마블 코믹스 스타일 - 사진들이 빠르게 지나가는 몽타주
- * - 'filmstrip' (B): 필름 스트립 - 세로로 내려오는 레트로 필름 감성
- * - 'game' (C): 인터랙티브 게임 - 도트 게임 스타일 잠금 해제
- * - 'gate' (D): 문/빛 입장 - 우아한 빛 효과와 입장 컨셉
- *
- * Usage:
- *  <IntroHost style="montage" onDone={() => setIntroDone(true)} />
- *  style을 "montage" | "filmstrip" | "game" | "gate" 로 바꾸면 됨!
- */
-
 export type IntroStyle = "montage" | "filmstrip" | "game" | "gate";
 
-export function IntroHost({
-  style,
-  onDone,
-}: {
-  style: IntroStyle;
-  onDone: () => void;
-}) {
+const INTRO_IMAGES = Array.from({ length: 15 }).map(
+  (_, i) => `/images/intro_${i + 1}.jpg`
+);
+
+function usePreloadImages(urls: string[]) {
+  useEffect(() => {
+    let cancelled = false;
+
+    (async () => {
+      for (const url of urls) {
+        if (cancelled) break;
+
+        const img = new Image();
+        img.decoding = "async";
+        img.loading = "eager";
+        img.src = url;
+
+        // 지원 브라우저에서 디코딩까지 미리
+        try {
+          // @ts-ignore
+          if (img.decode) await img.decode();
+        } catch {
+          // decode 실패해도 무시
+        }
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [urls]);
+}
+
+export function IntroHost({ style, onDone, }: { style: IntroStyle; onDone: () => void; }) {
+  usePreloadImages(INTRO_IMAGES);
+  
   switch (style) {
     case "montage":
       return <MontageIntro onDone={onDone} />;
@@ -39,190 +54,341 @@ export function IntroHost({
 
 /** -------------------------
  * A) 마블 코믹스 스타일 몽타주
- * 사진들이 빠르게 fade/zoom 되면서 지나가고 마지막에 문구
  * ------------------------- */
 function MontageIntro({ onDone }: { onDone: () => void }) {
-  const [phase, setPhase] = useState(0); // 0~5
+  const [currentImage, setCurrentImage] = useState(0);
+  const [showTextAndOverlay, setShowTextAndOverlay] = useState(false);
+  const [fadeOut, setFadeOut] = useState(false);
 
   useEffect(() => {
-    const timers = [
-      setTimeout(() => setPhase(1), 400),
-      setTimeout(() => setPhase(2), 1000),
-      setTimeout(() => setPhase(3), 1600),
-      setTimeout(() => setPhase(4), 2200),
-      setTimeout(() => setPhase(5), 2800),
-      setTimeout(onDone, 3600),
-    ];
-    return () => timers.forEach(clearTimeout);
+    // 이미지 무한 반복 (200ms마다)
+    const imageInterval = setInterval(() => {
+      setCurrentImage((prev) => (prev + 1) % 15);
+    }, 200);
+
+    // 15장 한바퀴 후 - 배경 + 문구 동시에!
+    const showTimer = setTimeout(() => {
+      setShowTextAndOverlay(true);
+    }, 15 * 200);
+
+    // 충분히 보인 후 fade out
+    const fadeTimer = setTimeout(() => {
+      setFadeOut(true);
+    }, 9000);
+
+    // 다음 화면으로
+    const doneTimer = setTimeout(() => {
+      onDone();
+    }, 10000);
+
+    return () => {
+      clearInterval(imageInterval);
+      clearTimeout(showTimer);
+      clearTimeout(fadeTimer);
+      clearTimeout(doneTimer);
+    };
   }, [onDone]);
 
   const images = useMemo(
     () => [
-      { id: 1, text: "Our Journey" },
-      { id: 2, text: "Together" },
-      { id: 3, text: "Forever" },
-      { id: 4, text: "In Love" },
+      { id: 1, src: "/images/intro_1.jpg" },
+      { id: 2, src: "/images/intro_2.jpg" },
+      { id: 3, src: "/images/intro_3.jpg" },
+      { id: 4, src: "/images/intro_4.jpg" },
+      { id: 5, src: "/images/intro_5.jpg" },
+      { id: 6, src: "/images/intro_6.jpg" },
+      { id: 7, src: "/images/intro_7.jpg" },
+      { id: 8, src: "/images/intro_8.jpg" },
+      { id: 9, src: "/images/intro_9.jpg" },
+      { id: 10, src: "/images/intro_10.jpg" },
+      { id: 11, src: "/images/intro_11.jpg" },
+      { id: 12, src: "/images/intro_12.jpg" },
+      { id: 13, src: "/images/intro_13.jpg" },
+      { id: 14, src: "/images/intro_14.jpg" },
+      { id: 15, src: "/images/intro_15.jpg" },
     ],
     []
   );
 
   return (
-    <div className="fixed inset-0 z-[100] bg-gradient-to-b from-black via-neutral-900 to-black">
-      {/* 몽타주 이미지들 */}
-      {images.map((img, idx) => (
-        <div
-          key={img.id}
-          className={`absolute inset-0 transition-all duration-500 ${
-            phase === idx + 1
-              ? "opacity-100 scale-100"
-              : phase > idx + 1
-              ? "opacity-0 scale-110"
-              : "opacity-0 scale-95"
-          }`}
-        >
-          <div
-            className="h-full w-full bg-cover bg-center"
-            style={{
-              backgroundImage: `linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4)), url(/images/main_img2.webp)`,
-            }}
+    <div
+      className={`fixed inset-0 z-[100] bg-black transition-opacity duration-1000 ${
+        fadeOut ? "opacity-0" : "opacity-100"
+      }`}
+    >
+      {/* 계속 전환되는 이미지 배경 */}
+      <div className="absolute inset-0 overflow-hidden">
+        {images.map((img, idx) => (
+          <img
+            key={img.id}
+            src={img.src}
+            alt=""
+            decoding="async"
+            loading="eager"
+            className={[
+              "absolute inset-0 h-full w-full object-cover object-center",
+              "transition-all duration-150 will-change-transform will-change-opacity",
+              currentImage === idx ? "opacity-100 scale-105" : "opacity-0 scale-100",
+            ].join(" ")}
           />
-          <div className="absolute inset-0 flex items-center justify-center">
-            <div className="text-center">
-              <h2 className="text-4xl font-bold text-white drop-shadow-lg">
-                {img.text}
+        ))}
+      </div>
+
+      {/* 배경 서서히 검정으로 덮음 - 3초에 걸쳐 천천히 */}
+      <div
+        className={`absolute inset-0 bg-black transition-opacity ease-in-out ${
+          showTextAndOverlay ? "opacity-100" : "opacity-0"
+        }`}
+        style={{
+          transitionDuration: '3000ms'
+        }}
+      />
+
+      {/* 문구 - 크게 시작해서 축소되며 나타남 */}
+      {showTextAndOverlay && (
+        <div className="absolute inset-0 flex items-center justify-center">
+          <div className="text-center animate-zoom-in">
+            {/* 날짜 - 이미지가 글자 안에만 보임 */}
+            <h1 
+              className="text-clip-image text-8xl font-black leading-tight"
+              style={{
+                backgroundImage: `url(${images[currentImage].src})`,
+              }}
+            >
+              2026. 12. 12
+            </h1>
+            
+            {/* Wedding Invitation */}
+            <div className="mt-8">
+              <h2 
+                className="text-clip-image text-4xl font-bold"
+                style={{
+                  backgroundImage: `url(${images[currentImage].src})`,
+                }}
+              >
+                Wedding Invitation
               </h2>
             </div>
           </div>
         </div>
-      ))}
-
-      {/* 마지막 로고/문구 */}
-      <div
-        className={`absolute inset-0 flex flex-col items-center justify-center transition-all duration-700 ${
-          phase === 5 ? "opacity-100 scale-100" : "opacity-0 scale-90"
-        }`}
-      >
-        <div className="text-center">
-          <div className="mb-4 text-6xl">💍</div>
-          <h1 className="text-3xl font-bold text-white">Wedding Invitation</h1>
-          <div className="mt-4 h-px w-32 bg-white/50" />
-          <p className="mt-4 text-lg text-white/90">
-            정준 ❤️ 송희
-          </p>
-        </div>
-      </div>
+      )}
 
       {/* 스킵 버튼 */}
       <button
         onClick={onDone}
         className="absolute bottom-8 right-8 text-sm text-white/60 underline hover:text-white/90"
       >
-        스킵
+        건너뛰기
       </button>
+
+      {/* 스타일 */}
+      <style>{`
+        /* 텍스트 안쪽으로만 이미지 보이게! */
+        .text-clip-image {
+          background-size: cover;
+          background-position: center;
+          background-clip: text;
+          -webkit-background-clip: text;
+          color: transparent;
+          -webkit-text-stroke: 2px rgba(255, 255, 255, 0.8);
+          text-stroke: 2px rgba(255, 255, 255, 0.8);
+          filter: drop-shadow(0 0 20px rgba(255, 255, 255, 0.5));
+        }
+
+        /* 크게 시작해서 축소되며 나타남 (3초) */
+        @keyframes zoom-in {
+          0% {
+            transform: scale(1.8);
+            opacity: 0;
+          }
+          100% {
+            transform: scale(1);
+            opacity: 1;
+          }
+        }
+        
+        .animate-zoom-in {
+          animation: zoom-in 3s ease-out;
+        }
+      `}</style>
     </div>
   );
 }
 
 /** -------------------------
  * B) 필름 스트립 레트로
- * 세로로 내려오는 필름 프레임, 레트로 감성
  * ------------------------- */
 function FilmStripIntro({ onDone }: { onDone: () => void }) {
-  const [progress, setProgress] = useState(0); // 0~100
-  const [stopped, setStopped] = useState(false);
+  const [scrollPosition, setScrollPosition] = useState(0);
+  const [showText1, setShowText1] = useState(false);
+  const [showText2, setShowText2] = useState(false);
+  const [showText3, setShowText3] = useState(false);
+  const [fadeOut, setFadeOut] = useState(false);
 
   useEffect(() => {
+    // 필름이 계속 내려오는 효과
     const interval = setInterval(() => {
-      setProgress((p) => {
-        if (p >= 100) {
-          setStopped(true);
-          return 100;
-        }
-        return p + 2;
-      });
+      setScrollPosition((prev) => prev + 14);
     }, 30);
-    return () => clearInterval(interval);
+
+    // 타이밍 - 총 10초
+    const timers = [
+      // 첫 번째 문구 - 나타남
+      setTimeout(() => setShowText1(true), 800),
+      // 첫 번째 문구 - 사라짐
+      setTimeout(() => setShowText1(false), 2800),
+      
+      // 두 번째 문구 - 나타남
+      setTimeout(() => setShowText2(true), 3500),
+      // 두 번째 문구 - 사라짐
+      setTimeout(() => setShowText2(false), 5500),
+      
+      // 세 번째 문구 - 나타남
+      setTimeout(() => setShowText3(true), 6500),
+      
+      // 전체 fade out
+      setTimeout(() => setFadeOut(true), 9000),
+      
+      // 다음 화면으로
+      setTimeout(onDone, 10000),
+    ];
+
+    return () => {
+      clearInterval(interval);
+      timers.forEach(clearTimeout);
+    };
+  }, [onDone]);
+
+  // 랜덤하게 섞인 프레임 배열
+  const frames = useMemo(() => {
+    const shuffledImages = [...INTRO_IMAGES];
+    for (let i = shuffledImages.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [shuffledImages[i], shuffledImages[j]] = [
+        shuffledImages[j],
+        shuffledImages[i],
+      ];
+    }
+  
+    return shuffledImages.map((src, idx) => ({
+      id: idx + 1,
+      label: String(idx + 1).padStart(2, "0"),
+      src,
+    }));
   }, []);
 
-  useEffect(() => {
-    if (stopped) {
-      const timer = setTimeout(onDone, 1200);
-      return () => clearTimeout(timer);
-    }
-  }, [stopped, onDone]);
-
-  const frames = useMemo(
-    () => [
-      { id: 1, label: "01" },
-      { id: 2, label: "02" },
-      { id: 3, label: "03" },
-      { id: 4, label: "04" },
-      { id: 5, label: "05" },
-    ],
-    []
-  );
+  // 프레임 하나의 높이
+  const FRAME_HEIGHT = 400;
+  const TOTAL_HEIGHT = frames.length * FRAME_HEIGHT;
 
   return (
-    <div className="fixed inset-0 z-[100] bg-neutral-900">
+    <div 
+      className={`fixed inset-0 z-[100] bg-neutral-900 transition-opacity duration-1000 ${
+        fadeOut ? "opacity-0" : "opacity-100"
+      }`}
+    >
       {/* 필름 스트립 */}
       <div className="relative mx-auto h-full w-full max-w-md overflow-hidden">
         {/* 필름 홀 (좌우) */}
         <div className="absolute left-0 top-0 z-10 h-full w-8 border-r-2 border-neutral-700 bg-neutral-800">
-          {Array.from({ length: 20 }).map((_, i) => (
+          {Array.from({ length: 40 }).map((_, i) => (
             <div
               key={i}
-              className="mx-auto mt-8 h-4 w-4 rounded-sm border border-neutral-600 bg-neutral-700"
+              className="mx-auto mt-8 h-4 w-4 rounded-sm border border-neutral-600 bg-neutral-300"
             />
           ))}
         </div>
         <div className="absolute right-0 top-0 z-10 h-full w-8 border-l-2 border-neutral-700 bg-neutral-800">
-          {Array.from({ length: 20 }).map((_, i) => (
+          {Array.from({ length: 40 }).map((_, i) => (
             <div
               key={i}
-              className="mx-auto mt-8 h-4 w-4 rounded-sm border border-neutral-600 bg-neutral-700"
+              className="mx-auto mt-8 h-4 w-4 rounded-sm border border-neutral-600 bg-neutral-300"
             />
           ))}
         </div>
 
-        {/* 필름 프레임들 */}
-        <div
-          className="absolute inset-x-8 transition-transform duration-100 ease-linear"
-          style={{
-            transform: `translateY(${-progress * 5}px)`,
-          }}
-        >
-          {frames.map((frame) => (
-            <div key={frame.id} className="mb-4 px-2">
-              <div className="relative overflow-hidden border-2 border-neutral-700 bg-neutral-800">
-                <img
-                  src="/images/main_img2.webp"
-                  alt={`Frame ${frame.label}`}
-                  className="aspect-[3/4] w-full object-cover opacity-90 grayscale"
-                />
-                <div className="absolute bottom-2 right-2 rounded bg-black/50 px-2 py-1 font-mono text-xs text-orange-400">
-                  {frame.label}
+        {/* 필름 프레임들 - 완전한 무한 반복 */}
+        <div className="absolute inset-x-8">
+          {Array.from({ length: 10 }).map((_, setIndex) => (
+            <div
+              key={setIndex}
+              className="transition-transform duration-100 ease-linear"
+              style={{
+                transform: `translateY(${-scrollPosition + setIndex * TOTAL_HEIGHT}px)`,
+              }}
+            >
+              {frames.map((frame) => (
+                <div key={`${setIndex}-${frame.id}`} className="mb-4 px-2">
+                  <div className="relative overflow-hidden border-2 border-neutral-700 bg-neutral-800">
+                    <img
+                      src={frame.src}
+                      alt={`Frame ${frame.label}`}
+                      className="aspect-[3/4] w-full object-cover opacity-90 grayscale"
+                    />
+                    <div className="absolute bottom-2 right-2 rounded bg-black/50 px-2 py-1 font-mono text-xs text-orange-400">
+                      {frame.label}
+                    </div>
+                  </div>
                 </div>
-              </div>
+              ))}
             </div>
           ))}
         </div>
 
-        {/* 정지된 후 문구 */}
-        {stopped && (
-          <div className="absolute inset-0 z-20 flex items-center justify-center bg-neutral-900/80 backdrop-blur-sm">
-            <div className="text-center">
-              <div className="mb-4 font-mono text-sm text-orange-400">
-                - FILM END -
-              </div>
-              <h2 className="text-2xl font-bold text-white">
-                정준 & 송희의 결혼식에
-                <br />
-                초대합니다
-              </h2>
-              <div className="mt-4 text-sm text-neutral-400">📸 Click</div>
+        {/* 배경 흐림 - 덜 흐리게 */}
+        <div
+          className={`absolute inset-0 z-15 bg-black/25 backdrop-blur-[2px] transition-opacity duration-1000 ${
+            (showText1 || showText2 || showText3) ? "opacity-100" : "opacity-0"
+          }`}
+        />
+
+        {/* 첫 번째 문구 */}
+        <div
+          className={`absolute inset-0 z-20 flex items-center justify-center transition-all duration-2000 ease-in-out ${
+            showText1
+              ? "opacity-100 translate-y-0" 
+              : "opacity-0 translate-y-8"
+          }`}
+        >
+          <div className="text-center px-8">
+            <p className="text-3xl text-white/95 leading-relaxed font-light tracking-wide drop-shadow-lg">
+              우리, 함께 걸어온 시간
+            </p>
+          </div>
+        </div>
+
+        {/* 두 번째 문구 */}
+        <div
+          className={`absolute inset-0 z-20 flex items-center justify-center transition-all duration-2000 ease-in-out ${
+            showText2
+              ? "opacity-100 translate-y-0" 
+              : "opacity-0 translate-y-8"
+          }`}
+        >
+          <div className="text-center px-8">
+            <p className="text-3xl text-white/95 leading-relaxed font-light tracking-wide drop-shadow-lg">
+              이제 하나의 길을 향해
+            </p>
+          </div>
+        </div>
+
+        {/* 세 번째 문구 */}
+        <div
+          className={`absolute inset-0 z-20 flex items-center justify-center transition-all duration-2000 ease-in-out ${
+            showText3
+              ? "opacity-100 translate-y-0" 
+              : "opacity-0 translate-y-8"
+          }`}
+        >
+          <div className="text-center px-8">
+            <p className="text-3xl text-white/95 leading-relaxed font-light tracking-wide drop-shadow-lg">
+              당신을 초대합니다
+            </p>
+            <div className="mt-8 font-serif text-xl text-white/80 tracking-wider">
+              2026. 12. 12
             </div>
           </div>
-        )}
+        </div>
       </div>
 
       {/* 레트로 노이즈 오버레이 */}
@@ -236,7 +402,7 @@ function FilmStripIntro({ onDone }: { onDone: () => void }) {
 
       <button
         onClick={onDone}
-        className="absolute bottom-8 left-1/2 -translate-x-1/2 text-sm text-white/60 underline hover:text-white/90"
+        className="absolute bottom-8 left-1/2 -translate-x-1/2 z-30 text-sm text-white/60 underline hover:text-white/90"
       >
         건너뛰기
       </button>
