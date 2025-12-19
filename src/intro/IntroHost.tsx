@@ -191,7 +191,7 @@ function FilmStripIntro({ onDone }: { onDone: () => void }) {
             transform: `translateY(${-progress * 5}px)`,
           }}
         >
-          {frames.map((frame, idx) => (
+          {frames.map((frame) => (
             <div key={frame.id} className="mb-4 px-2">
               <div className="relative overflow-hidden border-2 border-neutral-700 bg-neutral-800">
                 <img
@@ -266,9 +266,9 @@ function GameIntro({ onDone }: { onDone: () => void }) {
   }, [allTouched, onDone]);
 
   const handleTouch = (person: "groom" | "bride", e: React.MouseEvent) => {
-    const rect = e.currentTarget.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
+    // const rect = e.currentTarget.getBoundingClientRect();
+    // const x = e.clientX - rect.left;
+    // const y = e.clientY - rect.top;
 
     // 하트 생성
     setHearts((prev) => [
