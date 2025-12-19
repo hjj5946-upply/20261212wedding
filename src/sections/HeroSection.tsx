@@ -1,5 +1,5 @@
 // src/sections/HeroSection.tsx
-import React, { useEffect, useMemo, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import type { WeddingConfig } from "../config/wedding";
 import { Button } from "../components/Button";
 import { asset } from "../utils/asset";
@@ -11,47 +11,47 @@ type Props = {
   onShare: () => void;
 };
 
-function startOfDay(d: Date) {
-  const x = new Date(d);
-  x.setHours(0, 0, 0, 0);
-  return x;
-}
+// function startOfDay(d: Date) {
+//   const x = new Date(d);
+//   x.setHours(0, 0, 0, 0);
+//   return x;
+// }
 
-function msToHMS(ms: number) {
-  const total = Math.max(0, Math.floor(ms / 1000));
-  const h = Math.floor(total / 3600);
-  const m = Math.floor((total % 3600) / 60);
-  const s = total % 60;
-  return { h, m, s };
-}
+// function msToHMS(ms: number) {
+//   const total = Math.max(0, Math.floor(ms / 1000));
+//   const h = Math.floor(total / 3600);
+//   const m = Math.floor((total % 3600) / 60);
+//   const s = total % 60;
+//   return { h, m, s };
+// }
 
-function formatChip(msLeft: number, ddayDays: number, hms: { h: number; m: number; s: number }) {
-  if (msLeft <= 0) return "오늘이 그날!";
-  const within48h = msLeft > 0 && msLeft <= 48 * 60 * 60 * 1000;
-  if (!within48h) return `D-${ddayDays}`;
-  return `D-${ddayDays} · ${String(hms.h).padStart(2, "0")}:${String(hms.m).padStart(2, "0")}:${String(
-    hms.s
-  ).padStart(2, "0")}`;
-}
+// function formatChip(msLeft: number, ddayDays: number, hms: { h: number; m: number; s: number }) {
+//   if (msLeft <= 0) return "오늘이 그날!";
+//   const within48h = msLeft > 0 && msLeft <= 48 * 60 * 60 * 1000;
+//   if (!within48h) return `D-${ddayDays}`;
+//   return `D-${ddayDays} · ${String(hms.h).padStart(2, "0")}:${String(hms.m).padStart(2, "0")}:${String(
+//     hms.s
+//   ).padStart(2, "0")}`;
+// }
 
-function useDdayChip(targetISO: string) {
-  const target = useMemo(() => new Date(targetISO), [targetISO]);
-  const [now, setNow] = useState(() => new Date());
+// function useDdayChip(targetISO: string) {
+//   const target = useMemo(() => new Date(targetISO), [targetISO]);
+//   const [now, setNow] = useState(() => new Date());
 
-  useEffect(() => {
-    const t = setInterval(() => setNow(new Date()), 1000);
-    return () => clearInterval(t);
-  }, []);
+//   useEffect(() => {
+//     const t = setInterval(() => setNow(new Date()), 1000);
+//     return () => clearInterval(t);
+//   }, []);
 
-  const ddayDays = useMemo(() => {
-    const diff = startOfDay(target).getTime() - startOfDay(now).getTime();
-    return Math.ceil(diff / (1000 * 60 * 60 * 24));
-  }, [now, target]);
+//   const ddayDays = useMemo(() => {
+//     const diff = startOfDay(target).getTime() - startOfDay(now).getTime();
+//     return Math.ceil(diff / (1000 * 60 * 60 * 24));
+//   }, [now, target]);
 
-  const msLeft = target.getTime() - now.getTime();
-  const hms = msToHMS(msLeft);
-  return formatChip(msLeft, ddayDays, hms);
-}
+//   const msLeft = target.getTime() - now.getTime();
+//   const hms = msToHMS(msLeft);
+//   return formatChip(msLeft, ddayDays, hms);
+// }
 
 /**
  * 캔버스 눈 파티클 (모바일 안정화)
@@ -294,7 +294,7 @@ export function HeroSection({ data, onShare }: Props) {
 
 /** A안: 풀스크린 + 하단 패널 */
 function HeroSectionA({ data, onShare }: Props) {
-  const chipText = useDdayChip(data.ceremony.dateISO);
+  // const chipText = useDdayChip(data.ceremony.dateISO);
   const heroImg = asset("images/main_img.webp");
 
   const heroRef = useRef<HTMLElement | null>(null);
@@ -327,13 +327,13 @@ function HeroSectionA({ data, onShare }: Props) {
       <div className="absolute inset-0 bg-gradient-to-b from-black/25 via-black/10 to-black/65" />
 
       {/* 상단칩 */}
-      <div className="absolute left-0 right-0 top-0 z-10 pt-[max(env(safe-area-inset-top),16px)]">
+      {/* <div className="absolute left-0 right-0 top-0 z-10 pt-[max(env(safe-area-inset-top),16px)]">
         <div className="mx-auto flex max-w-md items-center justify-center px-5">
           <div className="rounded-full bg-white/80 px-4 py-2 backdrop-blur border border-neutral-200 shadow-sm">
             <span className="text-sm font-semibold text-neutral-900">{chipText}</span>
           </div>
         </div>
-      </div>
+      </div> */}
 
       {/* 눈 캔버스 */}
       <div className="pointer-events-none absolute inset-0 z-[5]">
@@ -398,7 +398,7 @@ function HeroSectionA({ data, onShare }: Props) {
 
 /** B안: 카드 사진 위에 눈 (모바일 안정화) */
 function HeroSectionB({ data, onShare }: Props) {
-  const chipText = useDdayChip(data.ceremony.dateISO);
+  // const chipText = useDdayChip(data.ceremony.dateISO);
 
   const cardRef = useRef<HTMLDivElement | null>(null);
   const snowRef = useRef<HTMLCanvasElement | null>(null);
@@ -461,11 +461,11 @@ function HeroSectionB({ data, onShare }: Props) {
 
         {/* 하단 */}
         <div className="mt-7">
-          <div className="flex items-center justify-center">
+          {/* <div className="flex items-center justify-center">
             <div className="rounded-full bg-white px-4 py-2 border border-neutral-200 shadow-sm">
               <span className="text-sm font-semibold text-neutral-900">{chipText}</span>
             </div>
-          </div>
+          </div> */}
 
           <div className="mt-4 text-center text-neutral-800">
             <div className="font-medium text-base">{data.ceremony.dateText}</div>
