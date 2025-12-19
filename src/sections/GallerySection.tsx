@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import type { WeddingConfig } from "../config/wedding";
 import { Section } from "../components/Section";
 import { LayoutGrid, RectangleVertical } from "lucide-react";
+import { asset } from "../utils/asset";
 
 type Props = { data: WeddingConfig };
 type ViewMode = "grid" | "single";
@@ -11,7 +12,7 @@ export function GallerySection({ data }: Props) {
     const n = data.gallery?.length ?? 0;
     const count = Math.max(n, 12);
     return Array.from({ length: count }).map((_, idx) => ({
-      src: "/images/main_img.webp",
+      src: asset("images/main_img.webp"),
       alt: data.gallery?.[idx]?.alt ?? `gallery-${idx + 1}`,
     }));
   }, [data.gallery]);

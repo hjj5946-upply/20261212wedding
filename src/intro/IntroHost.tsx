@@ -1,9 +1,10 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
+import { asset } from "../utils/asset";
 
 export type IntroStyle = "montage" | "filmstrip" | "game" | "gate";
 
 const INTRO_IMAGES = Array.from({ length: 15 }).map(
-  (_, i) => `/images/intro_${i + 1}.webp`
+  (_, i) => asset(`images/intro_${i + 1}.webp`)
 );
 
 function usePreloadImages(urls: string[]) {
@@ -94,7 +95,7 @@ function MontageIntro({ onDone }: { onDone: () => void }) {
   const images = useMemo(
     () => Array.from({ length: 15 }).map((_, i) => ({
       id: i + 1,
-      src: `/images/intro_${i + 1}.webp`,
+      src: asset(`images/intro_${i + 1}.webp`),
     })),
     []
   );
