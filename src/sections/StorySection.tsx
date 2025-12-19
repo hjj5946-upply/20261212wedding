@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { WeddingConfig } from "../config/wedding";
 import { Section } from "../components/Section";
+import { asset } from "../utils/asset";
 
 type Props = { data: WeddingConfig };
 
@@ -29,7 +30,7 @@ function StoryPhoto({ title }: { title: string }) {
     <div className="h-full overflow-hidden rounded-2xl border border-neutral-200 bg-white shadow-sm">
       <div className="h-full w-full">
         <img
-          src="/images/main_img.webp"
+          src={asset("images/main_img.webp")}
           alt={title}
           className="h-full w-full object-cover"
           loading="lazy"

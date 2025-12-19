@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import type { WeddingConfig } from "../config/wedding";
 import { Section } from "../components/Section";
+import { asset } from "../utils/asset";
 
 type Props = { data: WeddingConfig };
 
@@ -26,7 +27,7 @@ function buildInviteMessage() {
 }
 
 export function MessageSection({ data }: Props) {
-  const logoSrc = "/images/main_img.webp";
+  const logoSrc = asset("images/main_img.webp");
 
   const rootRef = useRef<HTMLDivElement | null>(null);
   const [revealed, setRevealed] = useState(false);
