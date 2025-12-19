@@ -26,7 +26,7 @@ function buildInviteMessage() {
 }
 
 export function MessageSection({ data }: Props) {
-  const logoSrc = "/images/main_img.jpg";
+  const logoSrc = "/images/main_img.webp";
 
   const rootRef = useRef<HTMLDivElement | null>(null);
   const [revealed, setRevealed] = useState(false);

@@ -295,7 +295,7 @@ export function HeroSection({ data, onShare }: Props) {
 /** A안: 풀스크린 + 하단 패널 */
 function HeroSectionA({ data, onShare }: Props) {
   const chipText = useDdayChip(data.ceremony.dateISO);
-  const heroImg = asset("images/main_img.jpg");
+  const heroImg = asset("images/main_img.webp");
 
   const heroRef = useRef<HTMLElement | null>(null);
   const snowRef = useRef<HTMLCanvasElement | null>(null);
@@ -417,7 +417,7 @@ function HeroSectionB({ data, onShare }: Props) {
     windMul: 1.0,
   });
 
-  const photoImg = asset("images/main_img.jpg");
+  const photoImg = asset("images/main_img.webp");
   const ribbonImg = asset("images/ribbon.png");
 
   return (

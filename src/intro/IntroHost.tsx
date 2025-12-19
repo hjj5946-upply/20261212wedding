@@ -3,7 +3,7 @@ import React, { useEffect, useMemo, useRef, useState } from "react";
 export type IntroStyle = "montage" | "filmstrip" | "game" | "gate";
 
 const INTRO_IMAGES = Array.from({ length: 15 }).map(
-  (_, i) => `/images/intro_${i + 1}.jpg`
+  (_, i) => `/images/intro_${i + 1}.webp`
 );
 
 function usePreloadImages(urls: string[]) {
@@ -61,10 +61,12 @@ function MontageIntro({ onDone }: { onDone: () => void }) {
   const [fadeOut, setFadeOut] = useState(false);
 
   useEffect(() => {
-    // 이미지 무한 반복 (200ms마다)
+    const isMobile = window.matchMedia("(max-width: 768px)").matches;
+
+    // 이미지 무한 반복
     const imageInterval = setInterval(() => {
       setCurrentImage((prev) => (prev + 1) % 15);
-    }, 200);
+    }, isMobile ? 200 : 200);
 
     // 15장 한바퀴 후 - 배경 + 문구 동시에!
     const showTimer = setTimeout(() => {
@@ -74,12 +76,12 @@ function MontageIntro({ onDone }: { onDone: () => void }) {
     // 충분히 보인 후 fade out
     const fadeTimer = setTimeout(() => {
       setFadeOut(true);
-    }, 9000);
+    }, 8000);
 
     // 다음 화면으로
     const doneTimer = setTimeout(() => {
       onDone();
-    }, 10000);
+    }, 9000);
 
     return () => {
       clearInterval(imageInterval);
@@ -90,23 +92,10 @@ function MontageIntro({ onDone }: { onDone: () => void }) {
   }, [onDone]);
 
   const images = useMemo(
-    () => [
-      { id: 1, src: "/images/intro_1.jpg" },
-      { id: 2, src: "/images/intro_2.jpg" },
-      { id: 3, src: "/images/intro_3.jpg" },
-      { id: 4, src: "/images/intro_4.jpg" },
-      { id: 5, src: "/images/intro_5.jpg" },
-      { id: 6, src: "/images/intro_6.jpg" },
-      { id: 7, src: "/images/intro_7.jpg" },
-      { id: 8, src: "/images/intro_8.jpg" },
-      { id: 9, src: "/images/intro_9.jpg" },
-      { id: 10, src: "/images/intro_10.jpg" },
-      { id: 11, src: "/images/intro_11.jpg" },
-      { id: 12, src: "/images/intro_12.jpg" },
-      { id: 13, src: "/images/intro_13.jpg" },
-      { id: 14, src: "/images/intro_14.jpg" },
-      { id: 15, src: "/images/intro_15.jpg" },
-    ],
+    () => Array.from({ length: 15 }).map((_, i) => ({
+      id: i + 1,
+      src: `/images/intro_${i + 1}.webp`,
+    })),
     []
   );
 
@@ -227,9 +216,11 @@ function FilmStripIntro({ onDone }: { onDone: () => void }) {
 
   useEffect(() => {
     // 필름이 계속 내려오는 효과
+    const isMobile = window.matchMedia("(max-width: 768px)").matches;
+
     const interval = setInterval(() => {
-      setScrollPosition((prev) => prev + 14);
-    }, 30);
+      setScrollPosition((prev) => prev + (isMobile ? 12 : 14));
+    }, isMobile ? 35 : 30);
 
     // 타이밍 - 총 10초
     const timers = [
@@ -309,7 +300,7 @@ function FilmStripIntro({ onDone }: { onDone: () => void }) {
 
         {/* 필름 프레임들 - 완전한 무한 반복 */}
         <div className="absolute inset-x-8">
-          {Array.from({ length: 10 }).map((_, setIndex) => (
+          {Array.from({ length: 3 }).map((_, setIndex) => (
             <div
               key={setIndex}
               className="transition-transform duration-100 ease-linear"
