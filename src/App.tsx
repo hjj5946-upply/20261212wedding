@@ -1,13 +1,30 @@
 import { useMemo, useState, useEffect } from "react";
 import { Invitation } from "./pages/Invitation";
-import { IntroHost } from "./intro/IntroHost";
+import { IntroHost, IntroStyle } from "./intro/IntroHost";
 
-function getIntroOption(): 1 | 2 | 3 {
+/**
+ * 인트로 스타일 선택
+ *
+ * URL 파라미터로 테스트:
+ * - ?intro=montage   (A안: 마블 코믹스 스타일 몽타주)
+ * - ?intro=filmstrip (B안: 필름 스트립 레트로)
+ * - ?intro=game      (C안: 인터랙티브 게임)
+ * - ?intro=gate      (D안: 문/빛 입장) ← 기본값
+ *
+ * 또는 아래 DEFAULT_INTRO_STYLE 변수를 직접 수정하세요
+ */
+const DEFAULT_INTRO_STYLE: IntroStyle = "gate"; // 👈 여기서 기본 스타일 변경!
+
+function getIntroStyle(): IntroStyle {
   const params = new URLSearchParams(window.location.search);
   const v = params.get("intro");
-  if (v === "2") return 2;
-  if (v === "3") return 3;
-  return 3;
+
+  // URL 파라미터 확인
+  if (v === "montage" || v === "filmstrip" || v === "game" || v === "gate") {
+    return v;
+  }
+
+  return DEFAULT_INTRO_STYLE;
 }
 
 function isNoIntro(): boolean {
@@ -42,7 +59,7 @@ export default function App() {
   useBlockContextMenu(true);
   usePreventPinchZoom(true);
 
-  const option = useMemo(() => getIntroOption(), []);
+  const introStyle = useMemo(() => getIntroStyle(), []);
   const [introDone, setIntroDone] = useState(false);
 
   if (isNoIntro()) {
@@ -52,7 +69,7 @@ export default function App() {
   return (
     <>
       {!introDone && (
-        <IntroHost option={option} onDone={() => setIntroDone(true)} />
+        <IntroHost style={introStyle} onDone={() => setIntroDone(true)} />
       )}
       {introDone && <Invitation />}
     </>
