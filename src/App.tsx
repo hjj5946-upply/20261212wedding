@@ -1,6 +1,6 @@
 import { useMemo, useState, useEffect } from "react";
 import { Invitation } from "./pages/Invitation";
-import { IntroHost, IntroStyle } from "./intro/IntroHost";
+import { IntroHost, type IntroStyle } from "./intro/IntroHost";
 
 /**
  * 인트로 스타일 선택
@@ -13,7 +13,7 @@ import { IntroHost, IntroStyle } from "./intro/IntroHost";
  *
  * 또는 아래 DEFAULT_INTRO_STYLE 변수를 직접 수정하세요
  */
-const DEFAULT_INTRO_STYLE: IntroStyle = "gate"; // 👈 여기서 기본 스타일 변경!
+const DEFAULT_INTRO_STYLE: IntroStyle = "montage"; // 👈 여기서 기본 스타일 변경!
 
 function getIntroStyle(): IntroStyle {
   const params = new URLSearchParams(window.location.search);
