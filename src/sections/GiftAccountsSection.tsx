@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import type { WeddingConfig, AccountInfo } from "../config/wedding";
 import { Section } from "../components/Section";
 import { Button } from "../components/Button";
+import { asset } from "../utils/asset";
 
 type Props = {
   data: WeddingConfig;
@@ -84,8 +85,9 @@ function AccountList({
                   window.open(url, "_blank", "noreferrer");
                 }}
               >
+                
                 <img
-                  src="/images/kakao_pay.png"
+                  src={asset("images/kakao_pay.webp")}
                   alt="카카오페이"
                   className="h-6 w-auto"
                 />
