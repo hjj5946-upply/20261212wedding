@@ -63,35 +63,57 @@ function MontageIntro({ onDone }: { onDone: () => void }) {
 
   useEffect(() => {
     const isMobile = window.matchMedia("(max-width: 768px)").matches;
-
-    // 이미지 무한 반복
-    const imageInterval = setInterval(() => {
-      setCurrentImage((prev) => (prev + 1) % 15);
-    }, isMobile ? 200 : 200);
-
-    // 15장 한바퀴 후 - 배경 + 문구 동시에!
-    const showTimer = setTimeout(() => {
+  
+    const totalImages = 15;
+  
+    const BASE_MS = isMobile ? 180 : 180; // 초반 속도
+    const FAST_MS = isMobile ? 100 : 90;   // 가속 속도
+  
+    // ✅ 문구/배경이 "몇 ms 뒤"에 등장할지 (여기만 조절)
+    const SHOW_AT = 1800; // 1.8
+  
+    // ✅ 문구/배경 뜬 "살짝 직후"부터 계속 빠르게 (여기만 조절)
+    const FAST_AFTER = 950;               // 0.7초 뒤부터 가속
+    const FAST_START_AT = SHOW_AT + FAST_AFTER;
+  
+    const FADE_AT = 6500;
+    const DONE_AT = 7500;
+  
+    const startedAt = performance.now();
+    let cancelled = false;
+    let timer: number | null = null;
+  
+    const tick = () => {
+      if (cancelled) return;
+  
+      const elapsed = performance.now() - startedAt;
+  
+      // ✅ 가속은 "FAST_START_AT 이후부터 계속"
+      const ms = elapsed >= FAST_START_AT ? FAST_MS : BASE_MS;
+  
+      setCurrentImage((prev) => (prev + 1) % totalImages);
+      timer = window.setTimeout(tick, ms);
+    };
+  
+    tick();
+  
+    // ✅ 문구/배경도 장수 기준 말고 시간으로
+    const showTimer = window.setTimeout(() => {
       setShowTextAndOverlay(true);
-    }, 15 * 200);
-
-    // 충분히 보인 후 fade out
-    const fadeTimer = setTimeout(() => {
-      setFadeOut(true);
-    }, 8000);
-
-    // 다음 화면으로
-    const doneTimer = setTimeout(() => {
-      onDone();
-    }, 9000);
-
+    }, SHOW_AT);
+  
+    const fadeTimer = window.setTimeout(() => setFadeOut(true), FADE_AT);
+    const doneTimer = window.setTimeout(() => onDone(), DONE_AT);
+  
     return () => {
-      clearInterval(imageInterval);
-      clearTimeout(showTimer);
-      clearTimeout(fadeTimer);
-      clearTimeout(doneTimer);
+      cancelled = true;
+      if (timer) window.clearTimeout(timer);
+      window.clearTimeout(showTimer);
+      window.clearTimeout(fadeTimer);
+      window.clearTimeout(doneTimer);
     };
   }, [onDone]);
-
+  
   const images = useMemo(
     () => Array.from({ length: 15 }).map((_, i) => ({
       id: i + 1,
@@ -130,7 +152,7 @@ function MontageIntro({ onDone }: { onDone: () => void }) {
           showTextAndOverlay ? "opacity-100" : "opacity-0"
         }`}
         style={{
-          transitionDuration: '3000ms'
+          transitionDuration: '2700ms'
         }}
       />
 
@@ -138,27 +160,35 @@ function MontageIntro({ onDone }: { onDone: () => void }) {
       {showTextAndOverlay && (
         <div className="absolute inset-0 flex items-center justify-center">
           <div className="text-center animate-zoom-in">
-            {/* 날짜 - 이미지가 글자 안에만 보임 */}
-            <h1 
-              className="text-clip-image text-8xl font-black leading-tight"
+            <h1
+              className="text-clip-image font-black leading-none"
               style={{
+                fontSize: "96px",
                 backgroundImage: `url(${images[currentImage].src})`,
               }}
             >
-              2026. 12. 12
+              2026
             </h1>
-            
-            {/* Wedding Invitation */}
-            <div className="mt-8">
-              <h2 
-                className="text-clip-image text-4xl font-bold"
-                style={{
-                  backgroundImage: `url(${images[currentImage].src})`,
-                }}
-              >
-                Wedding Invitation
-              </h2>
-            </div>
+            <h2
+              className="text-clip-image font-black leading-none mt-1"
+              style={{
+                fontSize: "96px",
+                backgroundImage: `url(${images[currentImage].src})`,
+              }}
+            >
+              12&nbsp;&nbsp;12
+            </h2>
+            <div className="mt-10" />
+            <p
+              className="text-clip-image font-semibold tracking-[0.2em] leading-tight"
+              style={{
+                fontSize: "36px",
+                backgroundImage: `url(${images[currentImage].src})`,
+              }}
+            >
+              Wedding<br />
+              Invitation
+            </p>
           </div>
         </div>
       )}
@@ -226,17 +256,17 @@ function FilmStripIntro({ onDone }: { onDone: () => void }) {
     // 타이밍 - 총 10초
     const timers = [
       // 첫 번째 문구 - 나타남
-      setTimeout(() => setShowText1(true), 800),
+      setTimeout(() => setShowText1(true), 700),
       // 첫 번째 문구 - 사라짐
-      setTimeout(() => setShowText1(false), 2800),
+      setTimeout(() => setShowText1(false), 2700),
       
       // 두 번째 문구 - 나타남
-      setTimeout(() => setShowText2(true), 3500),
+      setTimeout(() => setShowText2(true), 3600),
       // 두 번째 문구 - 사라짐
-      setTimeout(() => setShowText2(false), 5500),
+      setTimeout(() => setShowText2(false), 5600),
       
       // 세 번째 문구 - 나타남
-      setTimeout(() => setShowText3(true), 6500),
+      setTimeout(() => setShowText3(true), 6700),
       
       // 전체 fade out
       setTimeout(() => setFadeOut(true), 9000),
@@ -272,6 +302,25 @@ function FilmStripIntro({ onDone }: { onDone: () => void }) {
   // 프레임 하나의 높이
   const FRAME_HEIGHT = 400;
   const TOTAL_HEIGHT = frames.length * FRAME_HEIGHT;
+
+  const copyWrapClass = "mx-auto w-full max-w-[22rem] px-7 text-center";
+
+  const copyTextClass =
+    [
+      "font-noto-serif",
+      "text-white/95 drop-shadow-lg",
+      "font-[350] tracking-[-0.01em]",
+      "leading-[1.6]",
+      // 반응형 크기(모바일 기준 안정)
+      "text-[19px] sm:text-[21px]",
+    ].join(" ");
+
+  const copyEnterClass = (show: boolean) =>
+    [
+      "absolute inset-0 z-20 flex items-center justify-center",
+      "transition-all duration-[1800ms] ease-out",
+      show ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6",
+    ].join(" ");
 
   return (
     <div 
@@ -317,9 +366,6 @@ function FilmStripIntro({ onDone }: { onDone: () => void }) {
                       alt={`Frame ${frame.label}`}
                       className="aspect-[3/4] w-full object-cover opacity-90 grayscale"
                     />
-                    <div className="absolute bottom-2 right-2 rounded bg-black/50 px-2 py-1 font-mono text-xs text-orange-400">
-                      {frame.label}
-                    </div>
                   </div>
                 </div>
               ))}
@@ -335,48 +381,34 @@ function FilmStripIntro({ onDone }: { onDone: () => void }) {
         />
 
         {/* 첫 번째 문구 */}
-        <div
-          className={`absolute inset-0 z-20 flex items-center justify-center transition-all duration-2000 ease-in-out ${
-            showText1
-              ? "opacity-100 translate-y-0" 
-              : "opacity-0 translate-y-8"
-          }`}
-        >
-          <div className="text-center px-8">
-            <p className="text-3xl text-white/95 leading-relaxed font-light tracking-wide drop-shadow-lg">
-              우리, 함께 걸어온 시간
+        <div className={copyEnterClass(showText1)}>
+          <div className={copyWrapClass}>
+            <p className={copyTextClass}>
+              좋은 날, 가장 먼저<br/>
+              떠오른 분들이 있습니다
             </p>
           </div>
         </div>
 
         {/* 두 번째 문구 */}
-        <div
-          className={`absolute inset-0 z-20 flex items-center justify-center transition-all duration-2000 ease-in-out ${
-            showText2
-              ? "opacity-100 translate-y-0" 
-              : "opacity-0 translate-y-8"
-          }`}
-        >
-          <div className="text-center px-8">
-            <p className="text-3xl text-white/95 leading-relaxed font-light tracking-wide drop-shadow-lg">
-              이제 하나의 길을 향해
+        <div className={copyEnterClass(showText2)}>
+          <div className={copyWrapClass}>
+            <p className={copyTextClass}>
+              저희의 시작을 완성해 줄<br/>
+              소중한 한 사람
             </p>
           </div>
         </div>
 
         {/* 세 번째 문구 */}
-        <div
-          className={`absolute inset-0 z-20 flex items-center justify-center transition-all duration-2000 ease-in-out ${
-            showText3
-              ? "opacity-100 translate-y-0" 
-              : "opacity-0 translate-y-8"
-          }`}
-        >
-          <div className="text-center px-8">
-            <p className="text-3xl text-white/95 leading-relaxed font-light tracking-wide drop-shadow-lg">
-              당신을 초대합니다
+        <div className={copyEnterClass(showText3)}>
+          <div className={copyWrapClass}>
+            <p className={copyTextClass}>
+              그 소중한 당신과 함께<br/>
+              이 기쁨을 나누고 싶습니다.
             </p>
-            <div className="mt-8 font-serif text-xl text-white/80 tracking-wider">
+
+            <div className="mt-7 font-noto-serif text-[24px] sm:text-[30px] text-white/80 tracking-[0.18em]">
               2026. 12. 12
             </div>
           </div>
