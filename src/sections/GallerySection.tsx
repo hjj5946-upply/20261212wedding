@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { WeddingConfig } from "../config/wedding";
 import { Section } from "../components/Section";
+import { SectionTitle } from "../components/SectionTitle";
 import { LayoutGrid, RectangleVertical } from "lucide-react";
 import { asset } from "../utils/asset";
 
@@ -96,14 +97,7 @@ export function GallerySection({ data }: Props) {
   return (
     <Section id="gallery" className="px-5 py-12 border-t border-neutral-100 bg-white">
       <div className="mx-auto max-w-3xl">
-        {/* 중앙 제목 */}
-        <div className="text-center">
-          <div className="text-[13px] font-semibold tracking-[0.22em] text-neutral-800">
-            Gallery
-          </div>
-          <div className="mt-2 text-sm font-semibold text-neutral-600">갤러리</div>
-          <div className="mx-auto mt-4 h-px w-12 bg-wedding-gold-200" />
-        </div>
+        <SectionTitle english="GALLERY" korean="갤러리" />
 
         {/* 보기 방식 선택(아이콘만) */}
         <div className="mt-6 flex justify-center">
