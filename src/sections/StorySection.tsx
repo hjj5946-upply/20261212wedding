@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { WeddingConfig } from "../config/wedding";
 import { Section } from "../components/Section";
+import { SectionTitle } from "../components/SectionTitle";
 import { asset } from "../utils/asset";
 
 type Props = { data: WeddingConfig };
@@ -123,16 +124,7 @@ export function StorySection({ data }: Props) {
   return (
     <Section id="story" className="px-5 py-12 border-t border-neutral-100 bg-white">
       <div ref={ref} className="mx-auto max-w-5xl">
-        {/* 중앙 제목 */}
-        <div className="text-center">
-          <div className="text-[13px] font-semibold tracking-[0.22em] text-neutral-800">
-            Our Story
-          </div>
-          <div className="mt-2 text-sm font-semibold text-neutral-600">
-            우리의 이야기
-          </div>
-          <div className="mx-auto mt-4 h-px w-12 bg-wedding-gold-200" />
-        </div>
+        <SectionTitle english="OUR STORY" korean="우리의 이야기" />
 
         {/* 타임라인 */}
         <div className="relative mt-10">

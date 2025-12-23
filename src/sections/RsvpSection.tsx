@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Button } from "../components/Button";
 import { Section } from "../components/Section";
+import { SectionTitle } from "../components/SectionTitle";
 
 type Props = {
   onToast: (msg: string) => void;
@@ -54,17 +55,12 @@ export function RsvpSection({ onToast, onSubmit }: Props) {
   return (
     <Section id="rsvp" className="px-5 py-12 border-t border-neutral-100">
       <div className="mx-auto max-w-md">
-      <div className="text-center mb-6">
-        <div className="text-xs tracking-wide text-neutral-400">RSVP</div>
-        <h2 className="mt-1 text-lg font-semibold text-neutral-900">
-          참석 의사 전달
-        </h2>
-        <p className="mt-2 text-sm text-neutral-500">
+        <SectionTitle english="RSVP" korean="참석 의사 전달" />
+        <p className="mt-6 text-center text-sm text-neutral-500">
           참석 여부와 인원을 남겨주시면 준비에 큰 도움이 됩니다.
         </p>
-      </div>
 
-        <div className="rounded-2xl border border-neutral-200 bg-white p-5">
+        <div className="mt-6 rounded-2xl border border-neutral-200 bg-white p-5">
           {/* 상태 선택 */}
           <div className="grid grid-cols-3 gap-2">
             <ToggleChip
