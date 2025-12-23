@@ -138,7 +138,7 @@ export function InfoSection({ data }: Props) {
         <div
           className={[
             "absolute inset-0 flex items-center justify-center pointer-events-none",
-            "bg-emerald-200",
+            "bg-[#86cf70]",
             "transition-opacity duration-700 ease-out", // ✅ 효과 끝나면 바로 스르르 사라짐
             step === 1 ? "opacity-100" : "opacity-0",
           ].join(" ")}
@@ -222,7 +222,7 @@ export function InfoSection({ data }: Props) {
                       </span>
 
                       {/* 결혼 날짜 링 */}
-                      {isHit && <span className="absolute h-8 w-8 rounded-full border border-emerald-400/60" />}
+                      {isHit && <span className="absolute h-8 w-8 rounded-full border border-[#2fa833]/90" />}
                     </div>
                   );
                 })}

@@ -22,6 +22,7 @@ export type AccountInfo = {
     date: string;
     title: string;
     description: string;
+    image?: string;
   };
 
   export type CoupleInfo = {
@@ -148,30 +149,35 @@ export type AccountInfo = {
         date: "2017년 여름",
         title: "첫 인연",
         description: "서로의 처음 만난 그 순간",
+        image: "images/piano.webp",
       },
       {
         icon: "💕",
         date: "2018년 여름",
         title: "설레는 시작",
         description: "서로에게 특별한 사람이 되어가는 순간",
+        image: "images/piano.webp",
       },
       {
         icon: "🌸",
         date: "2018년 ~ 2024년",
         title: "함께한 날들",
         description: "웃음과 행복이 가득했던 우리의 이야기",
+        image: "images/piano.webp",
       },
       {
         icon: "💍",
         date: "2025년",
         title: "프러포즈",
         description: "평생을 함께하기로 약속한 날",
+        image: "images/piano.webp",
       },
       {
         icon: "🎊",
         date: "2026.12.12",
         title: "결혼",
         description: "새로운 이야기를 함께 그려 나아가는 날",
+        image: "images/piano.webp",
       },
     ],
   };

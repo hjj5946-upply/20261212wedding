@@ -1,22 +1,22 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import type { WeddingConfig } from "../config/wedding";
+// import type { WeddingConfig } from "../config/wedding";
 import { Section } from "../components/Section";
 import { SectionTitle } from "../components/SectionTitle";
 import { LayoutGrid, RectangleVertical } from "lucide-react";
 import { asset } from "../utils/asset";
 
-type Props = { data: WeddingConfig };
+// type Props = { data: WeddingConfig };
 type ViewMode = "grid" | "single";
 
-export function GallerySection({ data }: Props) {
+export function GallerySection() {
   const images = useMemo(() => {
-    const n = data.gallery?.length ?? 0;
-    const count = Math.max(n, 12);
-    return Array.from({ length: count }).map((_, idx) => ({
-      src: asset("images/main_img.webp"),
-      alt: data.gallery?.[idx]?.alt ?? `gallery-${idx + 1}`,
+    const imageCount = 21;
+    
+    return Array.from({ length: imageCount }, (_, idx) => ({
+      src: asset(`images/intro_${idx + 1}.webp`),
+      alt: `gallery-${idx + 1}`,
     }));
-  }, [data.gallery]);
+  }, []);
 
   const [mode, setMode] = useState<ViewMode>("grid");
 
@@ -107,7 +107,7 @@ export function GallerySection({ data }: Props) {
               label="바둑판 보기"
               onClick={() => setMode("grid")}
             >
-              <LayoutGrid size={20} />
+              <LayoutGrid size={21} />
             </IconTab>
 
             <IconTab
@@ -115,7 +115,7 @@ export function GallerySection({ data }: Props) {
               label="통으로 보기"
               onClick={() => setMode("single")}
             >
-              <RectangleVertical size={20} />
+              <RectangleVertical size={21} />
             </IconTab>
           </div>
         </div>

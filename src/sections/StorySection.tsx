@@ -26,15 +26,16 @@ function useInView<T extends HTMLElement>(
   return { ref, inView };
 }
 
-function StoryPhoto({ title }: { title: string }) {
+function StoryPhoto({ title, src }: { title: string; src: string }) {
   return (
     <div className="h-full overflow-hidden rounded-2xl border border-neutral-200 bg-white shadow-sm">
       <div className="h-full w-full">
         <img
-          src={asset("images/main_img.webp")}
+          src={asset(src)}
           alt={title}
           className="h-full w-full object-cover"
           loading="lazy"
+          draggable={false}
         />
       </div>
     </div>
@@ -105,7 +106,7 @@ export function StorySection({ data }: Props) {
     }
 
     setVisibleCount(0);
-    const stepMs = 600; // 연혁 간 시간 간격(원하면 더 키워도 됨)
+    const stepMs = 800; // 연혁 간 시간 간격(원하면 더 키워도 됨)
     let i = 0;
 
     const t = window.setInterval(() => {
@@ -156,9 +157,9 @@ export function StorySection({ data }: Props) {
                     {/* LEFT */}
                     <div className={`${rowHeight}`}>
                       {photoOnLeft ? (
-                        // ✅ 이미지 정사각형 + 작게(높이 고정이므로 정사각형 느낌 유지)
                         <div className="h-full w-full">
-                          <StoryPhoto title={item.title} />
+                          {/* ✅ item.image가 있으면 사용하고, 없으면 기본값인 piano.webp 사용 */}
+                          <StoryPhoto title={item.title} src={item.image || "images/piano.webp"} />
                         </div>
                       ) : (
                         <div className="h-full w-full flex">
@@ -188,7 +189,8 @@ export function StorySection({ data }: Props) {
                         </div>
                       ) : (
                         <div className="h-full w-full">
-                          <StoryPhoto title={item.title} />
+                          {/* ✅ 여기도 마찬가지로 item.image 전달 */}
+                          <StoryPhoto title={item.title} src={item.image || "images/piano.webp"} />
                         </div>
                       )}
                     </div>
