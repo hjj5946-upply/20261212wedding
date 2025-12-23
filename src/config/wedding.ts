@@ -99,23 +99,21 @@ export type AccountInfo = {
     },
 
     groomInfo: {
-      name: "준",
+      name: "홍정준",
       role: "신랑",
       mbti: "ISTJ",
-      hobby: "카메라, 여행",
-      favorite: "여행, 게임",
-      introduction: "언제나 긍정적이고 밝은 에너지를 가진 사람입니다.",
+      hobby: "여행, 게임",
+      introduction: "속은 따듯하고 언제나 긍정적인 사람입니다.",
     },
 
     brideInfo: {
-      name: "쏭",
+      name: "신송희",
       role: "신부",
       mbti: "ISFJ",
-      hobby: "독서, 베이킹",
-      favorite: "여행, 음악 감상, 게임",
+      hobby: "여행, 게임",
       introduction: "따뜻하고 세심한 마음을 가진 사람입니다.",
     },
-  
+    
     ceremony: {
       dateText: "2026.12.12 (토) 오후 1시 20분",
       dateISO: "2026-12-12T13:20:00+09:00",
