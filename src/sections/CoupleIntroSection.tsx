@@ -1,5 +1,6 @@
 import type { WeddingConfig, CoupleInfo } from "../config/wedding";
 import { Section } from "../components/Section";
+import { SectionTitle } from "../components/SectionTitle";
 
 type Props = { data: WeddingConfig };
 
@@ -82,17 +83,7 @@ export function CoupleIntroSection({ data }: Props) {
       className="px-5 py-12 border-t border-neutral-100 bg-neutral-100"
     >
       <div className="mx-auto max-w-3xl">
-        {/* 중앙 제목 */}
-        <div className="text-center">
-          {/* <img src="/about-us-logo.svg" alt="ABOUT US" className="mx-auto h-8" /> */}
-          <div className="text-[13px] font-semibold tracking-[0.22em] text-neutral-800">
-            ABOUT US
-          </div>
-          <div className="mt-2 text-sm font-semibold text-neutral-600">
-            저희를 소개합니다
-          </div>
-          <div className="mx-auto mt-4 h-px w-12 bg-wedding-gold-200" />
-        </div>
+        <SectionTitle english="ABOUT US" korean="저희를 소개합니다" />
 
         <div className="mt-6 grid grid-cols-2 gap-3 md:gap-4 items-stretch">
           {data.groomInfo ? (
