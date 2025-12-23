@@ -2,8 +2,7 @@ import { useEffect, useMemo, useRef } from "react";
 import type { WeddingConfig } from "../config/wedding";
 import { Button } from "../components/Button";
 import { Section } from "../components/Section";
-// import { SectionHeader } from "../components/SectionHeader";
-// import { asset } from "../utils/asset";
+import { SectionTitle } from "../components/SectionTitle";
 
 type Props = {
   data: WeddingConfig;
@@ -136,11 +135,7 @@ export function LocationSection({ data, onOpenMap, onCopy }: Props) {
   return (
     <Section id="location" className="px-5 py-12 border-t border-neutral-100">
       <div className="mx-auto max-w-md">
-        {/* 헤더: Location + 오시는 길 (중앙) */}
-        <div className="text-center">
-          <div className="text-xs tracking-wide text-neutral-400">Location</div>
-          <h2 className="mt-1 text-lg font-semibold text-neutral-900">오시는 길</h2>
-        </div>
+        <SectionTitle english="LOCATION" korean="오시는 길" />
 
         {/* 기존 약도 이미지: 주석 처리 */}
         {/*
