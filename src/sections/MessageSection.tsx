@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import type { WeddingConfig } from "../config/wedding";
 import { Section } from "../components/Section";
-import { asset } from "../utils/asset";
+// import { asset } from "../utils/asset";
 
 type Props = { data: WeddingConfig };
 
@@ -27,7 +27,7 @@ function buildInviteMessage() {
 }
 
 export function MessageSection({ data }: Props) {
-  const logoSrc = asset("images/main_img.webp");
+  // const logoSrc = asset("images/main_img.webp");
 
   const rootRef = useRef<HTMLDivElement | null>(null);
   const [revealed, setRevealed] = useState(false);
@@ -49,12 +49,44 @@ export function MessageSection({ data }: Props) {
     io.observe(el);
     return () => io.disconnect();
   }, []);
+  
+  const WeddingDivider = () => (
+    <div className="flex items-center justify-center w-full my-10 px-4">
+      {/* 왼쪽 선 */}
+      <div className="flex-1 h-[0.5px] bg-gradient-to-r from-transparent to-neutral-300"></div>
+      
+      {/* 나뭇잎 문양 */}
+      <div className="mx-4 flex items-center justify-center">
+        <svg width="42" height="24" viewBox="0 0 42 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          {/* 왼쪽 잎 */}
+          <path 
+            d="M21 20C21 20 15 18 13 12C11 6 15 2 15 2C15 2 21 6 21 12" 
+            stroke="#8A9A5B" /* 올리브 그린 */
+            strokeWidth="1" 
+            strokeLinecap="round"
+          />
+          {/* 오른쪽 잎 */}
+          <path 
+            d="M21 20C21 20 27 18 29 12C31 6 27 2 27 2C27 2 21 6 21 12" 
+            stroke="#A5B284" /* 약간 더 밝은 그린 */
+            strokeWidth="1" 
+            strokeLinecap="round"
+          />
+          {/* 중앙 줄기 점 */}
+          <circle cx="21" cy="21" r="1" fill="#86cf70" />
+        </svg>
+      </div>
+  
+      {/* 오른쪽 선 */}
+      <div className="flex-1 h-[0.5px] bg-gradient-to-l from-transparent to-neutral-300"></div>
+    </div>
+  );
 
   return (
     <Section id="message" className="px-5 py-16">
       <div ref={rootRef} className="mx-auto max-w-md text-center">
         {/* 로고 */}
-        <div
+        {/* <div
           className={[
             "mx-auto flex justify-center",
             "transition-all duration-700 ease-out",
@@ -68,6 +100,10 @@ export function MessageSection({ data }: Props) {
             loading="lazy"
             draggable={false}
           />
+        </div> */}
+
+        <div className={["transition-all duration-1000 ease-out", revealed ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"].join(" ")}>
+          <WeddingDivider />
         </div>
 
         {/* 짧은 명언 */}

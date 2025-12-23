@@ -177,7 +177,7 @@ export function Invitation() {
         <InfoSection data={data} />
         <CoupleIntroSection data={data} />
         <StorySection data={data} />
-        <GallerySection data={data} />
+        <GallerySection />
         <GiftAccountsSection data={data} onCopy={copyText} />
         <LocationSection data={data} onOpenMap={onOpenMap} onCopy={copyText} />
         <RsvpSection
