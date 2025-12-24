@@ -72,7 +72,7 @@ function StoryContent({
 
         <div className="mt-4 h-px w-full bg-neutral-100" />
         <div
-          className={`mt-3 h-px w-10 bg-wedding-gold-200 ${
+          className={`mt-3 h-px w-10 bg-wedding-green-200 ${
             align === "right" ? "ml-auto" : ""
           }`}
         />

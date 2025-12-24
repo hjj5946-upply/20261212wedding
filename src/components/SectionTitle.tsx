@@ -10,7 +10,7 @@ export function SectionTitle({ english, korean }: Props) {
         {english}
       </div>
       <div className="mt-2 text-sm font-semibold text-neutral-600">{korean}</div>
-      <div className="mx-auto mt-4 h-px w-12 bg-wedding-gold-200" />
+      <div className="mx-auto mt-4 h-px w-12 bg-wedding-green-200" />
     </div>
   );
 }

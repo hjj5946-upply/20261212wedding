@@ -89,7 +89,7 @@ export function GallerySection({ data }: Props) {
     >
       {children}
       {active ? (
-        <span className="ml-2 h-px w-6 bg-wedding-gold-200" aria-hidden />
+        <span className="ml-2 h-px w-6 bg-wedding-green-200" aria-hidden />
       ) : null}
     </button>
   );
