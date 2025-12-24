@@ -8,7 +8,7 @@ function InfoRow({ label, value }: { label: string; value?: string }) {
   if (!value) return null;
   return (
     <div className="flex items-start gap-2 text-xs">
-      <span className="min-w-[56px] shrink-0 text-wedding-green-300 font-semibold">
+      <span className="min-w-[56px] shrink-0 font-semibold text-[#63a356]">
         {label}
       </span>
       <span className="text-neutral-700 whitespace-pre-line break-words">
@@ -54,7 +54,7 @@ function PhotoCard({
           {info.role ? (
             <div className="mt-1 text-[11px] text-neutral-500">{info.role}</div>
           ) : null}
-          <div className="mx-auto mt-3 h-px w-10 bg-wedding-green-200" />
+          <div className="mx-auto mt-3 h-px w-10 bg-[#c2d6ba]" />
         </div>
 
         {info.introduction ? (

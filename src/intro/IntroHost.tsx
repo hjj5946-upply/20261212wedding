@@ -67,7 +67,7 @@ function MontageIntro({ onDone }: { onDone: () => void }) {
     const totalImages = 15;
   
     const BASE_MS = isMobile ? 180 : 180; // 초반 속도
-    const FAST_MS = isMobile ? 100 : 90;   // 가속 속도
+    const FAST_MS = isMobile ? 100 : 100;   // 가속 속도
   
     // ✅ 문구/배경이 "몇 ms 뒤"에 등장할지 (여기만 조절)
     const SHOW_AT = 1800; // 1.8

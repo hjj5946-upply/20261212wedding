@@ -26,14 +26,34 @@ function useInView<T extends HTMLElement>(
   return { ref, inView };
 }
 
-function StoryPhoto({ title, src }: { title: string; src: string }) {
+function StoryPhoto({
+  title,
+  src,
+  fit = "cover",
+  padding = "p-0",
+  bg = "bg-white",
+  rounded = "rounded-2xl",
+  objectPosition = "object-center",
+}: {
+  title: string;
+  src: string;
+  fit?: "cover" | "contain";
+  padding?: string;
+  bg?: string;
+  rounded?: string;
+  objectPosition?: string;
+}) {
+
+  const fitClass = fit === "contain" ? "object-contain" : "object-cover";
+
   return (
-    <div className="h-full overflow-hidden rounded-2xl border border-neutral-200 bg-white shadow-sm">
-      <div className="h-full w-full">
+    <div className={`h-full overflow-hidden ${rounded} border border-neutral-200 ${bg} shadow-sm`}>
+      {/* ✅ padding은 이미지 영역에만 적용 */}
+      <div className={`h-full w-full ${padding}`}>
         <img
           src={asset(src)}
           alt={title}
-          className="h-full w-full object-cover"
+          className={`h-full w-full ${fitClass} ${objectPosition}`}
           loading="lazy"
           draggable={false}
         />
@@ -97,7 +117,7 @@ export function StorySection({ data }: Props) {
     }
 
     setVisibleCount(0);
-    const stepMs = 600; // 연혁 간 시간 간격
+    const stepMs = 400; // 연혁 간 시간 간격
     let i = 0;
 
     const t = window.setInterval(() => {
@@ -150,7 +170,15 @@ export function StorySection({ data }: Props) {
                       {photoOnLeft ? (
                         <div className="h-full w-full">
                           {/* ✅ item.image가 있으면 사용하고, 없으면 기본값인 piano.webp 사용 */}
-                          <StoryPhoto title={item.title} src={item.image || "images/piano.webp"} />
+                          <StoryPhoto
+                            title={item.title}
+                            src={item.image || "images/wedding.webp"}
+                            fit={item.photo?.fit}
+                            padding={item.photo?.padding}
+                            bg={item.photo?.bg}
+                            rounded={item.photo?.rounded}
+                            objectPosition={item.photo?.objectPosition}
+                          />
                         </div>
                       ) : (
                         <div className="h-full w-full flex">
@@ -180,8 +208,15 @@ export function StorySection({ data }: Props) {
                         </div>
                       ) : (
                         <div className="h-full w-full">
-                          {/* ✅ 여기도 마찬가지로 item.image 전달 */}
-                          <StoryPhoto title={item.title} src={item.image || "images/piano.webp"} />
+                          <StoryPhoto
+                            title={item.title}
+                            src={item.image || "images/wedding.webp"}
+                            fit={item.photo?.fit}
+                            padding={item.photo?.padding}
+                            bg={item.photo?.bg}
+                            rounded={item.photo?.rounded}
+                            objectPosition={item.photo?.objectPosition}
+                          />
                         </div>
                       )}
                     </div>

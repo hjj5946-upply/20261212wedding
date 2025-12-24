@@ -138,7 +138,7 @@ export function InfoSection({ data }: Props) {
         <div
           className={[
             "absolute inset-0 flex items-center justify-center pointer-events-none",
-            "bg-[#86cf70]",
+            "bg-[#9ee084]",
             "transition-opacity duration-700 ease-out", // ✅ 효과 끝나면 바로 스르르 사라짐
             step === 1 ? "opacity-100" : "opacity-0",
           ].join(" ")}
