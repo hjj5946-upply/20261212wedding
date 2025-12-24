@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { WeddingConfig } from "../config/wedding";
 import { Section } from "../components/Section";
 import { SectionTitle } from "../components/SectionTitle";
@@ -87,11 +87,6 @@ export function StorySection({ data }: Props) {
 
   const { ref, inView } = useInView<HTMLDivElement>({ threshold: 0.22 });
 
-  const prefersReducedMotion = useMemo(() => {
-    if (typeof window === "undefined") return false;
-    return window.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches ?? false;
-  }, []);
-
   // ✅ 섹션 진입 시 위에서부터 순차 등장, 벗어나면 리셋
   const [visibleCount, setVisibleCount] = useState(0);
 
@@ -100,13 +95,9 @@ export function StorySection({ data }: Props) {
       setVisibleCount(0);
       return;
     }
-    if (prefersReducedMotion) {
-      setVisibleCount(data.story.length);
-      return;
-    }
 
     setVisibleCount(0);
-    const stepMs = 800; // 연혁 간 시간 간격(원하면 더 키워도 됨)
+    const stepMs = 600; // 연혁 간 시간 간격
     let i = 0;
 
     const t = window.setInterval(() => {
@@ -116,7 +107,7 @@ export function StorySection({ data }: Props) {
     }, stepMs);
 
     return () => window.clearInterval(t);
-  }, [inView, prefersReducedMotion, data.story.length]);
+  }, [inView, data.story.length]);
 
   const rowHeight = "h-[140px] md:h-[190px]"; // ✅ 이미지/설명 높이 동일(보이지 않게 맞춤)
   const centerCols = "grid-cols-[1fr_18px_1fr] md:grid-cols-[1fr_64px_1fr]";
