@@ -219,7 +219,7 @@ export function GuestbookSection({ onToast }: Props) {
                   <div className="mt-3 whitespace-pre-wrap text-sm leading-6 text-neutral-700">
                     {it.message}
                   </div>
-                  <div className="mt-4 h-px w-10 bg-wedding-gold-200" />
+                  <div className="mt-4 h-px w-10 bg-wedding-green-200" />
                 </div>
               ))}
 
