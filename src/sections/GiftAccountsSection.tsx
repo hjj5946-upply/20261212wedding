@@ -121,6 +121,15 @@ export function GiftAccountsSection({ data, onCopy }: Props) {
           축하의 마음만으로도 충분히 감사드립니다.
         </p>
 
+        {/* 화환 거절 안내 */}
+        <div className="mt-4 rounded-2xl bg-neutral-50 border border-neutral-200 px-4 py-3">
+          <p className="text-center text-xs text-neutral-600 leading-relaxed">
+            축하 화환은 정중히 사양하오니
+            <br />
+            따뜻한 마음만 받겠습니다.
+          </p>
+        </div>
+
         <div className="mt-6 space-y-3">
           {/* 신랑 */}
           <div className="rounded-2xl border border-neutral-200 overflow-hidden">
