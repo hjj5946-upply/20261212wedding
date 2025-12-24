@@ -340,56 +340,67 @@ function HeroSectionA({ data, onShare }: Props) {
         <canvas ref={snowRef} className="h-full w-full" />
       </div>
 
-      {/* 하단 패널 */}
-      <div className="absolute inset-x-0 bottom-0 z-10">
-        <div className="mx-auto max-w-md px-5 pb-[max(env(safe-area-inset-bottom),20px)]">
-          <div className="rounded-t-3xl bg-white/10 backdrop-blur-md border border-white/20 px-6 pt-6 pb-5 shadow-lg">
-            <div className="text-[11px] tracking-[0.22em] text-white/75 text-center">WEDDING INVITATION</div>
+      {/* 상단: 영어 문구 */}
+      <div className="absolute inset-x-0 top-0 z-10 pt-[max(env(safe-area-inset-top),80px)]">
+        <div className="mx-auto max-w-md px-5">
+          <h2
+            className="text-center text-white motion-reduce:animate-none animate-[fadeSlideDown_1.2s_ease-out]"
+            style={{
+              fontFamily: "'Cormorant Garamond', 'Playfair Display', Georgia, serif",
+              fontSize: '2.5rem',
+              fontWeight: 300,
+              letterSpacing: '0.08em',
+              textShadow: '0 2px 12px rgba(0,0,0,0.3)'
+            }}
+          >
+            The Wedding Of
+          </h2>
+        </div>
+      </div>
 
-            <h1 className="mt-3 text-center text-3xl font-semibold text-white">
+      {/* 하단: 이름, 일자, 장소 (배경 없이) */}
+      <div className="absolute inset-x-0 bottom-0 z-10 pb-[max(env(safe-area-inset-bottom),60px)]">
+        <div className="mx-auto max-w-md px-5">
+          <div className="text-center">
+            <h1 className="text-4xl font-light text-white motion-reduce:animate-none animate-[fadeSlideUp_1s_ease-out_0.3s_both]"
+                style={{
+                  textShadow: '0 2px 16px rgba(0,0,0,0.4)',
+                  letterSpacing: '0.02em'
+                }}>
               {data.couple.groomName}
-              <span className="mx-2 text-white/50">&amp;</span>
+              <span className="mx-3 text-white/60 text-2xl">&amp;</span>
               {data.couple.brideName}
             </h1>
 
-            <div className="mx-auto mt-4 h-px w-12 bg-white/40" />
-
-            <p className="mt-4 text-center text-sm leading-6 text-white/85">
-              소중한 분들을 모시고
-              <br />
-              저희의 새로운 시작을 함께하려 합니다.
-            </p>
-
-            <div className="mt-5 text-center text-sm text-white/90">
-              <div className="font-medium">{data.ceremony.dateText}</div>
-              <div className="mt-1 text-white/75">{data.ceremony.venueName}</div>
-            </div>
-
-            <div className="mt-6">
-              <Button fullWidth variant="secondary" onClick={onShare}>
-                청첩장 공유하기
-              </Button>
-            </div>
-
-            {/* Scroll hint */}
-            <div className="mt-5 flex flex-col items-center gap-2">
-              <span className="text-[11px] text-white/70">아래로 스크롤</span>
-              <span
-                className="h-6 w-4 rounded-full border border-white/40 flex items-start justify-center p-[3px]
-                           motion-reduce:animate-none animate-[bounceDot_1.4s_infinite]"
-                aria-hidden
-              >
-                <span className="block h-1.5 w-1.5 rounded-full bg-white/70" />
-              </span>
+            <div className="mt-6 text-white/95 motion-reduce:animate-none animate-[fadeSlideUp_1s_ease-out_0.5s_both]"
+                 style={{ textShadow: '0 2px 12px rgba(0,0,0,0.3)' }}>
+              <div className="text-lg font-light tracking-wide">{data.ceremony.dateText}</div>
+              <div className="mt-2 text-base font-light text-white/85">{data.ceremony.venueName}</div>
             </div>
           </div>
         </div>
       </div>
 
       <style>{`
-        @keyframes bounceDot {
-          0%, 100% { transform: translateY(0); opacity: .8; }
-          50% { transform: translateY(8px); opacity: 1; }
+        @keyframes fadeSlideDown {
+          from {
+            opacity: 0;
+            transform: translateY(-20px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+        @keyframes fadeSlideUp {
+          from {
+            opacity: 0;
+            transform: translateY(20px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
         }
       `}</style>
     </section>
