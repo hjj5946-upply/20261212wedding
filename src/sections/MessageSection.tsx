@@ -53,22 +53,22 @@ export function MessageSection({ data }: Props) {
   const WeddingDivider = () => (
     <div className="flex items-center justify-center w-full my-10 px-4">
       {/* 왼쪽 선 */}
-      <div className="flex-1 h-[0.5px] bg-gradient-to-r from-transparent to-neutral-300"></div>
+      <div className="flex-1 h-[1px] bg-gradient-to-r from-transparent to-[#86cf70]"></div>
       
       {/* 나뭇잎 문양 */}
       <div className="mx-4 flex items-center justify-center">
-        <svg width="42" height="24" viewBox="0 0 42 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <svg width="52" height="32" viewBox="0 0 42 24" fill="none" xmlns="http://www.w3.org/2000/svg">
           {/* 왼쪽 잎 */}
           <path 
             d="M21 20C21 20 15 18 13 12C11 6 15 2 15 2C15 2 21 6 21 12" 
-            stroke="#8A9A5B" /* 올리브 그린 */
+            stroke="#6ba339" /* 올리브 그린 */
             strokeWidth="1" 
             strokeLinecap="round"
           />
           {/* 오른쪽 잎 */}
           <path 
             d="M21 20C21 20 27 18 29 12C31 6 27 2 27 2C27 2 21 6 21 12" 
-            stroke="#A5B284" /* 약간 더 밝은 그린 */
+            stroke="#91c45e" /* 약간 더 밝은 그린 */
             strokeWidth="1" 
             strokeLinecap="round"
           />
@@ -78,7 +78,7 @@ export function MessageSection({ data }: Props) {
       </div>
   
       {/* 오른쪽 선 */}
-      <div className="flex-1 h-[0.5px] bg-gradient-to-l from-transparent to-neutral-300"></div>
+      <div className="flex-1 h-[1px] bg-gradient-to-l from-transparent to-[#86cf70]"></div>
     </div>
   );
 

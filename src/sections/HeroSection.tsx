@@ -199,7 +199,7 @@ function useSnowCanvas<T extends HTMLElement>(
         f.y += f.vy * dt * speedMul;
 
         f.life -= dt * speedMul;
-        if (f.y > ch + 60 || f.x < -120 || f.x > cw + 120 || f.life <= 0) reset(f);
+        if (f.y > ch + 90 || f.x < -120 || f.x > cw + 120 || f.life <= 0) reset(f);
 
         draw(f);
       }
@@ -291,9 +291,8 @@ export function HeroSection({ data, onShare }: Props) {
     </>
   );
 }
-
 /** A안: 풀스크린 + 하단 패널 */
-function HeroSectionA({ data, onShare }: Props) {
+function HeroSectionA({ data }: Props) {
   // const chipText = useDdayChip(data.ceremony.dateISO);
   const heroImg = asset("images/main_img.webp");
 
@@ -301,7 +300,7 @@ function HeroSectionA({ data, onShare }: Props) {
   const snowRef = useRef<HTMLCanvasElement | null>(null);
 
   useSnowCanvas(heroRef, snowRef, {
-    count: 60,
+    count: 70,
     rMin: 0.8,
     rMax: 3.6,
     vyMin: 18,
@@ -336,25 +335,16 @@ function HeroSectionA({ data, onShare }: Props) {
       </div> */}
 
       {/* 눈 캔버스 */}
-      <div className="pointer-events-none absolute inset-0 z-[5]">
+      <div className="pointer-events-none absolute inset-x-0 top-0 z-[5] h-[90%] overflow-hidden">
         <canvas ref={snowRef} className="h-full w-full" />
       </div>
 
       {/* 상단: 영어 문구 */}
       <div className="absolute inset-x-0 top-0 z-10 pt-[max(env(safe-area-inset-top),80px)]">
         <div className="mx-auto max-w-md px-5">
-          <h2
-            className="text-center text-white motion-reduce:animate-none animate-[fadeSlideDown_1.2s_ease-out]"
-            style={{
-              fontFamily: "'Cormorant Garamond', 'Playfair Display', Georgia, serif",
-              fontSize: '2.5rem',
-              fontWeight: 300,
-              letterSpacing: '0.08em',
-              textShadow: '0 2px 12px rgba(0,0,0,0.3)'
-            }}
-          >
-            The Wedding Of
-          </h2>
+          <div className="motion-reduce:animate-none animate-[fadeSlideDown_1.2s_ease-out]">
+            <TheWeddingOfTitle />
+          </div>
         </div>
       </div>
 
@@ -362,20 +352,48 @@ function HeroSectionA({ data, onShare }: Props) {
       <div className="absolute inset-x-0 bottom-0 z-10 pb-[max(env(safe-area-inset-bottom),60px)]">
         <div className="mx-auto max-w-md px-5">
           <div className="text-center">
-            <h1 className="text-4xl font-light text-white motion-reduce:animate-none animate-[fadeSlideUp_1s_ease-out_0.3s_both]"
-                style={{
-                  textShadow: '0 2px 16px rgba(0,0,0,0.4)',
-                  letterSpacing: '0.02em'
-                }}>
-              {data.couple.groomName}
-              <span className="mx-3 text-white/60 text-2xl">&amp;</span>
-              {data.couple.brideName}
+            <div className="text-[11px] tracking-[0.35em] text-white/70">
+              GROOM &nbsp;·&nbsp; BRIDE
+            </div>
+
+            <h1
+              className="text-white motion-reduce:animate-none animate-[fadeSlideUp_1s_ease-out_0.3s_both]"
+              style={{
+                fontFamily: '"Dancing Script","Allura","Parisienne",cursive',
+                fontSize: "32px",
+                lineHeight: 1.1,
+                fontWeight: 500,
+                letterSpacing: "0.03em",
+                textShadow: "0 2px 16px rgba(0,0,0,0.42)",
+              }}
+            >
+              JeongJun
+              <span className="mx-3 text-2xl text-white/70">&amp;</span>
+              SongHee
             </h1>
 
-            <div className="mt-6 text-white/95 motion-reduce:animate-none animate-[fadeSlideUp_1s_ease-out_0.5s_both]"
-                 style={{ textShadow: '0 2px 12px rgba(0,0,0,0.3)' }}>
-              <div className="text-lg font-light tracking-wide">{data.ceremony.dateText}</div>
-              <div className="mt-2 text-base font-light text-white/85">{data.ceremony.venueName}</div>
+            <div
+              className="mt-8 motion-reduce:animate-none animate-[fadeSlideUp_1s_ease-out_0.5s_both]"
+              style={{
+                fontFamily: '"Noto Serif KR","MaruBuri","Nanum Myeongjo",serif',
+                textShadow: "0 2px 12px rgba(0,0,0,0.28)",
+              }}
+            >
+              {/* 날짜 */}
+              <div
+                className="text-[14px] font-light tracking-[0.12em]"
+                style={{ color: "rgba(255,255,255,0.85)" }}
+              >
+                {data.ceremony.dateText}
+              </div>
+
+              {/* 장소 */}
+              <div
+                className="text-[16px] font-medium tracking-[0.06em]"
+                style={{ color: "rgba(255,255,255,0.95)" }}
+              >
+                {data.ceremony.venueName}
+              </div>
             </div>
           </div>
         </div>
@@ -491,5 +509,103 @@ function HeroSectionB({ data, onShare }: Props) {
         </div>
       </div>
     </section>
+  );
+}
+
+
+function TheWeddingOfTitle() {
+  return (
+    <div className="flex flex-col items-center justify-center">
+      <svg
+        className="w-[320px] max-w-[92%] h-[78px] overflow-visible"
+        viewBox="0 0 900 200"
+        fill="none"
+        aria-label="The Wedding Of"
+      >
+        <defs>
+          <filter id="softGlow" x="-40%" y="-40%" width="180%" height="180%">
+            <feGaussianBlur in="SourceGraphic" stdDeviation="2.2" result="blur" />
+            <feMerge>
+              <feMergeNode in="blur" />
+              <feMergeNode in="SourceGraphic" />
+            </feMerge>
+          </filter>
+        </defs>
+
+        {/* ✅ 1) 항상 보이는 베이스 텍스트(희미하게) */}
+        <text x="50%" y="155" textAnchor="middle" className="hero-script-base">
+          The Wedding Of
+        </text>
+
+        {/* ✅ 2) 위에 덮는 "써지는" 텍스트(stroke만) */}
+        <text x="50%" y="155" textAnchor="middle" className="hero-script-draw">
+          The Wedding Of
+        </text>
+
+        {/* ✅ 하트: 마지막에 등장(딜레이) + 위치/크기 조절은 transform 한 줄로 */}
+        <path
+          d="M450 42
+             C430 18, 392 18, 392 48
+             C392 82, 450 112, 450 112
+             C450 112, 508 82, 508 48
+             C508 18, 470 18, 450 42 Z"
+          fill="rgba(255,255,255,0.92)"
+          className="hero-heart"
+          transform="translate(155,-10) scale(0.26)"
+        />
+      </svg>
+
+      <div className="mt-1 h-px w-28 bg-white/40" />
+
+      <style>{`
+        /* ✅ 공통 폰트 */
+        .hero-script-base,
+        .hero-script-draw {
+          font-family: "Great Vibes", "Allura", "Dancing Script", "Parisienne", cursive;
+          font-size: 110px;
+          font-weight: 400;
+          letter-spacing: 0.08em;
+          stroke-linecap: round;
+          stroke-linejoin: round;
+        }
+
+        /* ✅ 베이스: 완성된 글씨(항상 보임) */
+        .hero-script-base {
+          fill: rgba(255,255,255,0.14);
+          stroke: rgba(255,255,255,0.22);
+          stroke-width: 1.2;
+          filter: url(#softGlow);
+        }
+
+        /* ✅ 드로잉: 진짜로 "써지는" 레이어 */
+        .hero-script-draw {
+          fill: transparent;
+          stroke: rgba(255,255,255,0.95);
+          stroke-width: 2.6;
+          filter: url(#softGlow);
+
+          stroke-dasharray: 1600;
+          stroke-dashoffset: 1600;
+          animation: writeText 2.2s ease-out 0.15s forwards;
+        }
+
+        @keyframes writeText {
+          to { stroke-dashoffset: 0; }
+        }
+
+        /* ✅ 하트: 문구 끝난 뒤 등장 */
+        .hero-heart {
+          opacity: 0;
+          transform-origin: center;
+          animation: heartIn 0.35s ease-out 1.75s forwards;
+        }
+
+        @keyframes heartIn {
+          0%   { opacity: 0; transform: translate(255px,-10px) scale(0.20); }
+          70%  { opacity: 1; transform: translate(255px,-10px) scale(0.30); }
+          100% { opacity: 1; transform: translate(255px,-10px) scale(0.26); }
+        }
+      `}</style>
+    </div>
   );
 }

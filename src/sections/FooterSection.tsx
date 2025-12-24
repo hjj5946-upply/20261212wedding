@@ -1,17 +1,13 @@
-import type { WeddingConfig } from "../config/wedding";
 import { Section } from "../components/Section";
 
-type Props = { data: WeddingConfig };
-
-export function FooterSection({ data }: Props) {
+export function FooterSection() {
   return (
-    <Section id="footer" className="px-5 py-12 border-t border-neutral-100">
+    <Section id="footer" className="px-5 py-16 border-t border-neutral-100">
       <div className="mx-auto max-w-md text-center">
-        <div className="text-sm font-medium text-neutral-900">
-          {data.couple.groomName} ♥ {data.couple.brideName}
+        <div className="mx-auto h-[0.5px] w-24 bg-[#63a356]" />
+        <div className="mt-10 text-xs text-neutral-400">
+          © 2026 Hong JeongJun
         </div>
-        <div className="mx-auto mt-4 h-px w-14 bg-wedding-green-200" />
-        <div className="mt-4 text-xs text-neutral-500">© 2026 Hong JeongJun</div>
       </div>
     </Section>
   );

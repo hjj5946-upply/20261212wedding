@@ -185,7 +185,7 @@ export function Invitation() {
           onSubmit={submitRsvp}
         />
         <GuestbookSection onToast={(msg) => setToast({ open: true, msg })} />
-        <FooterSection data={data} />
+        <FooterSection />
       </main>
     </>
   );
