@@ -136,3 +136,12 @@ VITE_NAVER_MAP_CLIENT_ID=your_naver_map_client_id
 ---
 
 💕 Made with Love for 홍정준 ♥ 신송희
+
+
+# DB연동
+
+- .env 파일 생성 후 
+VITE_SUPABASE_URL= supabase url
+VITE_SUPABASE_ANON_KEY= supabase api key
+
+VITE_NAVER_MAP_CLIENT_ID= naver map key
