@@ -224,51 +224,51 @@ function readVariant(): HeroVariant {
 }
 
 //시안 확정되면 해당 함수 주석&삭제
-function VariantToggle({
-  value,
-  onChange,
-}: {
-  value: HeroVariant;
-  onChange: (v: HeroVariant) => void;
-}) {
-  return (
-    <div
-      className={[
-        "fixed z-[60]",
-        "top-4 left-1/2 -translate-x-1/2",
-        "flex items-center gap-2",
-        "rounded-full bg-black/45 backdrop-blur",
-        "px-2 py-2 shadow",
-        "select-none",
-      ].join(" ")}
-      style={{ paddingTop: "max(env(safe-area-inset-top), 8px)" }}
-    >
-      <span className="px-2 text-[11px] text-white/85">임시</span>
+// function VariantToggle({
+//   value,
+//   onChange,
+// }: {
+//   value: HeroVariant;
+//   onChange: (v: HeroVariant) => void;
+// }) {
+//   return (
+//     <div
+//       className={[
+//         "fixed z-[60]",
+//         "top-4 left-1/2 -translate-x-1/2",
+//         "flex items-center gap-2",
+//         "rounded-full bg-black/45 backdrop-blur",
+//         "px-2 py-2 shadow",
+//         "select-none",
+//       ].join(" ")}
+//       style={{ paddingTop: "max(env(safe-area-inset-top), 8px)" }}
+//     >
+//       <span className="px-2 text-[11px] text-white/85">임시</span>
 
-      <button
-        type="button"
-        onClick={() => onChange("A")}
-        className={[
-          "h-8 px-3 rounded-full text-xs font-semibold transition",
-          value === "A" ? "bg-white text-neutral-900" : "bg-white/10 text-white/85",
-        ].join(" ")}
-      >
-        A안
-      </button>
+//       <button
+//         type="button"
+//         onClick={() => onChange("A")}
+//         className={[
+//           "h-8 px-3 rounded-full text-xs font-semibold transition",
+//           value === "A" ? "bg-white text-neutral-900" : "bg-white/10 text-white/85",
+//         ].join(" ")}
+//       >
+//         A안
+//       </button>
 
-      <button
-        type="button"
-        onClick={() => onChange("B")}
-        className={[
-          "h-8 px-3 rounded-full text-xs font-semibold transition",
-          value === "B" ? "bg-white text-neutral-900" : "bg-white/10 text-white/85",
-        ].join(" ")}
-      >
-        B안
-      </button>
-    </div>
-  );
-}
+//       <button
+//         type="button"
+//         onClick={() => onChange("B")}
+//         className={[
+//           "h-8 px-3 rounded-full text-xs font-semibold transition",
+//           value === "B" ? "bg-white text-neutral-900" : "bg-white/10 text-white/85",
+//         ].join(" ")}
+//       >
+//         B안
+//       </button>
+//     </div>
+//   );
+// }
 
 /** ✅ 엔트리: 배포본에서 A/B 토글로 비교 */
 export function HeroSection({ data, onShare }: Props) {
@@ -281,7 +281,7 @@ export function HeroSection({ data, onShare }: Props) {
   return (
     <>
       {/* ✅ 임시 토글: 확정되면 이 컴포넌트와 localStorage만 지우면 됨 */}
-      <VariantToggle value={variant} onChange={setVariant} />
+      {/* <VariantToggle value={variant} onChange={setVariant} /> */}
 
       {variant === "A" ? (
         <HeroSectionA data={data} onShare={onShare} />

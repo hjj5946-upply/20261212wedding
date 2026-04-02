@@ -47,46 +47,46 @@ function usePreventPinchZoom(enabled = true) {
 }
 
 /** ✅ 임시: 인트로 A~D 토글 (확정되면 삭제/주석 처리) */
-function IntroVariantToggle({
-  value,
-  onChange,
-}: {
-  value: IntroStyle;
-  onChange: (v: IntroStyle) => void;
-}) {
-  const Btn = ({ v, label }: { v: IntroStyle; label: string }) => (
-    <button
-      type="button"
-      onClick={() => onChange(v)}
-      className={[
-        "h-8 px-3 rounded-full text-xs font-semibold transition",
-        value === v ? "bg-white text-neutral-900" : "bg-white/10 text-white/85",
-      ].join(" ")}
-    >
-      {label}
-    </button>
-  );
+// function IntroVariantToggle({
+//   value,
+//   onChange,
+// }: {
+//   value: IntroStyle;
+//   onChange: (v: IntroStyle) => void;
+// }) {
+//   const Btn = ({ v, label }: { v: IntroStyle; label: string }) => (
+//     <button
+//       type="button"
+//       onClick={() => onChange(v)}
+//       className={[
+//         "h-8 px-3 rounded-full text-xs font-semibold transition",
+//         value === v ? "bg-white text-neutral-900" : "bg-white/10 text-white/85",
+//       ].join(" ")}
+//     >
+//       {label}
+//     </button>
+//   );
 
-  return (
-    <div
-      className={[
-        "fixed z-[999]",
-        "top-4 left-1/2 -translate-x-1/2",
-        "flex items-center gap-2",
-        "rounded-full bg-black/45 backdrop-blur",
-        "px-2 py-2 shadow",
-        "select-none",
-      ].join(" ")}
-      style={{ paddingTop: "max(env(safe-area-inset-top), 8px)" }}
-    >
-      <span className="px-2 text-[11px] text-white/85">시안</span>
-      <Btn v="montage" label="A" />
-      <Btn v="filmstrip" label="B" />
-      <Btn v="game" label="C" />
-      <Btn v="gate" label="D" />
-    </div>
-  );
-}
+//   return (
+//     <div
+//       className={[
+//         "fixed z-[999]",
+//         "top-4 left-1/2 -translate-x-1/2",
+//         "flex items-center gap-2",
+//         "rounded-full bg-black/45 backdrop-blur",
+//         "px-2 py-2 shadow",
+//         "select-none",
+//       ].join(" ")}
+//       style={{ paddingTop: "max(env(safe-area-inset-top), 8px)" }}
+//     >
+//       <span className="px-2 text-[11px] text-white/85">시안</span>
+//       <Btn v="montage" label="A" />
+//       <Btn v="filmstrip" label="B" />
+//       <Btn v="game" label="C" />
+//       <Btn v="gate" label="D" />
+//     </div>
+//   );
+// }
 
 export default function App() {
   useBlockContextMenu(true);
@@ -110,7 +110,7 @@ export default function App() {
   return (
     <>
       {/* ✅ 임시 토글: 확정되면 이 줄 + IntroVariantToggle 컴포넌트 삭제 */}
-      {!introDone && <IntroVariantToggle value={introStyle} onChange={setIntroStyle} />}
+      {/* {!introDone && <IntroVariantToggle value={introStyle} onChange={setIntroStyle} />} */}
 
       {!introDone && <IntroHost style={introStyle} onDone={() => setIntroDone(true)} />}
       {introDone && <Invitation />}
