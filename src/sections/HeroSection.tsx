@@ -272,7 +272,7 @@ function readVariant(): HeroVariant {
 
 /** ✅ 엔트리: 배포본에서 A/B 토글로 비교 */
 export function HeroSection({ data, onShare }: Props) {
-  const [variant, setVariant] = useState<HeroVariant>(() => readVariant());
+  const [variant] = useState<HeroVariant>(() => readVariant());
 
   useEffect(() => {
     localStorage.setItem(HERO_VARIANT_KEY, variant);
