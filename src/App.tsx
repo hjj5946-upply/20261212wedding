@@ -97,7 +97,7 @@ export default function App() {
     return readIntroStyleFromUrl() ?? readIntroStyleFromStorage() ?? DEFAULT_INTRO_STYLE;
   }, []);
 
-  const [introStyle, setIntroStyle] = useState<IntroStyle>(initialIntroStyle);
+  const [introStyle] = useState<IntroStyle>(initialIntroStyle);
   const [introDone, setIntroDone] = useState(false);
 
   // ✅ 토글로 바꾸면 storage에 저장(배포 테스트 편하게)
