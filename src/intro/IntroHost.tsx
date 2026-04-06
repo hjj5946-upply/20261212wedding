@@ -124,7 +124,7 @@ function MontageIntro({ onDone }: { onDone: () => void }) {
 
   return (
     <div
-      className={`fixed inset-0 z-[100] bg-black transition-opacity duration-1000 ${
+      className={`fixed inset-0 z-[100] mobile-fixed-overlay bg-black transition-opacity duration-1000 ${
         fadeOut ? "opacity-0" : "opacity-100"
       }`}
     >
@@ -324,7 +324,7 @@ function FilmStripIntro({ onDone }: { onDone: () => void }) {
 
   return (
     <div 
-      className={`fixed inset-0 z-[100] bg-neutral-900 transition-opacity duration-1000 ${
+      className={`fixed inset-0 z-[100] mobile-fixed-overlay bg-neutral-900 transition-opacity duration-1000 ${
         fadeOut ? "opacity-0" : "opacity-100"
       }`}
     >
@@ -476,7 +476,7 @@ function GameIntro({ onDone }: { onDone: () => void }) {
   };
 
   return (
-    <div className="fixed inset-0 z-[100] bg-gradient-to-b from-pink-100 via-purple-100 to-blue-100">
+    <div className="fixed inset-0 z-[100] mobile-fixed-overlay bg-gradient-to-b from-pink-100 via-purple-100 to-blue-100">
       <div className="mx-auto flex h-full max-w-md flex-col items-center justify-center px-8">
         <div className="mb-8 text-center">
           <div className="mb-2 font-mono text-sm text-purple-600">
@@ -636,7 +636,7 @@ function GateIntro({ onDone }: { onDone: () => void }) {
 
   return (
     <div
-      className="fixed inset-0 z-[100] cursor-pointer overflow-hidden bg-gradient-to-b from-amber-50 via-yellow-50 to-orange-50"
+      className="fixed inset-0 z-[100] mobile-fixed-overlay cursor-pointer overflow-hidden bg-gradient-to-b from-amber-50 via-yellow-50 to-orange-50"
       onClick={!touched ? handleClick : undefined}
     >
       {/* 빛 효과 배경 */}

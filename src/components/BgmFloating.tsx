@@ -62,7 +62,7 @@ export function BgmFloating() {
       onClick={toggle}
       aria-label="bgm toggle"
       className={[
-        "fixed top-4 right-4 z-50",
+        "fixed top-4 right-4 z-50 mobile-fixed-tr",
         "w-7 h-7",
         "rounded-full bg-black/45 backdrop-blur shadow",
         "p-1",
