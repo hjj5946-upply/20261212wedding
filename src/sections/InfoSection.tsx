@@ -130,7 +130,7 @@ export function InfoSection({ data }: Props) {
       <div
         ref={rootRef}
         className={[
-          "relative w-screen min-h-screen overflow-hidden",
+          "relative w-full min-h-screen overflow-hidden",
           "bg-white", // ✅ 내용화면은 처음부터 끝까지 흰색 베이스
         ].join(" ")}
       >
