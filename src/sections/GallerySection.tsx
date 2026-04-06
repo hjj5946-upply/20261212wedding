@@ -10,7 +10,7 @@ type ViewMode = "grid" | "single";
 
 export function GallerySection() {
   const images = useMemo(() => {
-    const imageCount = 21;
+    const imageCount = 18;
     
     return Array.from({ length: imageCount }, (_, idx) => ({
       src: asset(`images/intro_${idx + 1}.webp`),
@@ -22,7 +22,7 @@ export function GallerySection() {
 
   // grid 모드: 9장까지만, 더보기로 전체
   const [expanded, setExpanded] = useState(false);
-  const gridVisible = expanded ? images : images.slice(0, 9);
+  const gridVisible = expanded ? images : images.slice(0, 12);
 
   // single 모드: 현재 인덱스
   const [activeIdx, setActiveIdx] = useState(0);
@@ -107,7 +107,7 @@ export function GallerySection() {
               label="바둑판 보기"
               onClick={() => setMode("grid")}
             >
-              <LayoutGrid size={21} />
+              <LayoutGrid size={18} />
             </IconTab>
 
             <IconTab
@@ -115,7 +115,7 @@ export function GallerySection() {
               label="통으로 보기"
               onClick={() => setMode("single")}
             >
-              <RectangleVertical size={21} />
+              <RectangleVertical size={18} />
             </IconTab>
           </div>
         </div>
