@@ -12,7 +12,7 @@ export function FloatingCTA({
   return (
     <div
       className={[
-        "fixed bottom-4 left-1/2 z-40 w-[calc(100%-32px)] max-w-md -translate-x-1/2",
+        "fixed bottom-4 left-1/2 z-40 w-[calc(100%-32px)] max-w-[398px] -translate-x-1/2",
         "transition-all duration-300",
         visible
           ? "opacity-100 translate-y-0 pointer-events-auto"
