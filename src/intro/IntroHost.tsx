@@ -42,14 +42,16 @@ export function IntroHost({ style, onDone, }: { style: IntroStyle; onDone: () =>
   switch (style) {
     case "montage":
       return <MontageIntro onDone={onDone} />;
-    case "filmstrip":
-      return <FilmStripIntro onDone={onDone} />;
-    case "game":
-      return <GameIntro onDone={onDone} />;
-    case "gate":
-      return <GateIntro onDone={onDone} />;
+    // ── [A안 확정] B~D안 비활성화 ──────────────────────────
+    // case "filmstrip":
+    //   return <FilmStripIntro onDone={onDone} />;
+    // case "game":
+    //   return <GameIntro onDone={onDone} />;
+    // case "gate":
+    //   return <GateIntro onDone={onDone} />;
+    // ──────────────────────────────────────────────────────
     default:
-      return <GateIntro onDone={onDone} />;
+      return <MontageIntro onDone={onDone} />; // A안으로 폴백
   }
 }
 
@@ -235,9 +237,12 @@ function MontageIntro({ onDone }: { onDone: () => void }) {
   );
 }
 
-/** -------------------------
+/** =========================================================
+ * ❌ [B안 비활성화] A안 확정으로 미사용 — 소스코드 보존 목적
+ * =========================================================
  * B) 필름 스트립 레트로
- * ------------------------- */
+ * ======================================================== */
+// @ts-ignore – 비활성화 함수 (사용하지 않음, 삭제 금지)
 function FilmStripIntro({ onDone }: { onDone: () => void }) {
   const [scrollPosition, setScrollPosition] = useState(0);
   const [showText1, setShowText1] = useState(false);
@@ -434,10 +439,13 @@ function FilmStripIntro({ onDone }: { onDone: () => void }) {
   );
 }
 
-/** -------------------------
+/** =========================================================
+ * ❌ [C안 비활성화] A안 확정으로 미사용 — 소스코드 보존 목적
+ * =========================================================
  * C) 인터랙티브 게임
  * 도트 게임 스타일 - 신랑신부 터치하면 하트 나오고 잠금 해제
- * ------------------------- */
+ * ======================================================== */
+// @ts-ignore – 비활성화 함수 (사용하지 않음, 삭제 금지)
 function GameIntro({ onDone }: { onDone: () => void }) {
   const [groomTouched, setGroomTouched] = useState(false);
   const [brideTouched, setBrideTouched] = useState(false);
@@ -618,10 +626,13 @@ function GameIntro({ onDone }: { onDone: () => void }) {
   );
 }
 
-/** -------------------------
+/** =========================================================
+ * ❌ [D안 비활성화] A안 확정으로 미사용 — 소스코드 보존 목적
+ * =========================================================
  * D) 문/빛 입장
  * 우아한 빛 효과와 "함께 축복하러 들어가시겠습니까?" 컨셉
- * ------------------------- */
+ * ======================================================== */
+// @ts-ignore – 비활성화 함수 (사용하지 않음, 삭제 금지)
 function GateIntro({ onDone }: { onDone: () => void }) {
   const [touched, setTouched] = useState(false);
   const [entering, setEntering] = useState(false);

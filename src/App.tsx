@@ -1,9 +1,9 @@
 // App.tsx
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { Invitation } from "./pages/Invitation";
 import { IntroHost, type IntroStyle } from "./intro/IntroHost";
 
-const DEFAULT_INTRO_STYLE: IntroStyle = "filmstrip";
+const DEFAULT_INTRO_STYLE: IntroStyle = "montage"; // ✅ A안 확정
 const INTRO_STYLE_KEY = "intro_style_v1";
 
 function isIntroStyle(v: string | null): v is IntroStyle {
@@ -92,10 +92,12 @@ export default function App() {
   useBlockContextMenu(true);
   usePreventPinchZoom(true);
 
-  // ✅ URL 우선, 없으면 storage, 없으면 default
-  const initialIntroStyle = useMemo(() => {
-    return readIntroStyleFromUrl() ?? readIntroStyleFromStorage() ?? DEFAULT_INTRO_STYLE;
-  }, []);
+  // ✅ A안 확정: 항상 montage (URL·localStorage 무시)
+  const initialIntroStyle: IntroStyle = "montage";
+  // [A안 확정으로 비활성화] URL/storage에서 읽어 A~D 전환하는 로직
+  // const initialIntroStyle = useMemo(() => {
+  //   return readIntroStyleFromUrl() ?? readIntroStyleFromStorage() ?? DEFAULT_INTRO_STYLE;
+  // }, []);
 
   const [introStyle] = useState<IntroStyle>(initialIntroStyle);
   const [introDone, setIntroDone] = useState(false);

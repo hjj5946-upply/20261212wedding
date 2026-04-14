@@ -219,8 +219,10 @@ function useSnowCanvas<T extends HTMLElement>(
 
 const HERO_VARIANT_KEY = "hero_variant_v1";
 function readVariant(): HeroVariant {
-  const v = localStorage.getItem(HERO_VARIANT_KEY);
-  return v === "A" || v === "B" ? v : "B";
+  return "A"; // ✅ A안 확정
+  // [A안 확정으로 비활성화] localStorage에서 A/B 읽어 전환하는 로직
+  // const v = localStorage.getItem(HERO_VARIANT_KEY);
+  // return v === "A" || v === "B" ? v : "B";
 }
 
 //시안 확정되면 해당 함수 주석&삭제
@@ -280,14 +282,14 @@ export function HeroSection({ data, onShare }: Props) {
 
   return (
     <>
-      {/* ✅ 임시 토글: 확정되면 이 컴포넌트와 localStorage만 지우면 됨 */}
-      {/* <VariantToggle value={variant} onChange={setVariant} /> */}
-
+      {/* ✅ A안 확정 */}
+      <HeroSectionA data={data} onShare={onShare} />
+      {/* [A안 확정으로 비활성화] A/B 분기 렌더링
       {variant === "A" ? (
         <HeroSectionA data={data} onShare={onShare} />
       ) : (
         <HeroSectionB data={data} onShare={onShare} />
-      )}
+      )} */}
     </>
   );
 }
@@ -425,7 +427,12 @@ function HeroSectionA({ data }: Props) {
   );
 }
 
-/** B안: 카드 사진 위에 눈 (모바일 안정화) */
+/** =========================================================
+ * ❌ [B안 비활성화] A안 확정으로 미사용 — 소스코드 보존 목적
+ * =========================================================
+ * B안: 카드 사진 위에 눈 (모바일 안정화)
+ * ======================================================== */
+// @ts-ignore – 비활성화 함수 (사용하지 않음, 삭제 금지)
 function HeroSectionB({ data, onShare }: Props) {
   // const chipText = useDdayChip(data.ceremony.dateISO);
 
