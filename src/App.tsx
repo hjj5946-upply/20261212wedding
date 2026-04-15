@@ -3,23 +3,23 @@ import { useEffect, useState } from "react";
 import { Invitation } from "./pages/Invitation";
 import { IntroHost, type IntroStyle } from "./intro/IntroHost";
 
-const DEFAULT_INTRO_STYLE: IntroStyle = "montage";
+// const DEFAULT_INTRO_STYLE: IntroStyle = "montage";
 const INTRO_STYLE_KEY = "intro_style_v1";
 
-function isIntroStyle(v: string | null): v is IntroStyle {
-  return v === "montage" || v === "filmstrip" || v === "game" || v === "gate";
-}
+// function isIntroStyle(v: string | null): v is IntroStyle {
+//   return v === "montage" || v === "filmstrip" || v === "game" || v === "gate";
+// }
 
-function readIntroStyleFromUrl(): IntroStyle | null {
-  const params = new URLSearchParams(window.location.search);
-  const v = params.get("intro");
-  return isIntroStyle(v) ? v : null;
-}
+// function readIntroStyleFromUrl(): IntroStyle | null {
+//   const params = new URLSearchParams(window.location.search);
+//   const v = params.get("intro");
+//   return isIntroStyle(v) ? v : null;
+// }
 
-function readIntroStyleFromStorage(): IntroStyle | null {
-  const v = localStorage.getItem(INTRO_STYLE_KEY);
-  return isIntroStyle(v) ? v : null;
-}
+// function readIntroStyleFromStorage(): IntroStyle | null {
+//   const v = localStorage.getItem(INTRO_STYLE_KEY);
+//   return isIntroStyle(v) ? v : null;
+// }
 
 function isNoIntro(): boolean {
   const params = new URLSearchParams(window.location.search);

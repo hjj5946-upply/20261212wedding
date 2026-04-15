@@ -84,7 +84,7 @@ export function Invitation() {
       return;
     }
 
-    const a = initBgm();
+    initBgm();
     let armed = true;
 
     const tryPlayNow = (e: Event) => {
