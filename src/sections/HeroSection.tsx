@@ -377,7 +377,7 @@ function HeroSectionA({ data }: Props) {
             <div
               className="mt-8 motion-reduce:animate-none animate-[fadeSlideUp_1s_ease-out_0.5s_both]"
               style={{
-                fontFamily: '"Noto Serif KR","MaruBuri","Nanum Myeongjo",serif',
+                fontFamily: '"MaruBuri"',
                 textShadow: "0 2px 12px rgba(0,0,0,0.28)",
               }}
             >
@@ -497,12 +497,6 @@ function HeroSectionB({ data, onShare }: Props) {
 
         {/* 하단 */}
         <div className="mt-7">
-          {/* <div className="flex items-center justify-center">
-            <div className="rounded-full bg-white px-4 py-2 border border-neutral-200 shadow-sm">
-              <span className="text-sm font-semibold text-neutral-900">{chipText}</span>
-            </div>
-          </div> */}
-
           <div className="mt-4 text-center text-neutral-800">
             <div className="font-medium text-base">{data.ceremony.dateText}</div>
             <div className="mt-1 text-neutral-600 text-lg">{data.ceremony.venueName}</div>
@@ -518,7 +512,6 @@ function HeroSectionB({ data, onShare }: Props) {
     </section>
   );
 }
-
 
 function TheWeddingOfTitle() {
   return (
@@ -539,17 +532,14 @@ function TheWeddingOfTitle() {
           </filter>
         </defs>
 
-        {/* ✅ 1) 항상 보이는 베이스 텍스트(희미하게) */}
         <text x="50%" y="155" textAnchor="middle" className="hero-script-base">
           The Wedding Of
         </text>
 
-        {/* ✅ 2) 위에 덮는 "써지는" 텍스트(stroke만) */}
         <text x="50%" y="155" textAnchor="middle" className="hero-script-draw">
           The Wedding Of
         </text>
 
-        {/* ✅ 하트: 마지막에 등장(딜레이) + 위치/크기 조절은 transform 한 줄로 */}
         <path
           d="M450 42
              C430 18, 392 18, 392 48
@@ -587,7 +577,7 @@ function TheWeddingOfTitle() {
         /* ✅ 드로잉: 진짜로 "써지는" 레이어 */
         .hero-script-draw {
           fill: transparent;
-          stroke: rgba(255,255,255,0.95);
+          stroke: rgba(233, 233, 233, 0.95);
           stroke-width: 2.6;
           filter: url(#softGlow);
 

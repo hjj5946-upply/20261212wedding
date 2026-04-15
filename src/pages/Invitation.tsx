@@ -16,70 +16,22 @@ import { GiftAccountsSection } from "../sections/GiftAccountsSection";
 import { GuestbookSection } from "../sections/GuestbookSection";
 import { supabase } from "../lib/supabase";
 import { BgmFloating } from "../components/BgmFloating";
-import { getBgmEnabled, initBgm, playBgm } from "../utils/bgm";
+import { getBgmEnabled, initBgm, isBgmPlaying, playBgm } from "../utils/bgm";
 import { buildMapLinks, openDeepLinkOrFallback } from "../utils/mapNavigation";
 
 export function Invitation() {
-  // ✨ Fade in 상태 추가
   const [fadeIn, setFadeIn] = useState(false);
+  const [mapSelectOpen, setMapSelectOpen] = useState(false);
+  const [showCTA, setShowCTA] = useState(false);
+  const [toast, setToast] = useState<{ open: boolean; msg: string }>({ open: false, msg: "" });
+
+  const data = WEDDING;
 
   const handleNavigate = (type: "naver" | "kakao" | "tmap") => {
     const { venueLat, venueLng, venueName } = data.ceremony;
-  
     const { deep, web } = buildMapLinks(type, venueLat!, venueLng!, venueName);
     openDeepLinkOrFallback(type, deep, web);
   };
-
-  // ✨ 페이지 마운트 시 부드러운 fade in 효과
-  useEffect(() => {
-    const timer = setTimeout(() => setFadeIn(true), 200);
-    return () => clearTimeout(timer);
-  }, []);
-
-  useEffect(() => {
-    if (!getBgmEnabled()) {
-      console.log("[BGM] disabled by localStorage. key=bgm_enabled_v1");
-      return;
-    }
-    const a = initBgm();
-    let armed = true;
-    const tryPlayNow = (e: Event) => {
-      const type = e.type;
-      const tag = (e.target as HTMLElement)?.tagName;
-      console.log(`[BGM] event=${type} target=${tag} armed=${armed} paused=${a.paused}`);
-      if (!armed) return;
-      const p = playBgm();
-      p.then(() => {
-        localStorage.setItem("bgm_enabled_v1", "1");
-        armed = false;
-        setToast({ open: true, msg: "배경음악이 재생되었습니다" });
-        cleanup();
-      }).catch((err) => {
-        console.log("[BGM] play() failed:", err);
-      });
-    };
-    const cleanup = () => {
-      document.removeEventListener("pointerdown", tryPlayNow, true);
-      document.removeEventListener("touchstart", tryPlayNow, true);
-      document.removeEventListener("click", tryPlayNow, true);
-      document.removeEventListener("wheel", tryPlayNow, true);
-      document.removeEventListener("keydown", tryPlayNow, true);
-    };
-    document.addEventListener("pointerdown", tryPlayNow, true);
-    document.addEventListener("touchstart", tryPlayNow, true);
-    document.addEventListener("click", tryPlayNow, true);
-    document.addEventListener("wheel", tryPlayNow, true);    
-    document.addEventListener("keydown", tryPlayNow, true);  
-    return cleanup;
-  }, []);
-
-  const data = WEDDING;
-  const [mapSelectOpen, setMapSelectOpen] = useState(false);
-  const [showCTA, setShowCTA] = useState(false);
-  const [toast, setToast] = useState<{ open: boolean; msg: string }>({
-    open: false,
-    msg: "",
-  });
 
   const copyText = async (text: string) => {
     await navigator.clipboard.writeText(text);
@@ -90,20 +42,16 @@ export function Invitation() {
     const url = window.location.href;
     const title = document.title || "모바일 청첩장";
     const text = "소중한 분들을 초대합니다.";
-  
+
     if (navigator.share) {
       try {
-        await navigator.share({
-          title,
-          text,
-          url,
-        });
+        await navigator.share({ title, text, url });
         return;
       } catch {
         return;
       }
     }
-  
+
     await navigator.clipboard.writeText(url);
     setToast({ open: true, msg: "링크가 복사되었습니다." });
   };
@@ -125,16 +73,51 @@ export function Invitation() {
   };
 
   useEffect(() => {
+    const timer = setTimeout(() => setFadeIn(true), 200);
+    return () => clearTimeout(timer);
+  }, []);
+
+  useEffect(() => {
+    if (!getBgmEnabled()) return;
+    if (isBgmPlaying()) {
+      setToast({ open: true, msg: "배경음악이 재생되었습니다" });
+      return;
+    }
+
+    const a = initBgm();
+    let armed = true;
+
+    const tryPlayNow = (e: Event) => {
+      if (!armed) return;
+      if (e.type !== "click") return;
+
+      playBgm()
+        .then(() => {
+          localStorage.setItem("bgm_enabled_v1", "1");
+          armed = false;
+          setToast({ open: true, msg: "배경음악이 재생되었습니다" });
+          cleanup();
+        })
+        .catch((err) => console.log("[BGM] play() failed:", err));
+    };
+
+    const cleanup = () => {
+      document.removeEventListener("click", tryPlayNow, true);
+    };
+
+    document.addEventListener("click", tryPlayNow, true);
+
+    return cleanup;
+  }, []);
+
+  useEffect(() => {
     const giftSection = document.getElementById("gift");
     if (!giftSection) return;
-  
+
     const handleScroll = () => {
-      const scrollY = window.scrollY;
-      const giftTop = giftSection.offsetTop;
-  
-      setShowCTA(scrollY > giftTop - 200);
+      setShowCTA(window.scrollY > giftSection.offsetTop - 200);
     };
-  
+
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
@@ -160,7 +143,6 @@ export function Invitation() {
 
       <FloatingCTA visible={showCTA} onShare={onShare} onOpenMap={onOpenMap} />
 
-      {/* ✅ main은 내용만 */}
       <main
         className={[
           "min-h-screen bg-white text-neutral-900 pb-28",

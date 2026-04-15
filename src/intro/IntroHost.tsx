@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { asset } from "../utils/asset";
+import { playBgm } from "../utils/bgm";
 
 export type IntroStyle = "montage" | "filmstrip" | "game" | "gate";
 
@@ -129,6 +130,7 @@ function MontageIntro({ onDone }: { onDone: () => void }) {
       className={`fixed inset-0 z-[100] mobile-fixed-overlay bg-black transition-opacity duration-1000 ${
         fadeOut ? "opacity-0" : "opacity-100"
       }`}
+      onClick={() => playBgm().catch(() => {})}
     >
       {/* 계속 전환되는 이미지 배경 */}
       <div className="absolute inset-0 overflow-hidden">

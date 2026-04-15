@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { Invitation } from "./pages/Invitation";
 import { IntroHost, type IntroStyle } from "./intro/IntroHost";
 
-const DEFAULT_INTRO_STYLE: IntroStyle = "montage"; // ✅ A안 확정
+const DEFAULT_INTRO_STYLE: IntroStyle = "montage";
 const INTRO_STYLE_KEY = "intro_style_v1";
 
 function isIntroStyle(v: string | null): v is IntroStyle {
@@ -102,7 +102,6 @@ export default function App() {
   const [introStyle] = useState<IntroStyle>(initialIntroStyle);
   const [introDone, setIntroDone] = useState(false);
 
-  // ✅ 토글로 바꾸면 storage에 저장(배포 테스트 편하게)
   useEffect(() => {
     localStorage.setItem(INTRO_STYLE_KEY, introStyle);
   }, [introStyle]);
@@ -111,9 +110,6 @@ export default function App() {
 
   return (
     <>
-      {/* ✅ 임시 토글: 확정되면 이 줄 + IntroVariantToggle 컴포넌트 삭제 */}
-      {/* {!introDone && <IntroVariantToggle value={introStyle} onChange={setIntroStyle} />} */}
-
       {!introDone && <IntroHost style={introStyle} onDone={() => setIntroDone(true)} />}
       {introDone && <Invitation />}
     </>

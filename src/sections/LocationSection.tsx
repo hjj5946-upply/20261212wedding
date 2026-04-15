@@ -58,7 +58,7 @@ function NaverMap({
 
   useEffect(() => {
     (window as any).navermap_authFailure = () => {
-      console.error("[NaverMap] Open API 인증 실패");
+
     };
 
     // 좌표가 없으면 지도 SDK 로딩/렌더 불가 -> 링크 카드로 처리
