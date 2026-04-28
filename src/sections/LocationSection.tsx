@@ -187,7 +187,17 @@ export function NaverMapEmbed({ lat, lng }: { lat: number; lng: number }) {
       const w = window as any;
 
       const center = new w.naver.maps.LatLng(lat, lng);
-      const map = new w.naver.maps.Map(ref.current, { center, zoom: 16 });
+      const map = new w.naver.maps.Map(ref.current, {
+         center, 
+         zoom: 16,
+         draggable: false,        
+         pinchZoom: false,        
+         scrollWheel: false,     
+         keyboardShortcuts: false, 
+         disableDoubleTapZoom: true, 
+         disableDoubleClickZoom: true, 
+         disableTwoFingerTapZoom: true,
+      });
       new w.naver.maps.Marker({ position: center, map });
     })().catch(console.error);
   }, [lat, lng]);
