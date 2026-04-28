@@ -79,6 +79,13 @@ function NaverMap({
         const map = new w.naver.maps.Map(ref.current, {
           center,
           zoom: 16,
+          draggable: false,        
+          pinchZoom: false,        
+          scrollWheel: false,     
+          keyboardShortcuts: false, 
+          disableDoubleTapZoom: true, 
+          disableDoubleClickZoom: true, 
+          disableTwoFingerTapZoom: true,
         });
 
         new w.naver.maps.Marker({
