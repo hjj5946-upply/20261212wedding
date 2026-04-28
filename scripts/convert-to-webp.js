@@ -5,7 +5,6 @@ import sharp from "sharp";
 const inDir = path.resolve("public/images");
 
 if (!fs.existsSync(inDir)) {
-  console.error("❌ public/images 폴더가 없습니다:", inDir);
   process.exit(1);
 }
 
@@ -17,7 +16,6 @@ const files = fs
   ;
 
 if (files.length === 0) {
-  console.log("ℹ️ 변환할 이미지가 없습니다. (jpg/jpeg/png)");
   process.exit(0);
 }
 
@@ -36,6 +34,5 @@ const EFFORT = 4;      // ✅ 인코딩 속도/효율 균형 (0~6)
       .webp({ quality: QUALITY, effort: EFFORT })
       .toFile(output);
 
-    console.log("✅ created:", path.relative(process.cwd(), output));
   }
 })();

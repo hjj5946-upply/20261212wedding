@@ -1,25 +1,25 @@
 // App.tsx
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { Invitation } from "./pages/Invitation";
 import { IntroHost, type IntroStyle } from "./intro/IntroHost";
 
-const DEFAULT_INTRO_STYLE: IntroStyle = "filmstrip";
+// const DEFAULT_INTRO_STYLE: IntroStyle = "montage";
 const INTRO_STYLE_KEY = "intro_style_v1";
 
-function isIntroStyle(v: string | null): v is IntroStyle {
-  return v === "montage" || v === "filmstrip" || v === "game" || v === "gate";
-}
+// function isIntroStyle(v: string | null): v is IntroStyle {
+//   return v === "montage" || v === "filmstrip" || v === "game" || v === "gate";
+// }
 
-function readIntroStyleFromUrl(): IntroStyle | null {
-  const params = new URLSearchParams(window.location.search);
-  const v = params.get("intro");
-  return isIntroStyle(v) ? v : null;
-}
+// function readIntroStyleFromUrl(): IntroStyle | null {
+//   const params = new URLSearchParams(window.location.search);
+//   const v = params.get("intro");
+//   return isIntroStyle(v) ? v : null;
+// }
 
-function readIntroStyleFromStorage(): IntroStyle | null {
-  const v = localStorage.getItem(INTRO_STYLE_KEY);
-  return isIntroStyle(v) ? v : null;
-}
+// function readIntroStyleFromStorage(): IntroStyle | null {
+//   const v = localStorage.getItem(INTRO_STYLE_KEY);
+//   return isIntroStyle(v) ? v : null;
+// }
 
 function isNoIntro(): boolean {
   const params = new URLSearchParams(window.location.search);
@@ -92,15 +92,16 @@ export default function App() {
   useBlockContextMenu(true);
   usePreventPinchZoom(true);
 
-  // ✅ URL 우선, 없으면 storage, 없으면 default
-  const initialIntroStyle = useMemo(() => {
-    return readIntroStyleFromUrl() ?? readIntroStyleFromStorage() ?? DEFAULT_INTRO_STYLE;
-  }, []);
+  // ✅ A안 확정: 항상 montage (URL·localStorage 무시)
+  const initialIntroStyle: IntroStyle = "montage";
+  // [A안 확정으로 비활성화] URL/storage에서 읽어 A~D 전환하는 로직
+  // const initialIntroStyle = useMemo(() => {
+  //   return readIntroStyleFromUrl() ?? readIntroStyleFromStorage() ?? DEFAULT_INTRO_STYLE;
+  // }, []);
 
   const [introStyle] = useState<IntroStyle>(initialIntroStyle);
   const [introDone, setIntroDone] = useState(false);
 
-  // ✅ 토글로 바꾸면 storage에 저장(배포 테스트 편하게)
   useEffect(() => {
     localStorage.setItem(INTRO_STYLE_KEY, introStyle);
   }, [introStyle]);
@@ -109,9 +110,6 @@ export default function App() {
 
   return (
     <>
-      {/* ✅ 임시 토글: 확정되면 이 줄 + IntroVariantToggle 컴포넌트 삭제 */}
-      {/* {!introDone && <IntroVariantToggle value={introStyle} onChange={setIntroStyle} />} */}
-
       {!introDone && <IntroHost style={introStyle} onDone={() => setIntroDone(true)} />}
       {introDone && <Invitation />}
     </>

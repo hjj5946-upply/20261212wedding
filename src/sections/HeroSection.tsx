@@ -286,8 +286,7 @@ export function HeroSection({ data, onShare }: Props) {
       {variant === "A" ? (
         <HeroSectionA data={data} onShare={onShare} />
       ) : (
-        ""
-        // <HeroSectionB data={data} onShare={onShare} />
+        <HeroSectionB data={data} onShare={onShare} />
       )}
     </>
   );
@@ -427,91 +426,91 @@ function HeroSectionA({ data }: Props) {
 }
 
 /** B안: 카드 사진 위에 눈 (모바일 안정화) */
-// function HeroSectionB({ data, onShare }: Props) {
-//   // const chipText = useDdayChip(data.ceremony.dateISO);
+function HeroSectionB({ data, onShare }: Props) {
+  // const chipText = useDdayChip(data.ceremony.dateISO);
 
-//   const cardRef = useRef<HTMLDivElement | null>(null);
-//   const snowRef = useRef<HTMLCanvasElement | null>(null);
+  const cardRef = useRef<HTMLDivElement | null>(null);
+  const snowRef = useRef<HTMLCanvasElement | null>(null);
 
-//   useSnowCanvas(cardRef, snowRef, {
-//     count: 70,
-//     rMin: 0.8,
-//     rMax: 3.6,
-//     vyMin: 20,
-//     vyMax: 55,
-//     vxMin: -12,
-//     vxMax: 12,
-//     swingMin: 18,
-//     swingMax: 65,
-//     alpha: 0.92,
-//     windMul: 1.0,
-//   });
+  useSnowCanvas(cardRef, snowRef, {
+    count: 70,
+    rMin: 0.8,
+    rMax: 3.6,
+    vyMin: 20,
+    vyMax: 55,
+    vxMin: -12,
+    vxMax: 12,
+    swingMin: 18,
+    swingMax: 65,
+    alpha: 0.92,
+    windMul: 1.0,
+  });
 
-//   const photoImg = asset("images/main_img.webp");
-//   const ribbonImg = asset("images/ribbon.png");
+  const photoImg = asset("images/main_img.webp");
+  const ribbonImg = asset("images/ribbon.png");
 
-//   return (
-//     <section className="w-full bg-neutral-100">
-//       <div className="mx-auto max-w-md px-5 pt-[max(env(safe-area-inset-top),24px)] pb-[max(env(safe-area-inset-bottom),24px)] min-h-[100svh] flex flex-col">
-//         {/* 상단: 신랑 - 리본 - 신부 */}
-//         <div className="pt-6">
-//           <div className="flex items-center justify-center gap-20">
-//             <div className="text-center">
-//               <div className="text-[13px] tracking-[0.25em] text-neutral-500">GROOM</div>
-//               <div className="mt-1 text-xl text-neutral-700">{data.couple.groomName}</div>
-//             </div>
+  return (
+    <section className="w-full bg-neutral-100">
+      <div className="mx-auto max-w-md px-5 pt-[max(env(safe-area-inset-top),24px)] pb-[max(env(safe-area-inset-bottom),24px)] min-h-[100svh] flex flex-col">
+        {/* 상단: 신랑 - 리본 - 신부 */}
+        <div className="pt-6">
+          <div className="flex items-center justify-center gap-20">
+            <div className="text-center">
+              <div className="text-[13px] tracking-[0.25em] text-neutral-500">GROOM</div>
+              <div className="mt-1 text-xl text-neutral-700">{data.couple.groomName}</div>
+            </div>
 
-//             <div className="flex items-center justify-center">
-//               <img src={ribbonImg} alt="logo" className="h-8 w-auto object-contain" />
-//             </div>
+            <div className="flex items-center justify-center">
+              <img src={ribbonImg} alt="logo" className="h-8 w-auto object-contain" />
+            </div>
 
-//             <div className="text-center">
-//               <div className="text-[13px] tracking-[0.25em] text-neutral-500">BRIDE</div>
-//               <div className="mt-1 text-xl text-neutral-700">{data.couple.brideName}</div>
-//             </div>
-//           </div>
-//         </div>
+            <div className="text-center">
+              <div className="text-[13px] tracking-[0.25em] text-neutral-500">BRIDE</div>
+              <div className="mt-1 text-xl text-neutral-700">{data.couple.brideName}</div>
+            </div>
+          </div>
+        </div>
 
-//         {/* 중간: 사진 카드 */}
-//         <div className="mt-6 flex-1 flex items-center">
-//           <div className="w-full">
-//             <div
-//               ref={cardRef}
-//               className="relative aspect-[2/3] w-full max-h-[78vh] overflow-hidden rounded-3xl border border-neutral-200 bg-white
-//                          shadow-[0_14px_42px_-22px_rgba(0,0,0,0.26),0_2px_6px_0_rgba(0,0,0,0.14)]"
-//             >
-//               <img src={photoImg} alt="Wedding" className="absolute inset-0 h-full w-full object-cover" />
+        {/* 중간: 사진 카드 */}
+        <div className="mt-6 flex-1 flex items-center">
+          <div className="w-full">
+            <div
+              ref={cardRef}
+              className="relative aspect-[2/3] w-full max-h-[78vh] overflow-hidden rounded-3xl border border-neutral-200 bg-white
+                         shadow-[0_14px_42px_-22px_rgba(0,0,0,0.26),0_2px_6px_0_rgba(0,0,0,0.14)]"
+            >
+              <img src={photoImg} alt="Wedding" className="absolute inset-0 h-full w-full object-cover" />
 
-//               <div className="pointer-events-none absolute inset-0 z-20">
-//                 <canvas ref={snowRef} className="h-full w-full" />
-//               </div>
-//             </div>
-//           </div>
-//         </div>
+              <div className="pointer-events-none absolute inset-0 z-20">
+                <canvas ref={snowRef} className="h-full w-full" />
+              </div>
+            </div>
+          </div>
+        </div>
 
-//         {/* 하단 */}
-//         <div className="mt-7">
-//           {/* <div className="flex items-center justify-center">
-//             <div className="rounded-full bg-white px-4 py-2 border border-neutral-200 shadow-sm">
-//               <span className="text-sm font-semibold text-neutral-900">{chipText}</span>
-//             </div>
-//           </div> */}
+        {/* 하단 */}
+        <div className="mt-7">
+          {/* <div className="flex items-center justify-center">
+            <div className="rounded-full bg-white px-4 py-2 border border-neutral-200 shadow-sm">
+              <span className="text-sm font-semibold text-neutral-900">{chipText}</span>
+            </div>
+          </div> */}
 
-//           <div className="mt-4 text-center text-neutral-800">
-//             <div className="font-medium text-base">{data.ceremony.dateText}</div>
-//             <div className="mt-1 text-neutral-600 text-lg">{data.ceremony.venueName}</div>
-//           </div>
+          <div className="mt-4 text-center text-neutral-800">
+            <div className="font-medium text-base">{data.ceremony.dateText}</div>
+            <div className="mt-1 text-neutral-600 text-lg">{data.ceremony.venueName}</div>
+          </div>
 
-//           <div className="mt-5">
-//             <Button fullWidth variant="secondary" onClick={onShare}>
-//               청첩장 공유하기
-//             </Button>
-//           </div>
-//         </div>
-//       </div>
-//     </section>
-//   );
-// }
+          <div className="mt-5">
+            <Button fullWidth variant="secondary" onClick={onShare}>
+              청첩장 공유하기
+            </Button>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
 
 
 function TheWeddingOfTitle() {

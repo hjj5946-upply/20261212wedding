@@ -47,7 +47,6 @@ export function NaverMapEmbed({ lat, lng, zoom = 16 }: Props) {
     // 인증 실패 콜백(한 번만 세팅)
     window.navermap_authFailure = () => {
       // 필요하면 UI로 보여주고, 링크로 폴백하는 방식도 가능
-      console.error("[NaverMap] auth failure");
     };
 
     const src = `https://oapi.map.naver.com/openapi/v3/maps.js?ncpKeyId=${keyId}`;
@@ -56,7 +55,6 @@ export function NaverMapEmbed({ lat, lng, zoom = 16 }: Props) {
       await loadScriptOnce(src);
 
       if (!window.naver?.maps) {
-        console.error("[NaverMap] naver.maps is not available");
         return;
       }
 
