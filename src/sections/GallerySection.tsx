@@ -10,7 +10,7 @@ type ViewMode = "grid" | "single";
 
 export function GallerySection() {
   const images = useMemo(() => {
-    const imageCount = 18;
+    const imageCount = 24;
     
     return Array.from({ length: imageCount }, (_, idx) => ({
       src: asset(`images/intro_${idx + 1}.webp`),
@@ -107,7 +107,7 @@ export function GallerySection() {
               label="바둑판 보기"
               onClick={() => setMode("grid")}
             >
-              <LayoutGrid size={18} />
+              <LayoutGrid size={24} />
             </IconTab>
 
             <IconTab
@@ -115,7 +115,7 @@ export function GallerySection() {
               label="통으로 보기"
               onClick={() => setMode("single")}
             >
-              <RectangleVertical size={18} />
+              <RectangleVertical size={24} />
             </IconTab>
           </div>
         </div>
