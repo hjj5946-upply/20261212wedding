@@ -2,6 +2,10 @@
 import { useEffect, useState } from "react";
 import { Invitation } from "./pages/Invitation";
 import { IntroHost, type IntroStyle } from "./intro/IntroHost";
+import { gsap } from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
+
+gsap.registerPlugin(ScrollTrigger);
 
 // const DEFAULT_INTRO_STYLE: IntroStyle = "montage";
 const INTRO_STYLE_KEY = "intro_style_v1";
