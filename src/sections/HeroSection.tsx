@@ -80,27 +80,27 @@ function useSnowCanvas<T extends HTMLElement>(
 
     const rand = (a: number, b: number) => a + Math.random() * (b - a);
 
-    const count    = opts?.count    ?? 70;
-    const rMin     = opts?.rMin     ?? 0.8;
-    const rMax     = opts?.rMax     ?? 3.6;
-    const vyMin    = opts?.vyMin    ?? 20;
-    const vyMax    = opts?.vyMax    ?? 55;
-    const vxMin    = opts?.vxMin    ?? -12;
-    const vxMax    = opts?.vxMax    ?? 12;
+    const count = opts?.count ?? 70;
+    const rMin = opts?.rMin ?? 0.8;
+    const rMax = opts?.rMax ?? 3.6;
+    const vyMin = opts?.vyMin ?? 20;
+    const vyMax = opts?.vyMax ?? 55;
+    const vxMin = opts?.vxMin ?? -12;
+    const vxMax = opts?.vxMax ?? 12;
     const swingMin = opts?.swingMin ?? 18;
     const swingMax = opts?.swingMax ?? 65;
-    const windMul  = opts?.windMul  ?? 1;
-    const alpha    = opts?.alpha    ?? 0.92;
+    const windMul = opts?.windMul ?? 1;
+    const alpha = opts?.alpha ?? 0.92;
 
     const flakes: Flake[] = Array.from({ length: count }).map(() => ({
-      x:     rand(0, cw),
-      y:     rand(0, ch),
-      r:     rand(rMin, rMax),
-      vy:    rand(vyMin, vyMax),
-      vx:    rand(vxMin, vxMax),
+      x: rand(0, cw),
+      y: rand(0, ch),
+      r: rand(rMin, rMax),
+      vy: rand(vyMin, vyMax),
+      vx: rand(vxMin, vxMax),
       swing: rand(swingMin, swingMax),
       phase: rand(0, Math.PI * 2),
-      life:  rand(3.5, 9.5),
+      life: rand(3.5, 9.5),
     }));
 
     const reset = (f: Flake) => {
@@ -115,12 +115,12 @@ function useSnowCanvas<T extends HTMLElement>(
         f.x = cw + rand(10, 80);
         f.y = rand(0, ch * 0.7);
       }
-      f.r     = rand(rMin, rMax);
-      f.vy    = rand(vyMin, vyMax);
-      f.vx    = rand(vxMin, vxMax);
+      f.r = rand(rMin, rMax);
+      f.vy = rand(vyMin, vyMax);
+      f.vx = rand(vxMin, vxMax);
       f.swing = rand(swingMin, swingMax);
       f.phase = rand(0, Math.PI * 2);
-      f.life  = rand(3.5, 9.5);
+      f.life = rand(3.5, 9.5);
     };
 
     const draw = (f: Flake) => {
@@ -135,9 +135,9 @@ function useSnowCanvas<T extends HTMLElement>(
       ctx.fill();
     };
 
-    let raf  = 0;
+    let raf = 0;
     let last = performance.now();
-    let t    = 0;
+    let t = 0;
 
     const tick = (now: number) => {
       const dt = Math.min(0.033, (now - last) / 1000);
@@ -285,12 +285,12 @@ export function HeroSection({ data }: Props) {
   const heroImg = asset("images/main_img.webp");
 
   // refs
-  const sectionRef  = useRef<HTMLElement | null>(null);
-  const snowRef     = useRef<HTMLCanvasElement | null>(null);
-  const imgRef      = useRef<HTMLImageElement | null>(null);
-  const labelRef    = useRef<HTMLDivElement | null>(null);   // "GROOM · BRIDE"
-  const nameRef     = useRef<HTMLHeadingElement | null>(null);
-  const metaRef     = useRef<HTMLDivElement | null>(null);   // 날짜 + 장소
+  const sectionRef = useRef<HTMLElement | null>(null);
+  const snowRef = useRef<HTMLCanvasElement | null>(null);
+  const imgRef = useRef<HTMLImageElement | null>(null);
+  const labelRef = useRef<HTMLDivElement | null>(null);   // "GROOM · BRIDE"
+  const nameRef = useRef<HTMLHeadingElement | null>(null);
+  const metaRef = useRef<HTMLDivElement | null>(null);   // 날짜 + 장소
   const topBlockRef = useRef<HTMLDivElement | null>(null);   // "The Wedding Of" 래퍼
 
   // 눈 파티클
@@ -319,6 +319,12 @@ export function HeroSection({ data }: Props) {
         duration: 2.4,
         ease: "power2.out",
       }, 0);
+
+      tl.from(snowRef.current, {
+        opacity: 0,
+        duration: 2.0,
+        ease: "power2.out",
+      }, 0.8);
 
       // ② "The Wedding Of" 래퍼: 위에서 내려오며 fade
       //    (SVG 내부 writeText 애니는 CSS가 담당, 래퍼만 GSAP으로)
@@ -428,7 +434,8 @@ export function HeroSection({ data }: Props) {
             >
               <div
                 className="text-[14px] font-light tracking-[0.12em]"
-                style={{ color: "rgba(255,255,255,0.85)" }}
+                style={{ 
+                  color: "rgba(255,255,255,0.85)" }}
               >
                 {data.ceremony.dateText}
               </div>

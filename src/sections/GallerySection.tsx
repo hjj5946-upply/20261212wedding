@@ -1,7 +1,7 @@
 // src/sections/GallerySection.tsx
 import { useEffect, useMemo, useRef, useState } from "react";
 import { gsap } from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
+
 import { Section } from "../components/Section";
 import { SectionTitle } from "../components/SectionTitle";
 import { LayoutGrid, RectangleVertical } from "lucide-react";
@@ -24,11 +24,9 @@ export function GallerySection() {
 
   const gridVisible = expanded ? images : images.slice(0, 12);
 
-  // refs
   const sectionRef    = useRef<HTMLDivElement | null>(null);
   const gridRef       = useRef<HTMLDivElement | null>(null);
   const singleImgRef  = useRef<HTMLImageElement | null>(null);
-  const directionRef  = useRef<"left" | "right">("right"); // 슬라이드 방향
 
   // ── ① 그리드 stagger 등장 (섹션 진입 시) ──────────────
   useEffect(() => {
