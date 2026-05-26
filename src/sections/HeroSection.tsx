@@ -9,11 +9,6 @@ type Props = {
   onShare: () => void;
 };
 
-// ─────────────────────────────────────────────
-// 눈 파티클 캔버스 훅
-// - prefers-reduced-motion이면 속도만 낮춤
-// - ResizeObserver + rAF 보정
-// ─────────────────────────────────────────────
 function useSnowCanvas<T extends HTMLElement>(
   containerRef: React.RefObject<T | null>,
   canvasRef: React.RefObject<HTMLCanvasElement | null>,
@@ -178,120 +173,14 @@ function useSnowCanvas<T extends HTMLElement>(
 }
 
 // ─────────────────────────────────────────────
-// "The Wedding Of" SVG 타이틀
-// stroke-dashoffset 써지는 효과는 CSS로 유지
-// (SVG path 길이 기반이라 GSAP보다 CSS가 더 정밀)
-// ─────────────────────────────────────────────
-function TheWeddingOfTitle() {
-  return (
-    <div className="flex flex-col items-center justify-center">
-      <svg
-        className="w-[320px] max-w-[92%] h-[78px] overflow-visible"
-        viewBox="0 0 900 200"
-        fill="none"
-        aria-label="The Wedding Of"
-      >
-        <defs>
-          <filter id="softGlow" x="-40%" y="-40%" width="180%" height="180%">
-            <feGaussianBlur in="SourceGraphic" stdDeviation="2.2" result="blur" />
-            <feMerge>
-              <feMergeNode in="blur" />
-              <feMergeNode in="SourceGraphic" />
-            </feMerge>
-          </filter>
-        </defs>
-
-        {/* 베이스: 항상 희미하게 보이는 완성 글씨 */}
-        <text x="50%" y="155" textAnchor="middle" className="hero-script-base">
-          The Wedding Of
-        </text>
-
-        {/* 드로잉: 실제로 "써지는" 레이어 */}
-        <text x="50%" y="155" textAnchor="middle" className="hero-script-draw">
-          The Wedding Of
-        </text>
-
-        {/* 하트: 써지기 끝난 뒤 등장 */}
-        <path
-          d="M450 42
-             C430 18, 392 18, 392 48
-             C392 82, 450 112, 450 112
-             C450 112, 508 82, 508 48
-             C508 18, 470 18, 450 42 Z"
-          fill="rgba(255,255,255,0.92)"
-          className="hero-heart"
-          transform="translate(155,-10) scale(0.26)"
-        />
-      </svg>
-
-      {/* 구분선 */}
-      <div className="mt-1 h-px w-28 bg-white/40" />
-
-      <style>{`
-        .hero-script-base,
-        .hero-script-draw {
-          font-family: "Great Vibes", "Allura", "Dancing Script", "Parisienne", cursive;
-          font-size: 110px;
-          font-weight: 400;
-          letter-spacing: 0.08em;
-          stroke-linecap: round;
-          stroke-linejoin: round;
-        }
-
-        /* 완성된 글씨 — 항상 희미하게 */
-        .hero-script-base {
-          fill: rgba(255,255,255,0.14);
-          stroke: rgba(255,255,255,0.22);
-          stroke-width: 1.2;
-          filter: url(#softGlow);
-        }
-
-        /* 써지는 레이어 */
-        .hero-script-draw {
-          fill: transparent;
-          stroke: rgba(255,255,255,0.95);
-          stroke-width: 2.6;
-          filter: url(#softGlow);
-          stroke-dasharray: 1600;
-          stroke-dashoffset: 1600;
-          animation: writeText 2.0s ease-out 0.11s forwards;
-        }
-
-        @keyframes writeText {
-          to { stroke-dashoffset: 0; }
-        }
-
-        /* 하트 — 써지기 끝난 뒤 등장 */
-        .hero-heart {
-          opacity: 0;
-          transform-origin: center;
-          animation: heartIn 0.35s ease-out 1.75s forwards;
-        }
-
-        @keyframes heartIn {
-          0%   { opacity: 0; transform: translate(255px,-10px) scale(0.20); }
-          70%  { opacity: 1; transform: translate(255px,-10px) scale(0.30); }
-          100% { opacity: 1; transform: translate(255px,-10px) scale(0.26); }
-        }
-      `}</style>
-    </div>
-  );
-}
-
-// ─────────────────────────────────────────────
-// HeroSection (A안 확정)
+// HeroSection
 // ─────────────────────────────────────────────
 export function HeroSection({ data }: Props) {
   const heroImg = asset("images/main_img.webp");
 
-  // refs
   const sectionRef = useRef<HTMLElement | null>(null);
   const snowRef = useRef<HTMLCanvasElement | null>(null);
   const imgRef = useRef<HTMLImageElement | null>(null);
-  const labelRef = useRef<HTMLDivElement | null>(null);   // "GROOM · BRIDE"
-  const nameRef = useRef<HTMLHeadingElement | null>(null);
-  const metaRef = useRef<HTMLDivElement | null>(null);   // 날짜 + 장소
-  const topBlockRef = useRef<HTMLDivElement | null>(null);   // "The Wedding Of" 래퍼
 
   // 눈 파티클
   useSnowCanvas(sectionRef, snowRef, {
@@ -308,54 +197,23 @@ export function HeroSection({ data }: Props) {
     windMul: 0.9,
   });
 
-  // ── GSAP 진입 타임라인 ──────────────────────
+  // ── GSAP: 배경 이미지 + 눈 페이드인 ──────────
   useEffect(() => {
     const ctx = gsap.context(() => {
-      const tl = gsap.timeline({ defaults: { ease: "power3.out" } });
+      const tl = gsap.timeline({ defaults: { ease: "power2.out" } });
 
-      // ① 배경 이미지: scale 1.08 → 1 (Ken Burns 느낌)
+      // 배경 이미지: Ken Burns
       tl.from(imgRef.current, {
         scale: 1.08,
         duration: 2.4,
-        ease: "power2.out",
       }, 0);
 
+      // 눈: 서서히 등장
       tl.from(snowRef.current, {
         opacity: 0,
         duration: 2.0,
-        ease: "power2.out",
       }, 0.8);
 
-      // ② "The Wedding Of" 래퍼: 위에서 내려오며 fade
-      //    (SVG 내부 writeText 애니는 CSS가 담당, 래퍼만 GSAP으로)
-      tl.from(topBlockRef.current, {
-        y: -28,
-        opacity: 0,
-        duration: 1.0,
-        ease: "expo.out",
-      }, 0.3);
-
-      // ③ "GROOM · BRIDE" 레이블
-      tl.from(labelRef.current, {
-        y: 16,
-        opacity: 0,
-        duration: 0.7,
-      }, 1.4);
-
-      // ④ 이름 (JeongJun & SongHee) — 약간 더 크게 올라오며
-      tl.from(nameRef.current, {
-        y: 24,
-        opacity: 0,
-        duration: 0.85,
-        ease: "expo.out",
-      }, 1.75);
-
-      // ⑤ 날짜 + 장소 — 마지막에 부드럽게
-      tl.from(metaRef.current, {
-        y: 18,
-        opacity: 0,
-        duration: 0.75,
-      }, 2.15);
     }, sectionRef);
 
     return () => ctx.revert();
@@ -365,91 +223,66 @@ export function HeroSection({ data }: Props) {
     <section ref={sectionRef} className="relative h-[100svh] w-full overflow-hidden">
 
       {/* 배경 이미지 */}
+      {/* <img
+        ref={imgRef}
+        src={heroImg}
+        alt="Wedding"
+        className="absolute inset-0 h-full w-full object-contain"
+        // ✅ object-contain: 이미지 전체가 잘리지 않고 보임
+        // 양옆 잘림이 싫으면 object-contain, 꽉 채우려면 object-cover
+        loading="eager"
+        decoding="async"
+      /> */}
+
+      {/* 블러 배경 이미지 */}
+      <img
+        src={heroImg}
+        alt=""
+        aria-hidden
+        className="absolute inset-0 h-full w-full object-cover scale-110 blur-xl opacity-80"
+      />
+
+      {/* 원본 이미지 */}
       <img
         ref={imgRef}
         src={heroImg}
         alt="Wedding"
-        className="absolute inset-0 h-full w-full object-cover"
+        className="absolute inset-0 h-full w-full object-contain"
         loading="eager"
         decoding="async"
       />
-
-      {/* 그라디언트 오버레이 */}
-      <div className="absolute inset-0 bg-gradient-to-b from-black/25 via-black/10 to-black/65" />
 
       {/* 눈 캔버스 */}
       <div className="pointer-events-none absolute inset-x-0 top-0 z-[5] h-[90%] overflow-hidden">
         <canvas ref={snowRef} className="h-full w-full" />
       </div>
 
-      {/* ── 상단: "The Wedding Of" ── */}
-      <div
-        ref={topBlockRef}
-        className="absolute inset-x-0 top-0 z-10 pt-[max(env(safe-area-inset-top),80px)]"
-      >
+      {/* ── 주석처리: 상단 "The Wedding Of" 문구 ──
+      <div ref={topBlockRef} className="absolute inset-x-0 top-0 z-10 pt-[max(env(safe-area-inset-top),80px)]">
         <div className="mx-auto max-w-md px-5">
           <TheWeddingOfTitle />
         </div>
       </div>
+      ── */}
 
-      {/* ── 하단: 이름 · 날짜 · 장소 ── */}
+      {/* ── 주석처리: 하단 이름 · 날짜 · 장소 ──
       <div className="absolute inset-x-0 bottom-0 z-10 pb-[max(env(safe-area-inset-bottom),60px)]">
         <div className="mx-auto max-w-md px-5">
           <div className="text-center">
-
-            {/* GROOM · BRIDE 레이블 */}
-            <div
-              ref={labelRef}
-              className="text-[11px] tracking-[0.35em] text-white/70"
-            >
-              GROOM &nbsp;·&nbsp; BRIDE
+            <div ref={labelRef} className="text-[11px] tracking-[0.35em] text-white/70">
+              GROOM · BRIDE
             </div>
-
-            {/* 이름 */}
-            <h1
-              ref={nameRef}
-              className="text-white"
-              style={{
-                fontFamily: '"Dancing Script","Allura","Parisienne",cursive',
-                fontSize: "32px",
-                lineHeight: 1.1,
-                fontWeight: 500,
-                letterSpacing: "0.03em",
-                textShadow: "0 2px 16px rgba(0,0,0,0.42)",
-              }}
-            >
-              JeongJun
-              <span className="mx-3 text-2xl text-white/70">&amp;</span>
-              SongHee
+            <h1 ref={nameRef} className="text-white" style={{ fontFamily: '"Dancing Script","Allura","Parisienne",cursive', fontSize: "32px" }}>
+              JeongJun & SongHee
             </h1>
-
-            {/* 날짜 + 장소 */}
-            <div
-              ref={metaRef}
-              className="mt-8"
-              style={{
-                fontFamily: '"Noto Serif KR","MaruBuri","Nanum Myeongjo",serif',
-                textShadow: "0 2px 12px rgba(0,0,0,0.28)",
-              }}
-            >
-              <div
-                className="text-[14px] font-light tracking-[0.12em]"
-                style={{ 
-                  color: "rgba(255,255,255,0.85)" }}
-              >
-                {data.ceremony.dateText}
-              </div>
-              <div
-                className="text-[16px] font-medium tracking-[0.06em]"
-                style={{ color: "rgba(255,255,255,0.95)" }}
-              >
-                {data.ceremony.venueName}
-              </div>
+            <div ref={metaRef} className="mt-8">
+              <div>{data.ceremony.dateText}</div>
+              <div>{data.ceremony.venueName}</div>
             </div>
-
           </div>
         </div>
       </div>
+      ── */}
 
     </section>
   );
