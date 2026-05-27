@@ -22,6 +22,7 @@
     background: #ffffff;
     color: #111827;
     touch-action: manipulation;
+    overflow-x: hidden;
   }
 }
 
@@ -36,6 +37,7 @@
     margin: 0 auto;
     box-shadow: 0 8px 40px rgba(0, 0, 0, 0.18);
     min-height: 100vh;
+    overflow-x: hidden;
   }
 
   /* fixed inset-0 오버레이(인트로·모달)를 컨테이너 안쪽으로 제한 */
