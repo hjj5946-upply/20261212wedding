@@ -175,7 +175,7 @@ function useSnowCanvas<T extends HTMLElement>(
 // ─────────────────────────────────────────────
 // HeroSection
 // ─────────────────────────────────────────────
-export function HeroSection({ data }: Props) {
+export function HeroSection({ data: _data }: Props) {
   const heroImg = asset("images/main_img.webp");
 
   const sectionRef = useRef<HTMLElement | null>(null);
