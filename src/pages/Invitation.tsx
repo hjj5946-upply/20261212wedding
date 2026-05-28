@@ -87,7 +87,7 @@ export function Invitation() {
     initBgm();
     let armed = true;
 
-    const tryPlayNow = (e: Event) => {
+    const tryPlayNow = (_: Event) => {
       if (!armed) return;
       if (isBgmPlaying()) {
         armed = false;
