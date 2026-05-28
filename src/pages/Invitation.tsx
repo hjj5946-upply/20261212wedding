@@ -89,7 +89,11 @@ export function Invitation() {
 
     const tryPlayNow = (e: Event) => {
       if (!armed) return;
-      if (e.type !== "click") return;
+      if (isBgmPlaying()) {
+        armed = false;
+        cleanup();
+        return;
+      }
 
       playBgm()
         .then(() => {
@@ -103,9 +107,11 @@ export function Invitation() {
 
     const cleanup = () => {
       document.removeEventListener("click", tryPlayNow, true);
+      document.removeEventListener("touchstart", tryPlayNow, true);
     };
 
     document.addEventListener("click", tryPlayNow, true);
+    document.addEventListener("touchstart", tryPlayNow, true);
 
     return cleanup;
   }, []);
