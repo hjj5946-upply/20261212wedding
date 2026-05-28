@@ -7,14 +7,13 @@ import { StorySection } from "../sections/StorySection";
 import { GallerySection } from "../sections/GallerySection";
 import { InfoSection } from "../sections/InfoSection";
 import { LocationSection } from "../sections/LocationSection";
-import { RsvpSection } from "../sections/RsvpSection";
 import { FooterSection } from "../sections/FooterSection";
 import { FloatingCTA } from "../components/FloatingCTA";
 import { Toast } from "../components/Toast";
 import { MapSelectModal } from "../components/MapSelectModal";
 import { GiftAccountsSection } from "../sections/GiftAccountsSection";
 import { GuestbookSection } from "../sections/GuestbookSection";
-import { supabase } from "../lib/supabase";
+// import { supabase } from "../lib/supabase";
 import { BgmFloating } from "../components/BgmFloating";
 import { getBgmEnabled, initBgm, isBgmPlaying, playBgm } from "../utils/bgm";
 import { buildMapLinks, openDeepLinkOrFallback } from "../utils/mapNavigation";
@@ -58,19 +57,19 @@ export function Invitation() {
 
   const onOpenMap = () => setMapSelectOpen(true);
 
-  const submitRsvp = async (payload: {
-    status: "attend" | "maybe" | "decline";
-    name: string;
-    phone?: string;
-    count: number;
-    memo?: string;
-  }) => {
-    const { error } = await supabase.from("rsvps").insert({
-      ...payload,
-      user_agent: navigator.userAgent,
-    });
-    if (error) throw error;
-  };
+  // const submitRsvp = async (payload: {
+  //   status: "attend" | "maybe" | "decline";
+  //   name: string;
+  //   phone?: string;
+  //   count: number;
+  //   memo?: string;
+  // }) => {
+  //   const { error } = await supabase.from("rsvps").insert({
+  //     ...payload,
+  //     user_agent: navigator.userAgent,
+  //   });
+  //   if (error) throw error;
+  // };
 
   useEffect(() => {
     const timer = setTimeout(() => setFadeIn(true), 200);
