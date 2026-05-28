@@ -3,6 +3,7 @@ import React, { useEffect, useRef } from "react";
 import { gsap } from "gsap";
 import type { WeddingConfig } from "../config/wedding";
 import { asset } from "../utils/asset";
+import { isBgmPlaying, playBgm } from "../utils/bgm";
 
 type Props = {
   data: WeddingConfig;
@@ -217,6 +218,23 @@ export function HeroSection({ data: _data }: Props) {
     }, sectionRef);
 
     return () => ctx.revert();
+  }, []);
+
+  useEffect(() => {
+    if (isBgmPlaying()) return;
+
+    const tryPlay = () => {
+      if (isBgmPlaying()) return;
+      playBgm().catch(() => { });
+    };
+
+    document.addEventListener("touchend", tryPlay, { once: true });
+    document.addEventListener("click", tryPlay, { once: true });
+
+    return () => {
+      document.removeEventListener("touchend", tryPlay);
+      document.removeEventListener("click", tryPlay);
+    };
   }, []);
 
   return (

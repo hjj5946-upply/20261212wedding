@@ -102,16 +102,19 @@ export function Invitation() {
           setToast({ open: true, msg: "배경음악이 재생되었습니다" });
           cleanup();
         })
-        .catch((err) => console.log("[BGM] play() failed:", err));
+        .catch(
+          () => {
+
+          });
     };
 
     const cleanup = () => {
       document.removeEventListener("click", tryPlayNow, true);
-      document.removeEventListener("touchstart", tryPlayNow, true);
+      document.removeEventListener("touchend", tryPlayNow, true);
     };
 
     document.addEventListener("click", tryPlayNow, true);
-    document.addEventListener("touchstart", tryPlayNow, true);
+    document.addEventListener("touchend", tryPlayNow, true);
 
     return cleanup;
   }, []);
