@@ -171,10 +171,10 @@ export function Invitation() {
         <GallerySection />
         <GiftAccountsSection data={data} onCopy={copyText} />
         <LocationSection data={data} onOpenMap={onOpenMap} onCopy={copyText} />
-        <RsvpSection
+        {/* <RsvpSection
           onToast={(msg) => setToast({ open: true, msg })}
           onSubmit={submitRsvp}
-        />
+        /> */}
         <GuestbookSection onToast={(msg) => setToast({ open: true, msg })} />
         <FooterSection />
       </main>
