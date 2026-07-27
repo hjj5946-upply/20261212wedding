@@ -47,7 +47,14 @@ function AccountList({
 
         return (
           <div key={idx} className="rounded-2xl border border-neutral-200 p-4">
-            <div className="text-sm font-medium">{a.holder}</div>
+            <div className="flex items-center gap-2">
+              {a.relation ? (
+                <span className="rounded-full bg-neutral-100 px-2 py-0.5 text-[11px] text-neutral-500">
+                  {a.relation}
+                </span>
+              ) : null}
+              <span className="text-sm font-medium">{a.holder}</span>
+            </div>
 
             <div className="mt-1 text-sm text-neutral-700">
               {a.bank} {shownNumber}
@@ -76,23 +83,23 @@ function AccountList({
                 </Button>
               </div>
 
-              <Button
-                variant="secondary"
-                type="button"
-                className="w-full h-10 !bg-[#FEE800] !border !border-neutral-200 flex items-center justify-center"
-                onClick={async () => {
-                  await onCopy(copyText);
-                  const url = a.kakaoPayUrl || "https://www.kakaopay.com/";
-                  window.open(url, "_blank", "noreferrer");
-                }}
-              >
-                
-                <img
-                  src={asset("images/kakao_pay.webp")}
-                  alt="카카오페이"
-                  className="h-6 w-auto"
-                />
-              </Button>
+              {a.kakaoPayUrl ? (
+                <Button
+                  variant="secondary"
+                  type="button"
+                  className="w-full h-10 !bg-[#FEE800] !border !border-neutral-200 flex items-center justify-center"
+                  onClick={async () => {
+                    await onCopy(copyText);
+                    window.open(a.kakaoPayUrl, "_blank", "noreferrer");
+                  }}
+                >
+                  <img
+                    src={asset("images/kakao_pay.webp")}
+                    alt="카카오페이"
+                    className="h-6 w-auto"
+                  />
+                </Button>
+              ) : null}
             </div>
 
 
