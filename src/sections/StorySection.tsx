@@ -1,30 +1,11 @@
-import { useEffect, useRef, useState } from "react";
+import { memo, useEffect, useState } from "react";
 import type { WeddingConfig } from "../config/wedding";
 import { Section } from "../components/Section";
 import { SectionTitle } from "../components/SectionTitle";
 import { asset } from "../utils/asset";
+import { useInView } from "../utils/useInView";
 
 type Props = { data: WeddingConfig };
-
-function useInView<T extends HTMLElement>(
-  options: IntersectionObserverInit = { threshold: 0.2 }
-) {
-  const ref = useRef<T | null>(null);
-  const [inView, setInView] = useState(false);
-
-  useEffect(() => {
-    if (!ref.current) return;
-
-    const io = new IntersectionObserver(([entry]) => {
-      setInView(entry.isIntersecting);
-    }, options);
-
-    io.observe(ref.current);
-    return () => io.disconnect();
-  }, [options]);
-
-  return { ref, inView };
-}
 
 function StoryPhoto({
   title,
@@ -102,16 +83,17 @@ function StoryContent({
   );
 }
 
-export function StorySection({ data }: Props) {
-  if (!data.story || data.story.length === 0) return null;
-
-  const { ref, inView } = useInView<HTMLDivElement>({ threshold: 0.22 });
+function StorySectionBase({ data }: Props) {
+  // ✅ 훅은 조건 없이 항상 호출한다(early return을 아래로 내림)
+  const { ref, inView } = useInView<HTMLDivElement>(0.22);
 
   // ✅ 섹션 진입 시 위에서부터 순차 등장, 벗어나면 리셋
   const [visibleCount, setVisibleCount] = useState(0);
 
+  const storyCount = data.story?.length ?? 0;
+
   useEffect(() => {
-    if (!inView) {
+    if (!inView || storyCount === 0) {
       setVisibleCount(0);
       return;
     }
@@ -123,11 +105,13 @@ export function StorySection({ data }: Props) {
     const t = window.setInterval(() => {
       i += 1;
       setVisibleCount(i);
-      if (i >= data.story.length) window.clearInterval(t);
+      if (i >= storyCount) window.clearInterval(t);
     }, stepMs);
 
     return () => window.clearInterval(t);
-  }, [inView, data.story.length]);
+  }, [inView, storyCount]);
+
+  if (storyCount === 0) return null;
 
   const rowHeight = "h-[140px] md:h-[190px]"; // ✅ 이미지/설명 높이 동일(보이지 않게 맞춤)
   const centerCols = "grid-cols-[1fr_18px_1fr] md:grid-cols-[1fr_64px_1fr]";
@@ -230,3 +214,7 @@ export function StorySection({ data }: Props) {
     </Section>
   );
 }
+
+// data(WEDDING)는 모듈 상수이므로, 부모(Invitation)의 토스트·모달 상태 변경으로
+// 이 섹션까지 다시 렌더되는 것을 막는다.
+export const StorySection = memo(StorySectionBase);

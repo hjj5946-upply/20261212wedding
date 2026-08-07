@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { memo, useEffect, useState } from "react";
 import type { WeddingConfig, AccountInfo } from "../config/wedding";
 import { Section } from "../components/Section";
 import { SectionTitle } from "../components/SectionTitle";
@@ -115,7 +115,7 @@ function AccountList({
   );
 }
 
-export function GiftAccountsSection({ data, onCopy }: Props) {
+function GiftAccountsSectionBase({ data, onCopy }: Props) {
   const [open, setOpen] = useState<null | "groom" | "bride">(null);
 
   return (
@@ -178,3 +178,5 @@ export function GiftAccountsSection({ data, onCopy }: Props) {
     </Section>
   );
 }
+
+export const GiftAccountsSection = memo(GiftAccountsSectionBase);

@@ -1,6 +1,5 @@
 import { Modal } from "./Modal";
-
-const BASE = import.meta.env.BASE_URL;
+import { asset } from "../utils/asset";
 
 function MapButton({
   kind,
@@ -18,9 +17,11 @@ function MapButton({
         aria-label="네이버 지도"
       >
         <img
-          src={`${BASE}images/navermap.png`}
+          src={asset("images/navermap.webp")}
           alt="네이버 지도"
           className="h-5 w-auto object-contain"
+          loading="lazy"
+          decoding="async"
         />
       </button>
     );
@@ -35,9 +36,11 @@ function MapButton({
         aria-label="카카오맵"
       >
         <img
-          src={`${BASE}images/kakaomap.png`}
+          src={asset("images/kakaomap.webp")}
           alt="카카오맵"
           className="h-6 w-auto object-contain"
+          loading="lazy"
+          decoding="async"
         />
         <span className="text-sm font-semibold text-black">카카오맵</span>
       </button>
@@ -52,9 +55,11 @@ function MapButton({
       aria-label="티맵"
     >
       <img
-        src={`${BASE}images/tmap.png`}
+        src={asset("images/tmap.webp")}
         alt="티맵"
         className="h-6 w-auto object-contain"
+        loading="lazy"
+        decoding="async"
       />
     </button>
   );

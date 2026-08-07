@@ -83,7 +83,10 @@ export function initBgm() {
         a.src = getRandomTrack();
         a.load();
         if (getBgmEnabled()) {
-          a.play().then(() => fadeIn(a));
+          // 재생 거부 시 unhandled rejection 이 남지 않게 처리
+          a.play()
+            .then(() => fadeIn(a))
+            .catch(() => { });
         }
       });
     }

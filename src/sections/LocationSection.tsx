@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef } from "react";
+import { memo, useEffect, useMemo, useRef, useState } from "react";
 import type { WeddingConfig } from "../config/wedding";
 import { Button } from "../components/Button";
 import { Section } from "../components/Section";
@@ -51,6 +51,27 @@ function NaverMap({
 }) {
   const ref = useRef<HTMLDivElement | null>(null);
 
+  // 지도는 페이지 하단에 있다. 화면에 가까워질 때 SDK를 불러오면
+  // 초기 로딩에서 외부 스크립트 요청이 빠진다(도달 시점엔 이미 준비됨).
+  const [nearViewport, setNearViewport] = useState(false);
+
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+
+    const io = new IntersectionObserver(
+      ([entry]) => {
+        if (!entry.isIntersecting) return;
+        io.disconnect();
+        setNearViewport(true);
+      },
+      { rootMargin: "400px 0px" }
+    );
+
+    io.observe(el);
+    return () => io.disconnect();
+  }, []);
+
   const naverSearchUrl = useMemo(() => {
     const q = encodeURIComponent(`${title}`.trim());
     return `https://map.naver.com/v5/search/${q}`;
@@ -63,6 +84,7 @@ function NaverMap({
 
     // 좌표가 없으면 지도 SDK 로딩/렌더 불가 -> 링크 카드로 처리
     if (!lat || !lng) return;
+    if (!nearViewport) return;
 
     const clientId = import.meta.env.VITE_NAVER_MAP_CLIENT_ID as string | undefined;
     if (!clientId) return;
@@ -96,7 +118,7 @@ function NaverMap({
         // 실패 시 그냥 fallback 링크 UI만 남김(아래 렌더에서 처리)
       }
     })();
-  }, [lat, lng]);
+  }, [lat, lng, nearViewport]);
 
   // 1) 좌표 없음 or 2) clientId 없음 => 네이버지도 링크 카드
   const clientId = (import.meta.env.VITE_NAVER_MAP_CLIENT_ID as string | undefined) || "";
@@ -130,7 +152,7 @@ function NaverMap({
   );
 }
 
-export function LocationSection({ data, onOpenMap, onCopy }: Props) {
+function LocationSectionBase({ data, onOpenMap, onCopy }: Props) {
   const { venueName, venueAddress } = data.ceremony as any;
 
   // 가능하면 config에 좌표를 넣어두는 걸 추천 (없으면 검색 링크로 fallback)
@@ -179,6 +201,8 @@ export function LocationSection({ data, onOpenMap, onCopy }: Props) {
     </Section>
   );
 }
+
+export const LocationSection = memo(LocationSectionBase);
 
 export function NaverMapEmbed({ lat, lng }: { lat: number; lng: number }) {
   const ref = useRef<HTMLDivElement | null>(null);

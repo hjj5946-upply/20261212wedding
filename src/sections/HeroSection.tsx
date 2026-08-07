@@ -1,5 +1,5 @@
 // src/sections/HeroSection.tsx
-import React, { useEffect, useRef } from "react";
+import React, { memo, useEffect, useRef } from "react";
 import { gsap } from "gsap";
 import type { WeddingConfig } from "../config/wedding";
 import { asset } from "../utils/asset";
@@ -132,10 +132,13 @@ function useSnowCanvas<T extends HTMLElement>(
     };
 
     let raf = 0;
+    let running = false;
     let last = performance.now();
     let t = 0;
 
     const tick = (now: number) => {
+      if (!running) return;
+
       const dt = Math.min(0.033, (now - last) / 1000);
       last = now;
       t += dt;
@@ -163,10 +166,44 @@ function useSnowCanvas<T extends HTMLElement>(
       raf = requestAnimationFrame(tick);
     };
 
-    raf = requestAnimationFrame(tick);
+    // 눈은 히어로 영역 안에서만 보인다. 화면에서 벗어나거나 탭이 백그라운드로
+    // 가면 루프를 멈춘다(보이는 결과는 동일, 스크롤 이후 CPU/배터리 소모 제거).
+    const start = () => {
+      if (running) return;
+      running = true;
+      last = performance.now(); // 멈춘 동안의 시간 점프 방지
+      raf = requestAnimationFrame(tick);
+    };
+
+    const stop = () => {
+      running = false;
+      if (raf) cancelAnimationFrame(raf);
+      raf = 0;
+    };
+
+    let visible = true;
+
+    const sync = () => {
+      if (visible && !document.hidden) start();
+      else stop();
+    };
+
+    const io = new IntersectionObserver(
+      ([entry]) => {
+        visible = entry.isIntersecting;
+        sync();
+      },
+      { threshold: 0 }
+    );
+    io.observe(container);
+
+    document.addEventListener("visibilitychange", sync);
+    start();
 
     return () => {
-      cancelAnimationFrame(raf);
+      stop();
+      io.disconnect();
+      document.removeEventListener("visibilitychange", sync);
       ro.disconnect();
       window.clearTimeout(late);
     };
@@ -176,8 +213,10 @@ function useSnowCanvas<T extends HTMLElement>(
 // ─────────────────────────────────────────────
 // HeroSection
 // ─────────────────────────────────────────────
-export function HeroSection({ data: _data }: Props) {
-  const heroImg = asset("images/main_img.webp");
+const HERO_IMG = asset("images/main_img.webp");
+
+function HeroSectionBase({ data: _data }: Props) {
+  const heroImg = HERO_IMG;
 
   const sectionRef = useRef<HTMLElement | null>(null);
   const snowRef = useRef<HTMLCanvasElement | null>(null);
@@ -258,9 +297,10 @@ export function HeroSection({ data: _data }: Props) {
         alt=""
         aria-hidden
         className="absolute inset-0 h-full w-full object-cover scale-110 blur-xl opacity-80"
+        decoding="async"
       />
 
-      {/* 원본 이미지 */}
+      {/* 원본 이미지 (같은 URL이므로 요청은 1회) */}
       <img
         ref={imgRef}
         src={heroImg}
@@ -268,6 +308,7 @@ export function HeroSection({ data: _data }: Props) {
         className="absolute inset-0 h-full w-full object-contain"
         loading="eager"
         decoding="async"
+        fetchPriority="high"
       />
 
       {/* 눈 캔버스 */}
@@ -305,3 +346,5 @@ export function HeroSection({ data: _data }: Props) {
     </section>
   );
 }
+
+export const HeroSection = memo(HeroSectionBase);

@@ -1,139 +1,104 @@
 # 💒 모바일 청첩장 | 2026.12.12
 
-홍정준 ♥ 신송희의 결혼을 축하해주세요
+홍정준 ♥ 신송희의 결혼식에 초대합니다.
 
-## 📱 프로젝트 소개
+React + TypeScript + Vite로 만든 1페이지 모바일 청첩장입니다.
+라우터 없이 인트로 애니메이션 → 초대장 본문 순으로 이어지는 단일 스크롤 페이지 구조입니다.
 
-React와 TypeScript로 제작된 현대적이고 인터랙티브한 모바일 청첩장입니다.
-소중한 날을 함께해주실 분들을 위한 자체 제작한 모바일 청첩장입니다.
+## ✨ 구성 섹션
 
-### ✨ 주요 기능
+인트로(`IntroHost`, 몽타주 애니메이션) 이후 아래 순서로 렌더링됩니다.
 
-- **다양한 인트로 애니메이션** - 몽타주 인트로 화면
-- **신랑신부 소개** - MBTI, 취미, 좋아하는 것 등 개인 정보 소개
-- **우리의 이야기** - 타임라인 형식으로 보여주는 연애 스토리
-- **갤러리** - 그리드/슬라이드 뷰로 전환 가능한 사진 갤러리
-- **계좌 안내** - 마스킹 처리된 계좌번호와 카카오페이 연동
-- **네이버 지도** - 실시간 지도 및 길찾기 (네이버/카카오/티맵)
-- **RSVP** - 참석 의사 및 인원 접수
-- **방명록** - Supabase 연동 실시간 축하 메시지
-- **배경음악** - 자동재생 지원 BGM
-- **공유하기** - 웹 공유 API 또는 링크 복사
+| 섹션 | 설명 |
+| --- | --- |
+| Hero | 메인 사진 + 눈 내리는 캔버스 효과 |
+| Message | 초대 인사말 |
+| Info | 예식 일시·장소 안내 |
+| CoupleIntro | 신랑·신부 소개 (MBTI, 취미 등) |
+| Story | 타임라인 형식 연애 스토리 |
+| Gallery | 그리드 / 단일 뷰 전환 갤러리 |
+| GiftAccounts | 마스킹된 계좌번호 복사 + 카카오페이 링크 |
+| Location | 네이버 지도 임베드 + 길찾기(네이버/카카오/티맵) |
+| Guestbook | Supabase 연동 실시간 방명록 |
+| Footer | 마무리 문구 |
+
+이 밖에 BGM 플로팅 버튼, 공유하기(Web Share API / 링크 복사), 하단 플로팅 CTA가 상시 동작합니다.
+
+> `RsvpSection`(참석 의사 접수)은 구현되어 있으나 현재 `src/pages/Invitation.tsx`에서 주석 처리되어 비활성 상태입니다.
 
 ## 🛠 기술 스택
 
-### Frontend
-- **React 19.2.0** - 최신 React
-- **TypeScript** - 타입 안정성
-- **Vite (Rolldown)** - 빠른 빌드 도구
-- **TailwindCSS** - 유틸리티 퍼스트 CSS
-- **Lucide React** - 아이콘 라이브러리
+- **React 19** / **TypeScript 5.9**
+- **Vite 7 (rolldown-vite)** — `overrides`로 rolldown 번들러 사용
+- **TailwindCSS 3** — `wedding-*` 커스텀 색상 팔레트
+- **GSAP + ScrollTrigger** — 섹션 진입 애니메이션
+- **Supabase** — 방명록(`guestbook_messages`) 저장/조회
+- **Naver Maps API** — 지도 임베드
+- **lucide-react** — 아이콘
+- **sharp** — 이미지 WebP 변환 스크립트
 
-### Backend & Services
-- **Supabase** - RSVP 및 방명록 데이터 저장
-- **Naver Maps API** - 지도 및 위치 정보
-
-### Dev Tools
-- **ESLint** - 코드 품질 관리
-- **Sharp** - 이미지 최적화 (WebP 변환)
-
-## 🚀 시작하기
-
-### 설치
+## 🚀 실행
 
 ```bash
 npm install
+npm run dev       # 개발 서버 (--host, 모바일 실기기 확인용)
+npm run build     # tsc -b && vite build
+npm run preview   # 빌드 결과 미리보기
+npm run lint      # ESLint
+npm run img:webp  # public/images 의 jpg/png → webp 변환 (1080px, q78)
 ```
 
-### 개발 서버 실행
+## ⚙️ 환경 변수
 
-```bash
-npm run dev
+프로젝트 루트에 `.env` 생성 (git에 커밋되지 않음):
+
+```env
+VITE_SUPABASE_URL=...
+VITE_SUPABASE_ANON_KEY=...
+VITE_NAVER_MAP_CLIENT_ID=...
 ```
 
-### 빌드
+`src/lib/supabase.ts`는 Supabase 환경 변수가 없으면 모듈 로드 시점에 예외를 던집니다.
 
-```bash
-npm run build
-```
-
-### 프리뷰
-
-```bash
-npm preview
-```
-
-### 이미지 WebP 변환
-
-```bash
-npm run img:webp
-```
-
-## 📁 프로젝트 구조
+## 📁 구조
 
 ```
 src/
-├── components/       # 재사용 가능한 컴포넌트
-│   ├── SectionTitle.tsx
-│   ├── Button.tsx
-│   ├── Modal.tsx
-│   └── ...
-├── sections/        # 페이지 섹션 컴포넌트
-│   ├── HeroSection.tsx
-│   ├── CoupleIntroSection.tsx
-│   ├── StorySection.tsx
-│   ├── GallerySection.tsx
-│   ├── GiftAccountsSection.tsx
-│   ├── LocationSection.tsx
-│   ├── RsvpSection.tsx
-│   └── GuestbookSection.tsx
-├── intro/           # 인트로 애니메이션
-│   └── IntroHost.tsx
-├── pages/           # 페이지 컴포넌트
-│   └── Invitation.tsx
-├── config/          # 설정 파일
-│   └── wedding.ts
-├── lib/             # 외부 라이브러리 설정
-│   └── supabase.ts
-├── utils/           # 유틸리티 함수
-├── App.tsx          # 메인 앱
-└── main.tsx         # 엔트리 포인트
-```
-
-## ⚙️ 환경 변수 설정
-
-`.env` 파일을 생성하고 다음 환경 변수를 설정하세요:
-
-```env
-VITE_SUPABASE_URL=your_supabase_url
-VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
-VITE_NAVER_MAP_CLIENT_ID=your_naver_map_client_id
+├── components/   # 재사용 UI (Modal, Toast, Button, NaverMapEmbed, BgmFloating ...)
+├── sections/     # 초대장 본문 섹션 (Hero, Story, Gallery, Guestbook ...)
+├── intro/        # IntroHost — 진입 애니메이션
+├── pages/        # Invitation — 섹션 조립 + 전역 상태(토스트/모달/BGM)
+├── config/       # wedding.ts — 모든 콘텐츠 데이터 (단일 소스)
+├── lib/          # supabase 클라이언트
+├── utils/        # asset, bgm, share, mapNavigation
+├── App.tsx       # 인트로 ↔ 본문 전환
+└── main.tsx      # 엔트리
+public/
+├── images/       # intro_1~15.(jpg|webp), main_img, og_image ...
+├── audio/        # BGM 6곡 (랜덤 재생)
+└── fonts/        # NotoSerifKR
 ```
 
 ## 🎨 커스터마이징
 
-### 결혼식 정보 수정
+- **콘텐츠 수정**: `src/config/wedding.ts` — 신랑신부 정보, 예식 일시/장소, 좌표, 계좌, 스토리 타임라인 등이 모두 여기 있습니다.
+- **색상 테마**: `tailwind.config.cjs` 의 `wedding.{ivory,gray,green,gold,silver}` 팔레트.
+- **메타/OG 태그**: `index.html`.
+- **PC 레이아웃**: `src/index.css` 에서 431px 이상일 때 430px 모바일 프레임으로 고정됩니다.
 
-`src/config/wedding.ts` 파일에서 신랑신부 정보, 결혼식 일시/장소, 계좌 정보 등을 수정할 수 있습니다.
+## 🔗 URL 옵션
 
-### 색상 테마 변경
+- `?noIntro=1` — 인트로를 건너뛰고 초대장 본문부터 표시
 
-`tailwind.config.cjs` 파일에서 `wedding-gold` 색상을 원하는 테마 색상으로 변경할 수 있습니다.
+## ⚠️ 알려진 이슈
 
-## 🌐 배포
-
-이 프로젝트는 다음 플랫폼에 쉽게 배포할 수 있습니다:
-
-- **GitHub Pages**
-- **Vercel**
-- **Netlify**
-- **Cloudflare Pages**
+- `GallerySection`은 `intro_1.webp` ~ `intro_24.webp`를 참조하지만 `public/images`에는 15장만 있어 16~24번은 깨진 이미지로 표시됩니다. 사진을 추가하거나 `imageCount`를 15로 낮춰야 합니다.
+- `index.html`의 OG URL(`jjsh-261212.com`)과 `wedding.ts`의 `site.baseUrl`(GitHub Pages)이 서로 다릅니다. 배포 도메인에 맞춰 통일이 필요합니다.
 
 ## 📝 라이선스
 
-개인적인 용도로 자유롭게 사용하실 수 있습니다.
+개인 용도로 자유롭게 사용하실 수 있습니다.
 
 ---
 
 💕 Made with Love for 정준 ♥ 송희
-

@@ -1,34 +1,51 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { asset } from "../utils/asset";
 import { playBgm, isBgmPlaying  } from "../utils/bgm";
 
 export type IntroStyle = "montage" | "filmstrip" | "game" | "gate";
 
-const INTRO_IMAGES = Array.from({ length: 15 }).map(
-  (_, i) => asset(`images/intro_${i + 1}.webp`)
-);
+const TOTAL_IMAGES = 15;
 
+// 목록은 고정값이므로 모듈 상수로 한 번만 만든다
+const INTRO_FRAMES = Array.from({ length: TOTAL_IMAGES }, (_, i) => ({
+  id: i + 1,
+  src: asset(`images/intro_${i + 1}.webp`),
+}));
+
+/** 지금 전환에 참여하는 프레임인지 (직전 / 현재 / 다음) */
+function isNearCurrent(idx: number, current: number) {
+  return (
+    idx === current ||
+    idx === (current + 1) % TOTAL_IMAGES ||
+    idx === (current - 1 + TOTAL_IMAGES) % TOTAL_IMAGES
+  );
+}
+
+/**
+ * 프레임 전환이 180ms 간격이라 디코딩을 미리 끝내둬야 끊김이 없다.
+ * 첫 두 장은 순서대로(가장 먼저 화면에 필요) 나머지는 병렬로 디코딩한다.
+ * 기존에는 15장을 전부 순차 await 해서 뒤쪽 프레임 준비가 늦었다.
+ */
 function usePreloadImages(urls: string[]) {
   useEffect(() => {
     let cancelled = false;
 
-    (async () => {
-      for (const url of urls) {
-        if (cancelled) break;
-
-        const img = new Image();
-        img.decoding = "async";
-        img.loading = "eager";
-        img.src = url;
-
-        // 지원 브라우저에서 디코딩까지 미리
-        try {
-          // @ts-ignore
-          if (img.decode) await img.decode();
-        } catch {
-          // decode 실패해도 무시
-        }
+    const decode = async (url: string) => {
+      if (cancelled) return;
+      const img = new Image();
+      img.decoding = "async";
+      img.loading = "eager";
+      img.src = url;
+      try {
+        await img.decode?.();
+      } catch {
+        // decode 실패해도 무시
       }
+    };
+
+    (async () => {
+      for (const url of urls.slice(0, 2)) await decode(url);
+      await Promise.all(urls.slice(2).map(decode));
     })();
 
     return () => {
@@ -37,8 +54,10 @@ function usePreloadImages(urls: string[]) {
   }, [urls]);
 }
 
+const INTRO_IMAGE_URLS = INTRO_FRAMES.map((f) => f.src);
+
 export function IntroHost({ style, onDone, }: { style: IntroStyle; onDone: () => void; }) {
-  usePreloadImages(INTRO_IMAGES);
+  usePreloadImages(INTRO_IMAGE_URLS);
 
   switch (style) {
     case "montage":
@@ -60,7 +79,7 @@ function MontageIntro({ onDone }: { onDone: () => void }) {
   useEffect(() => {
     const isMobile = window.matchMedia("(max-width: 768px)").matches;
 
-    const totalImages = 15;
+    const totalImages = TOTAL_IMAGES;
 
     const BASE_MS = isMobile ? 180 : 180; // 초반 속도
     const FAST_MS = isMobile ? 100 : 100;   // 가속 속도
@@ -110,13 +129,7 @@ function MontageIntro({ onDone }: { onDone: () => void }) {
     };
   }, [onDone]);
 
-  const images = useMemo(
-    () => Array.from({ length: 15 }).map((_, i) => ({
-      id: i + 1,
-      src: asset(`images/intro_${i + 1}.webp`),
-    })),
-    []
-  );
+  const images = INTRO_FRAMES;
 
   const tryPlayBgm = () => {
     if (isBgmPlaying()) return;
@@ -145,7 +158,8 @@ function MontageIntro({ onDone }: { onDone: () => void }) {
             loading="eager"
             className={[
               "absolute inset-0 h-full w-full object-cover object-center",
-              "transition-all duration-150 will-change-transform will-change-opacity",
+              "intro-frame",
+              isNearCurrent(idx, currentImage) ? "intro-frame-active" : "",
               currentImage === idx ? "opacity-100 scale-105" : "opacity-0 scale-100",
             ].join(" ")}
           />
@@ -209,36 +223,7 @@ function MontageIntro({ onDone }: { onDone: () => void }) {
         건너뛰기
       </button>
 
-      {/* 스타일 */}
-      <style>{`
-        /* 텍스트 안쪽으로만 이미지 보이게! */
-        .text-clip-image {
-          background-size: cover;
-          background-position: center;
-          background-clip: text;
-          -webkit-background-clip: text;
-          color: transparent;
-          -webkit-text-stroke: 2px rgba(255, 255, 255, 0.8);
-          text-stroke: 2px rgba(255, 255, 255, 0.8);
-          filter: drop-shadow(0 0 20px rgba(255, 255, 255, 0.5));
-        }
-
-        /* 크게 시작해서 축소되며 나타남 (3초) */
-        @keyframes zoom-in {
-          0% {
-            transform: scale(1.8);
-            opacity: 0;
-          }
-          100% {
-            transform: scale(1);
-            opacity: 1;
-          }
-        }
-        
-        .animate-zoom-in {
-          animation: zoom-in 3s ease-out;
-        }
-      `}</style>
+      {/* .text-clip-image / .animate-zoom-in / .intro-frame* 는 src/index.css 로 이동 */}
     </div>
   );
 }

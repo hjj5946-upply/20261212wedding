@@ -1,33 +1,13 @@
 // src/sections/CoupleIntroSection.tsx
-import { useEffect, useRef, useState } from "react";
+import { memo, useEffect, useRef } from "react";
 import { gsap } from "gsap";
 import type { WeddingConfig, CoupleInfo } from "../config/wedding";
 import { Section } from "../components/Section";
 import { SectionTitle } from "../components/SectionTitle";
 import { asset } from "../utils/asset";
+import { useInView } from "../utils/useInView";
 
 type Props = { data: WeddingConfig };
-
-// ─────────────────────────────────────────────
-// IntersectionObserver 훅 (StorySection과 동일)
-// ─────────────────────────────────────────────
-function useInView<T extends HTMLElement>(
-  options: IntersectionObserverInit = { threshold: 0.2 }
-) {
-  const ref = useRef<T | null>(null);
-  const [inView, setInView] = useState(false);
-
-  useEffect(() => {
-    if (!ref.current) return;
-    const io = new IntersectionObserver(([entry]) => {
-      setInView(entry.isIntersecting);
-    }, options);
-    io.observe(ref.current);
-    return () => io.disconnect();
-  }, [options]);
-
-  return { ref, inView };
-}
 
 // ─────────────────────────────────────────────
 // InfoRow
@@ -49,12 +29,14 @@ function InfoRow({ label, value }: { label: string; value?: string }) {
 // ─────────────────────────────────────────────
 // PhotoCard
 // ─────────────────────────────────────────────
+const FALLBACK_PHOTO = asset("images/main_img.webp");
+
 function PhotoCard({
   info
 }: {
   info: CoupleInfo;
 }) {
-  const tempImg = asset("images/main_img.webp");
+  const tempImg = FALLBACK_PHOTO;
 
   return (
     <div className="h-full overflow-hidden rounded-2xl border border-neutral-200 bg-white shadow-sm">
@@ -106,10 +88,20 @@ function PhotoCard({
 // ─────────────────────────────────────────────
 // CoupleIntroSection
 // ─────────────────────────────────────────────
-export function CoupleIntroSection({ data }: Props) {
-  if (!data.groomInfo && !data.brideInfo) return null;
+// 카드 내부 애니메이션 대상 (선택자는 기존과 동일)
+function cardParts(card: HTMLElement) {
+  return {
+    photo: card.querySelector(".aspect-\\[3\\/4\\]"),
+    name: card.querySelector(".text-base"),
+    divider: card.querySelector(".bg-\\[\\#c2d6ba\\]"),
+    intro: card.querySelector("p"),
+    rows: card.querySelectorAll(".flex.items-start"),
+  };
+}
 
-  const { ref: inViewRef, inView } = useInView<HTMLDivElement>({ threshold: 0.2 });
+function CoupleIntroSectionBase({ data }: Props) {
+  // ✅ 훅은 조건 없이 항상 호출한다(early return을 아래로 내림)
+  const { ref: inViewRef, inView } = useInView<HTMLDivElement>(0.2);
   const sectionRef = useRef<HTMLDivElement | null>(null);
   const groomRef   = useRef<HTMLDivElement | null>(null);
   const brideRef   = useRef<HTMLDivElement | null>(null);
@@ -117,23 +109,11 @@ export function CoupleIntroSection({ data }: Props) {
   useEffect(() => {
     // ── 섹션 벗어나면 리셋 ──────────────────
     if (!inView) {
-      gsap.set(groomRef.current, { clearProps: "all" });
-      gsap.set(brideRef.current, { clearProps: "all" });
+      for (const card of [groomRef.current, brideRef.current]) {
+        if (!card) continue;
+        gsap.set(card, { clearProps: "all" });
 
-      if (groomRef.current) {
-        const photo   = groomRef.current.querySelector(".aspect-\\[3\\/4\\]");
-        const name    = groomRef.current.querySelector(".text-base");
-        const divider = groomRef.current.querySelector(".bg-\\[\\#c2d6ba\\]");
-        const intro   = groomRef.current.querySelector("p");
-        const rows    = groomRef.current.querySelectorAll(".flex.items-start");
-        gsap.set([photo, name, divider, intro, ...Array.from(rows)], { clearProps: "all" });
-      }
-      if (brideRef.current) {
-        const photo   = brideRef.current.querySelector(".aspect-\\[3\\/4\\]");
-        const name    = brideRef.current.querySelector(".text-base");
-        const divider = brideRef.current.querySelector(".bg-\\[\\#c2d6ba\\]");
-        const intro   = brideRef.current.querySelector("p");
-        const rows    = brideRef.current.querySelectorAll(".flex.items-start");
+        const { photo, name, divider, intro, rows } = cardParts(card);
         gsap.set([photo, name, divider, intro, ...Array.from(rows)], { clearProps: "all" });
       }
       return;
@@ -164,11 +144,7 @@ export function CoupleIntroSection({ data }: Props) {
       cards.forEach((card, cardIdx) => {
         if (!card) return;
 
-        const photo   = card.querySelector(".aspect-\\[3\\/4\\]");
-        const name    = card.querySelector(".text-base");
-        const divider = card.querySelector(".bg-\\[\\#c2d6ba\\]");
-        const intro   = card.querySelector("p");
-        const rows    = card.querySelectorAll(".flex.items-start");
+        const { photo, name, divider, intro, rows } = cardParts(card);
 
         tl.from(photo, {
           opacity: 0,
@@ -210,6 +186,8 @@ export function CoupleIntroSection({ data }: Props) {
     return () => ctx.revert();
   }, [inView]);
 
+  if (!data.groomInfo && !data.brideInfo) return null;
+
   return (
     <Section
       id="couple"
@@ -244,3 +222,5 @@ export function CoupleIntroSection({ data }: Props) {
     </Section>
   );
 }
+
+export const CoupleIntroSection = memo(CoupleIntroSectionBase);

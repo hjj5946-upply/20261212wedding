@@ -1,4 +1,4 @@
-@import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css');
+/* Pretendard는 index.html의 <link>로 직접 로드한다(@import 체인 제거) */
 
 @font-face {
   font-family: "NotoSerifKR";
@@ -121,6 +121,52 @@
   .bg-gradient-radial {
     background: radial-gradient(circle, var(--tw-gradient-stops));
   }
+}
+
+/* ── 인트로(MontageIntro) ── 컴포넌트 안 <style> 태그에서 옮겨옴 ── */
+
+/* 텍스트 안쪽으로만 이미지 보이게! */
+.text-clip-image {
+  background-size: cover;
+  background-position: center;
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+  -webkit-text-stroke: 2px rgba(255, 255, 255, 0.8);
+  text-stroke: 2px rgba(255, 255, 255, 0.8);
+  filter: drop-shadow(0 0 20px rgba(255, 255, 255, 0.5));
+}
+
+/* 크게 시작해서 축소되며 나타남 (3초) */
+@keyframes zoom-in {
+  0% {
+    transform: scale(1.8);
+    opacity: 0;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.animate-zoom-in {
+  animation: zoom-in 3s ease-out;
+}
+
+/* 인트로 배경 이미지 전환: transition-all 대신 실제로 변하는 속성만 */
+.intro-frame {
+  transition-property: opacity, transform;
+  transition-duration: 150ms;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/*
+ * will-change는 지금 전환에 참여하는 프레임(직전/현재/다음)에만 붙인다.
+ * 15장 전부에 걸면 풀스크린 합성 레이어가 15개 남아 저사양 기기에서
+ * GPU 메모리를 크게 잡아먹는다.
+ */
+.intro-frame-active {
+  will-change: opacity, transform;
 }
 
 @keyframes eq1 { 0%,100%{height:4px} 50%{height:10px} }

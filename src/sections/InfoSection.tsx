@@ -1,8 +1,11 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { memo, useEffect, useMemo, useRef, useState } from "react";
 import type { WeddingConfig } from "../config/wedding";
 import { Section } from "../components/Section";
 
 type Props = { data: WeddingConfig };
+
+const WEEKDAYS_KO = ["일", "월", "화", "수", "목", "금", "토"];
+const SPRING_DOTS = Array.from({ length: 19 }, (_, i) => i);
 
 function pad2(n: number) {
   return String(n).padStart(2, "0");
@@ -53,9 +56,8 @@ function dateTextClass(weekday: number, day: number | null) {
   return "text-neutral-800";
 }
 
-export function InfoSection({ data }: Props) {
+function InfoSectionBase({ data }: Props) {
   const weddingDate = useMemo(() => new Date(data.ceremony.dateISO), [data.ceremony.dateISO]);
-  const [now, setNow] = useState(() => new Date());
 
   const rootRef = useRef<HTMLDivElement | null>(null);
   const [inView, setInView] = useState(false);
@@ -69,12 +71,6 @@ export function InfoSection({ data }: Props) {
 
   // ✅ year/month가 바뀌면 달력도 다시 생성되어야 함
   const cal = useMemo(() => buildCalendarGrid(year, month), [year, month]);
-  const weekdaysKo = ["일", "월", "화", "수", "목", "금", "토"];
-
-  const { days, hours, minutes, seconds } = useMemo(
-    () => diffParts(weddingDate, now),
-    [weddingDate, now]
-  );
 
   // 섹션 진입/이탈 감지 (다시 들어오면 인트로 재시작)
   useEffect(() => {
@@ -113,14 +109,6 @@ export function InfoSection({ data }: Props) {
     const t = window.setTimeout(() => setStep(5), introTotal);
     return () => window.clearTimeout(t);
   }, [inView, year, month, day]);
-
-  // 본문 표시(step=5)부터 초 단위 갱신
-  useEffect(() => {
-    if (step !== 5) return;
-    setNow(new Date());
-    const id = window.setInterval(() => setNow(new Date()), 1000);
-    return () => window.clearInterval(id);
-  }, [step]);
 
   const titleLogoSrc: string | null = null;
   const titleText = "WEDDING DAY";
@@ -184,7 +172,7 @@ export function InfoSection({ data }: Props) {
             <div className="mt-12 mx-auto w-full">
               {/* 스프링 */}
               <div className="mb-4 flex justify-center gap-2">
-                {Array.from({ length: 19 }).map((_, i) => (
+                {SPRING_DOTS.map((i) => (
                   <span key={i} className="inline-block h-2 w-3 rounded-full border border-neutral-300 bg-white" />
                 ))}
               </div>
@@ -196,7 +184,7 @@ export function InfoSection({ data }: Props) {
 
               {/* 요일 */}
               <div className="mt-3 grid grid-cols-7 gap-1 text-[12px]">
-                {weekdaysKo.map((w, idx) => (
+                {WEEKDAYS_KO.map((w, idx) => (
                   <div
                     key={w}
                     className={[
@@ -232,21 +220,50 @@ export function InfoSection({ data }: Props) {
               <div className="mt-3 h-px w-full bg-neutral-200" />
             </div>
 
-            {/* D-day 카드: 흰색 + border + shadow */}
-            <div className="mt-10 grid grid-cols-4 gap-3">
-              <CountdownCard label="DAYS" value={days} />
-              <CountdownCard label="HOURS" value={hours} />
-              <CountdownCard label="MINUTES" value={minutes} />
-              <CountdownCard label="SECONDS" value={seconds} />
-            </div>
-
-            <div className="mt-14 text-sm text-neutral-700">
-              정준 ♥ 송희 결혼식이 <span className="font-semibold text-neutral-900">{days}</span>일 남았습니다.
-            </div>
+            {/* D-day 카드 + 남은 일수 문구 (1초마다 이 부분만 갱신) */}
+            <Countdown target={weddingDate} running={step === 5} />
           </div>
         </div>
       </div>
     </Section>
+  );
+}
+
+export const InfoSection = memo(InfoSectionBase);
+
+/**
+ * 1초 간격 갱신을 이 컴포넌트로 격리한다.
+ * 예전에는 setNow가 InfoSection 전체(달력 42칸 + 스프링 19개 + 인트로 문자열)를
+ * 매초 다시 렌더했다. 출력 DOM 구조는 이전과 동일하다.
+ */
+function Countdown({ target, running }: { target: Date; running: boolean }) {
+  const [now, setNow] = useState(() => new Date());
+
+  useEffect(() => {
+    if (!running) return;
+    setNow(new Date());
+    const id = window.setInterval(() => setNow(new Date()), 1000);
+    return () => window.clearInterval(id);
+  }, [running]);
+
+  const { days, hours, minutes, seconds } = useMemo(
+    () => diffParts(target, now),
+    [target, now]
+  );
+
+  return (
+    <>
+      <div className="mt-10 grid grid-cols-4 gap-3">
+        <CountdownCard label="DAYS" value={days} />
+        <CountdownCard label="HOURS" value={hours} />
+        <CountdownCard label="MINUTES" value={minutes} />
+        <CountdownCard label="SECONDS" value={seconds} />
+      </div>
+
+      <div className="mt-14 text-sm text-neutral-700">
+        정준 ♥ 송희 결혼식이 <span className="font-semibold text-neutral-900">{days}</span>일 남았습니다.
+      </div>
+    </>
   );
 }
 

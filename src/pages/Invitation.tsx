@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { WEDDING } from "../config/wedding";
 import { HeroSection } from "../sections/HeroSection";
 import { MessageSection } from "../sections/MessageSection";
@@ -26,18 +26,20 @@ export function Invitation() {
 
   const data = WEDDING;
 
+  // ✅ 콜백을 렌더마다 새로 만들지 않는다.
+  //    (하위 섹션의 memo가 실제로 동작하고, Toast의 자동 닫힘 타이머도 리셋되지 않음)
   const handleNavigate = (type: "naver" | "kakao" | "tmap") => {
     const { venueLat, venueLng, venueName } = data.ceremony;
     const { deep, web } = buildMapLinks(type, venueLat!, venueLng!, venueName);
     openDeepLinkOrFallback(type, deep, web);
   };
 
-  const copyText = async (text: string) => {
+  const copyText = useCallback(async (text: string) => {
     await navigator.clipboard.writeText(text);
     setToast({ open: true, msg: "복사했습니다" });
-  };
+  }, []);
 
-  const onShare = async () => {
+  const onShare = useCallback(async () => {
     const url = window.location.href;
     const title = document.title || "모바일 청첩장";
     const text = "소중한 분들을 초대합니다.";
@@ -53,9 +55,14 @@ export function Invitation() {
 
     await navigator.clipboard.writeText(url);
     setToast({ open: true, msg: "링크가 복사되었습니다." });
-  };
+  }, []);
 
-  const onOpenMap = () => setMapSelectOpen(true);
+  const onOpenMap = useCallback(() => setMapSelectOpen(true), []);
+  const onCloseToast = useCallback(() => setToast({ open: false, msg: "" }), []);
+  const onGuestbookToast = useCallback(
+    (msg: string) => setToast({ open: true, msg }),
+    []
+  );
 
   // const submitRsvp = async (payload: {
   //   status: "attend" | "maybe" | "decline";
@@ -118,16 +125,41 @@ export function Invitation() {
     return cleanup;
   }, []);
 
+  // 플로팅 CTA: "마음 전하는 곳" 섹션부터 노출.
+  // 기존 구현은 스크롤 이벤트마다 offsetTop을 읽어(= 강제 레이아웃 계산) 스크롤을
+  // 무겁게 만들었다. 임계값은 캐시하고, 리스너는 passive + rAF 스로틀로 바꾼다.
   useEffect(() => {
     const giftSection = document.getElementById("gift");
     if (!giftSection) return;
 
-    const handleScroll = () => {
-      setShowCTA(window.scrollY > giftSection.offsetTop - 200);
+    let threshold = giftSection.offsetTop - 200;
+    let raf = 0;
+
+    const update = () => {
+      raf = 0;
+      setShowCTA(window.scrollY > threshold);
     };
 
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
+    const onScroll = () => {
+      if (raf) return;
+      raf = requestAnimationFrame(update);
+    };
+
+    // 이미지 로드/폰트 적용으로 섹션 위치가 밀리면 임계값을 다시 잰다
+    const ro = new ResizeObserver(() => {
+      threshold = giftSection.offsetTop - 200;
+      onScroll();
+    });
+    ro.observe(document.body);
+
+    update();
+    window.addEventListener("scroll", onScroll, { passive: true });
+
+    return () => {
+      window.removeEventListener("scroll", onScroll);
+      ro.disconnect();
+      if (raf) cancelAnimationFrame(raf);
+    };
   }, []);
 
   return (
@@ -137,7 +169,7 @@ export function Invitation() {
       <Toast
         open={toast.open}
         message={toast.msg}
-        onClose={() => setToast({ open: false, msg: "" })}
+        onClose={onCloseToast}
       />
 
       <MapSelectModal
@@ -174,7 +206,7 @@ export function Invitation() {
           onToast={(msg) => setToast({ open: true, msg })}
           onSubmit={submitRsvp}
         /> */}
-        <GuestbookSection onToast={(msg) => setToast({ open: true, msg })} />
+        <GuestbookSection onToast={onGuestbookToast} />
         <FooterSection />
       </main>
     </>

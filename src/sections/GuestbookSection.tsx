@@ -1,5 +1,5 @@
-import { useEffect, useMemo, useState } from "react";
-import { supabase } from "../lib/supabase";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { getSupabase } from "../lib/supabase";
 import { Section } from "../components/Section";
 import { SectionTitle } from "../components/SectionTitle";
 import { Button } from "../components/Button";
@@ -47,9 +47,10 @@ export function GuestbookSection({ onToast }: Props) {
     return n.length >= 2 && n.length <= 20 && m.length >= 2 && m.length <= 300;
   }, [name, message]);
 
-  const loadLatest = async () => {
+  const loadLatest = useCallback(async () => {
     setLoading(true);
     try {
+      const supabase = await getSupabase();
       const { data, error } = await supabase
         .from("guestbook_messages")
         .select("id, created_at, name, message")
@@ -67,12 +68,13 @@ export function GuestbookSection({ onToast }: Props) {
     } finally {
       setLoading(false);
     }
-  };
+  }, [onToast]);
 
   const loadMore = async () => {
     if (!cursor || !hasMore) return;
     setLoading(true);
     try {
+      const supabase = await getSupabase();
       const { data, error } = await supabase
         .from("guestbook_messages")
         .select("id, created_at, name, message")
@@ -93,10 +95,27 @@ export function GuestbookSection({ onToast }: Props) {
     }
   };
 
+  // 방명록은 페이지 최하단이다. 화면에 가까워질 때(600px 전) 처음 불러오면
+  // Supabase 청크 + 목록 요청이 초기 렌더 경로에서 빠진다. 사용자가 스크롤해
+  // 도달하는 시점에는 이미 로드되어 있어 보이는 결과는 동일하다.
+  const rootRef = useRef<HTMLDivElement | null>(null);
+
   useEffect(() => {
-    loadLatest();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+    const el = rootRef.current;
+    if (!el) return;
+
+    const io = new IntersectionObserver(
+      ([entry]) => {
+        if (!entry.isIntersecting) return;
+        io.disconnect();
+        loadLatest();
+      },
+      { rootMargin: "600px 0px" }
+    );
+
+    io.observe(el);
+    return () => io.disconnect();
+  }, [loadLatest]);
 
   const submit = async () => {
     if (!canSubmit) {
@@ -123,6 +142,7 @@ export function GuestbookSection({ onToast }: Props) {
 
     setSubmitting(true);
     try {
+      const supabase = await getSupabase();
       const { error } = await supabase.from("guestbook_messages").insert({
         name: name.trim(),
         message: message.trim(),
@@ -146,7 +166,7 @@ export function GuestbookSection({ onToast }: Props) {
 
   return (
     <Section id="guestbook" className="px-5 py-12 border-t border-neutral-100">
-      <div className="mx-auto max-w-md">
+      <div ref={rootRef} className="mx-auto max-w-md">
         <SectionTitle english="GUESTBOOK" korean="방명록" />
         <p className="mt-6 text-center text-sm text-neutral-500">축하 메시지를 남겨주세요.</p>
 

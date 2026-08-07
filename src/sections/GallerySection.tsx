@@ -1,5 +1,5 @@
 // src/sections/GallerySection.tsx
-import { useEffect, useMemo, useRef, useState } from "react";
+import { memo, useCallback, useEffect, useRef, useState } from "react";
 import { gsap } from "gsap";
 
 import { Section } from "../components/Section";
@@ -9,20 +9,57 @@ import { asset } from "../utils/asset";
 
 type ViewMode = "grid" | "single";
 
-export function GallerySection() {
-  const images = useMemo(() => {
-    const imageCount = 24;
-    return Array.from({ length: imageCount }, (_, idx) => ({
-      src: asset(`images/intro_${idx + 1}.webp`),
-      alt: `gallery-${idx + 1}`,
-    }));
-  }, []);
+// ⚠️ public/images 의 실제 intro_*.webp 장수와 일치해야 한다.
+//    (24로 두면 16~24번은 존재하지 않아 404 요청 + 깨진 타일이 생긴다)
+const IMAGE_COUNT = 15;
+const GRID_PREVIEW_COUNT = 12;
+
+// 목록은 고정값이므로 모듈 상수로 한 번만 만든다
+const IMAGES = Array.from({ length: IMAGE_COUNT }, (_, idx) => ({
+  src: asset(`images/intro_${idx + 1}.webp`),
+  alt: `gallery-${idx + 1}`,
+}));
+
+// ── 아이콘 탭 ─────────────────────────────────────────
+// 컴포넌트 바깥으로 빼서 렌더마다 새 타입이 만들어지지 않게 한다
+function IconTab({
+  active,
+  label,
+  onClick,
+  children,
+}: {
+  active: boolean;
+  label: string;
+  onClick: () => void;
+  children: React.ReactNode;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      aria-label={label}
+      aria-pressed={active}
+      className={[
+        "inline-flex items-center justify-center rounded-full p-2 transition",
+        active ? "text-neutral-900" : "text-neutral-400 hover:text-neutral-700",
+      ].join(" ")}
+    >
+      {children}
+      {active && (
+        <span className="ml-2 h-px w-6 bg-wedding-green-200" aria-hidden />
+      )}
+    </button>
+  );
+}
+
+function GallerySectionBase() {
+  const images = IMAGES;
 
   const [mode, setMode] = useState<ViewMode>("grid");
   const [expanded, setExpanded] = useState(false);
   const [activeIdx, setActiveIdx] = useState(0);
 
-  const gridVisible = expanded ? images : images.slice(0, 12);
+  const gridVisible = expanded ? images : images.slice(0, GRID_PREVIEW_COUNT);
 
   const sectionRef    = useRef<HTMLDivElement | null>(null);
   const gridRef       = useRef<HTMLDivElement | null>(null);
@@ -79,10 +116,16 @@ export function GallerySection() {
   }, [expanded]);
 
   // ── ③ single 모드 이미지 전환 (슬라이드) ──────────────
-  const animateSingleTransition = (newIdx: number, direction: "left" | "right") => {
+  // 다음 인덱스를 함수형 업데이트로 계산해 콜백을 렌더 간에 재사용한다
+  // (기존에는 activeIdx가 바뀔 때마다 키보드 리스너가 재등록되고 있었다)
+  const slide = useCallback((delta: 1 | -1) => {
+    const direction = delta === 1 ? "right" : "left";
+    const advance = () =>
+      setActiveIdx((prev) => (prev + delta + IMAGE_COUNT) % IMAGE_COUNT);
+
     const img = singleImgRef.current;
     if (!img) {
-      setActiveIdx(newIdx);
+      advance();
       return;
     }
 
@@ -96,7 +139,7 @@ export function GallerySection() {
       duration: 0.22,
       ease: "power2.in",
       onComplete: () => {
-        setActiveIdx(newIdx);
+        advance();
         // 새 이미지 들어오기 (DOM 업데이트 후)
         gsap.fromTo(
           img,
@@ -105,17 +148,10 @@ export function GallerySection() {
         );
       },
     });
-  };
+  }, []);
 
-  const goPrev = () => {
-    const newIdx = (activeIdx - 1 + images.length) % images.length;
-    animateSingleTransition(newIdx, "left");
-  };
-
-  const goNext = () => {
-    const newIdx = (activeIdx + 1) % images.length;
-    animateSingleTransition(newIdx, "right");
-  };
+  const goPrev = useCallback(() => slide(-1), [slide]);
+  const goNext = useCallback(() => slide(1), [slide]);
 
   // 스와이프 처리 (single)
   const touch = useRef<{ startX: number; lastX: number; dragging: boolean } | null>(null);
@@ -146,42 +182,13 @@ export function GallerySection() {
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [mode, activeIdx, images.length]);
+  }, [mode, goPrev, goNext]);
 
   // mode 전환 시 activeIdx 보정
   useEffect(() => {
     if (mode !== "single") return;
-    setActiveIdx((v) => Math.min(Math.max(0, v), images.length - 1));
-  }, [mode, images.length]);
-
-  // ── 아이콘 탭 ─────────────────────────────────────────
-  const IconTab = ({
-    active,
-    label,
-    onClick,
-    children,
-  }: {
-    active: boolean;
-    label: string;
-    onClick: () => void;
-    children: React.ReactNode;
-  }) => (
-    <button
-      type="button"
-      onClick={onClick}
-      aria-label={label}
-      aria-pressed={active}
-      className={[
-        "inline-flex items-center justify-center rounded-full p-2 transition",
-        active ? "text-neutral-900" : "text-neutral-400 hover:text-neutral-700",
-      ].join(" ")}
-    >
-      {children}
-      {active && (
-        <span className="ml-2 h-px w-6 bg-wedding-green-200" aria-hidden />
-      )}
-    </button>
-  );
+    setActiveIdx((v) => Math.min(Math.max(0, v), IMAGE_COUNT - 1));
+  }, [mode]);
 
   return (
     <Section id="gallery" className="px-5 py-12 border-t border-neutral-100 bg-white">
@@ -226,7 +233,7 @@ export function GallerySection() {
             </div>
 
             {/* 더보기 */}
-            {images.length > 12 && !expanded && (
+            {images.length > GRID_PREVIEW_COUNT && !expanded && (
               <div className="mt-5 flex justify-center">
                 <button
                   type="button"
@@ -289,3 +296,5 @@ export function GallerySection() {
     </Section>
   );
 }
+
+export const GallerySection = memo(GallerySectionBase);
