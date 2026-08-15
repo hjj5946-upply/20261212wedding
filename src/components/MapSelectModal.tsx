@@ -51,16 +51,17 @@ function MapButton({
     <button
       type="button"
       onClick={onClick}
-      className="w-full h-12 rounded-2xl bg-white border border-neutral-300 flex items-center justify-center active:scale-[0.99]"
+      className="w-full h-12 rounded-2xl bg-white border border-neutral-300 flex items-center justify-center gap-2 active:scale-[0.99]"
       aria-label="티맵"
     >
       <img
         src={asset("images/tmap.webp")}
-        alt="티맵"
+        alt=""
         className="h-6 w-auto object-contain"
         loading="lazy"
         decoding="async"
       />
+      <span className="text-sm font-semibold text-neutral-800">티맵</span>
     </button>
   );
 }

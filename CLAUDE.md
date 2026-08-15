@@ -36,7 +36,7 @@ npm run img:webp  # public/images jpg/png → webp (1080px, quality 78)
 
 ## 데이터 / 외부 연동
 
-- Supabase 테이블은 **`guestbook_messages`** (`id`, `created_at`, `name`, `message`) 하나만 실제 사용 중입니다. `rsvps` 테이블에 쓰는 코드는 `Invitation.tsx`에서 주석 처리된 상태입니다.
+- Supabase 테이블은 **`guestbook_messages`** (`id`, `created_at`, `name`, `message`) 하나뿐입니다. 다만 방명록 섹션이 현재 주석 처리되어 있어 **런타임에서 Supabase를 호출하는 코드는 없습니다.** `rsvps` 테이블 쪽도 마찬가지로 주석 상태입니다.
 - 방명록에는 **허니팟 필드 + 12초 쿨다운(localStorage)** 스팸 방지가 들어 있습니다. 이 장치를 제거하지 마세요.
 - 환경 변수는 `VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY`, `VITE_NAVER_MAP_CLIENT_ID` 세 개이며 `.env`는 gitignore 대상입니다. **키 값을 커밋하거나 문서에 적지 마세요.**
 - 지도 이동은 `src/utils/mapNavigation.ts`의 딥링크 → 웹 폴백 로직을 재사용합니다. 앱 미설치 시 무반응 문제를 이미 처리해 두었습니다.
@@ -49,8 +49,9 @@ npm run img:webp  # public/images jpg/png → webp (1080px, quality 78)
 
 ## 주의사항
 
-- `RsvpSection.tsx`는 살아 있지만 `Invitation.tsx`에서 주석 처리되어 **화면에 없습니다.** RSVP 관련 요청을 받으면 먼저 활성화 여부를 확인하세요.
-- `GallerySection`은 갤러리 전용 사진 `c_1~c_25.webp`를 씁니다(`IMAGE_PREFIX = "c"`, `IMAGE_COUNT = 25`). 인트로의 `intro_*.webp`와는 별개입니다. 사진을 추가/삭제하면 `IMAGE_COUNT`를 `public/images`의 실제 `${IMAGE_PREFIX}_*.webp` 장수와 반드시 맞추세요 — 크게 두면 없는 번호가 404 + 깨진 타일이 됩니다.
+- `RsvpSection.tsx`와 `GuestbookSection.tsx`는 파일이 살아 있지만 `Invitation.tsx`에서 주석 처리되어 **화면에 없습니다.** RSVP·방명록 관련 요청을 받으면 먼저 활성화 여부를 확인하세요.
+- 방명록을 되살리려면 `Invitation.tsx`의 **3곳**(`import`, `onGuestbookToast` 콜백, JSX) 주석을 함께 해제해야 합니다. `noUnusedLocals: true`라 하나만 풀면 빌드가 깨집니다.
+- `GallerySection`은 갤러리 전용 사진 `gi_1~gi_25.webp`를 씁니다(`IMAGE_PREFIX = "gi"`, `IMAGE_COUNT = 25`). 인트로의 `intro_*.webp`와는 별개입니다. 사진을 추가/삭제하면 `IMAGE_COUNT`를 `public/images`의 실제 `${IMAGE_PREFIX}_*.webp` 장수와 반드시 맞추세요 — 크게 두면 없는 번호가 404 + 깨진 타일이 됩니다.
 - **배포 도메인은 `https://jjsh-261212.com` 입니다.** `index.html`의 OG/트위터 태그와 `wedding.ts`의 `site.baseUrl`/`ogImageUrl`이 모두 이 주소를 씁니다. 도메인이 나오면 다시 묻지 말고 이 값을 쓰세요.
 - 참고: `site.baseUrl`/`site.ogImageUrl`은 현재 **어디에서도 읽히지 않습니다**(공유는 `Invitation.tsx`가 `window.location.href`를 사용, OG는 `index.html`이 처리). 값이 틀려도 화면 동작에는 영향이 없습니다.
 - 새 사진을 추가하면 `npm run img:webp`로 WebP를 생성하고, 코드에서는 `.webp`를 참조합니다.

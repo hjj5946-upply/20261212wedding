@@ -6,7 +6,7 @@ export function FooterSection() {
       <div className="mx-auto max-w-md text-center">
         <div className="mx-auto h-[0.5px] w-24 bg-[#63a356]" />
         <div className="mt-10 text-xs text-neutral-400">
-          © 2026 · Designed & Developed by Hong JeongJun
+          © Designed & Developed by Hong JeongJun
         </div>
       </div>
     </Section>

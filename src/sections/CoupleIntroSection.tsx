@@ -123,25 +123,33 @@ function CoupleIntroSectionBase({ data }: Props) {
     const ctx = gsap.context(() => {
       const tl = gsap.timeline();
 
-      // 신랑 카드: 왼쪽에서
-      tl.from(groomRef.current, {
-        x: -48,
-        opacity: 0,
-        duration: 0.85,
-        ease: "power3.out",
-      }, 0);
+      // 화면 밖에서 날아오는 거리 / 벽에 부딪혀 튕겨나가는 정도
+      const FLY = 150;
+      const REBOUND = 14;
+      const FLIGHT = 0.4;   // 날아와 벽에 부딪히기까지
+      const SETTLE = 0.5;   // 팅긴 뒤 제자리에 딱
+      const CARD_IN = FLIGHT + SETTLE;
 
-      // 신부 카드: 오른쪽에서
-      tl.from(brideRef.current, {
-        x: 48,
-        opacity: 0,
-        duration: 0.85,
-        ease: "power3.out",
-      }, 0.12);
+      // 카드 한 장: 옆에서 가속하며 날아와 → 벽에 부딪혀 살짝 튕기고 → 제자리
+      const flyIn = (card: HTMLElement | null, dir: -1 | 1, at: number) => {
+        if (!card) return;
 
-      // 카드 내부 순차 등장
-      const cards = [groomRef.current, brideRef.current];
-      cards.forEach((card, cardIdx) => {
+        tl.fromTo(
+          card,
+          { x: FLY * dir, opacity: 0 },
+          { x: -REBOUND * dir, opacity: 1, duration: FLIGHT, ease: "power3.in" },
+          at
+        );
+
+        tl.to(
+          card,
+          { x: 0, duration: SETTLE, ease: "elastic.out(1, 0.5)" },
+          at + FLIGHT
+        );
+      };
+
+      // 카드 내부 요소들: 날아오는 동안 함께 채워져 착지 시점엔 완성된 상태
+      const fillIn = (card: HTMLElement | null, at: number) => {
         if (!card) return;
 
         const { photo, name, divider, intro, rows } = cardParts(card);
@@ -151,7 +159,7 @@ function CoupleIntroSectionBase({ data }: Props) {
           scale: 0.95,
           duration: 0.6,
           ease: "power2.out",
-        }, 0.15 + cardIdx * 0.12);
+        }, at + 0.1);
 
         tl.from([name, divider], {
           opacity: 0,
@@ -159,7 +167,7 @@ function CoupleIntroSectionBase({ data }: Props) {
           duration: 0.5,
           ease: "power2.out",
           stagger: 0.08,
-        }, 0.35 + cardIdx * 0.12);
+        }, at + 0.28);
 
         if (intro) {
           tl.from(intro, {
@@ -167,7 +175,7 @@ function CoupleIntroSectionBase({ data }: Props) {
             y: 8,
             duration: 0.5,
             ease: "power2.out",
-          }, 0.5 + cardIdx * 0.12);
+          }, at + 0.42);
         }
 
         if (rows.length > 0) {
@@ -177,10 +185,19 @@ function CoupleIntroSectionBase({ data }: Props) {
             duration: 0.45,
             ease: "power2.out",
             stagger: 0.08,
-          }, 0.6 + cardIdx * 0.12);
+          }, at + 0.52);
         }
-      });
+      };
 
+      // 신랑(왼쪽에서) → 착지 후 신부(오른쪽에서)
+      const groomAt = 0;
+      const brideAt = groomAt + CARD_IN;
+
+      flyIn(groomRef.current, -1, groomAt);
+      fillIn(groomRef.current, groomAt);
+
+      flyIn(brideRef.current, 1, brideAt);
+      fillIn(brideRef.current, brideAt);
     }, sectionRef);
 
     return () => ctx.revert();

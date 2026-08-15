@@ -12,7 +12,8 @@ import { FloatingCTA } from "../components/FloatingCTA";
 import { Toast } from "../components/Toast";
 import { MapSelectModal } from "../components/MapSelectModal";
 import { GiftAccountsSection } from "../sections/GiftAccountsSection";
-import { GuestbookSection } from "../sections/GuestbookSection";
+// 방명록 일시 비활성화 (되살리려면 이 import + onGuestbookToast + JSX 3곳 주석 해제)
+// import { GuestbookSection } from "../sections/GuestbookSection";
 // import { supabase } from "../lib/supabase";
 import { BgmFloating } from "../components/BgmFloating";
 import { getBgmEnabled, initBgm, isBgmPlaying, playBgm } from "../utils/bgm";
@@ -59,10 +60,11 @@ export function Invitation() {
 
   const onOpenMap = useCallback(() => setMapSelectOpen(true), []);
   const onCloseToast = useCallback(() => setToast({ open: false, msg: "" }), []);
-  const onGuestbookToast = useCallback(
-    (msg: string) => setToast({ open: true, msg }),
-    []
-  );
+  // 방명록 일시 비활성화
+  // const onGuestbookToast = useCallback(
+  //   (msg: string) => setToast({ open: true, msg }),
+  //   []
+  // );
 
   // const submitRsvp = async (payload: {
   //   status: "attend" | "maybe" | "decline";
@@ -206,7 +208,8 @@ export function Invitation() {
           onToast={(msg) => setToast({ open: true, msg })}
           onSubmit={submitRsvp}
         /> */}
-        <GuestbookSection onToast={onGuestbookToast} />
+        {/* 방명록 일시 비활성화 */}
+        {/* <GuestbookSection onToast={onGuestbookToast} /> */}
         <FooterSection />
       </main>
     </>

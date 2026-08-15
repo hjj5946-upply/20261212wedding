@@ -9,10 +9,10 @@ import { asset } from "../utils/asset";
 
 type ViewMode = "grid" | "single";
 
-// 갤러리 사진 소스 (인트로 사진과 별개인 갤러리 전용 사진 c_1~c_25).
+// 갤러리 사진 소스 (인트로 사진과 별개인 갤러리 전용 사진 gi_1~gi_25).
 // ⚠️ IMAGE_COUNT 는 public/images 의 실제 `${IMAGE_PREFIX}_*.webp` 장수와 일치해야 한다.
 //    (장수보다 크게 두면 없는 번호는 404 요청 + 깨진 타일이 생긴다)
-const IMAGE_PREFIX = "c";
+const IMAGE_PREFIX = "gi";
 const IMAGE_COUNT = 25;
 const GRID_PREVIEW_COUNT = 12;
 

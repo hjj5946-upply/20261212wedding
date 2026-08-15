@@ -19,12 +19,11 @@ React + TypeScript + Vite로 만든 1페이지 모바일 청첩장입니다.
 | Gallery | 그리드 / 단일 뷰 전환 갤러리 |
 | GiftAccounts | 마스킹된 계좌번호 복사 + 카카오페이 링크 |
 | Location | 네이버 지도 임베드 + 길찾기(네이버/카카오/티맵) |
-| Guestbook | Supabase 연동 실시간 방명록 |
 | Footer | 마무리 문구 |
 
 이 밖에 BGM 플로팅 버튼, 공유하기(Web Share API / 링크 복사), 하단 플로팅 CTA가 상시 동작합니다.
 
-> `RsvpSection`(참석 의사 접수)은 구현되어 있으나 현재 `src/pages/Invitation.tsx`에서 주석 처리되어 비활성 상태입니다.
+> `RsvpSection`(참석 의사 접수)과 `GuestbookSection`(Supabase 방명록)은 구현되어 있으나 현재 `src/pages/Invitation.tsx`에서 주석 처리되어 비활성 상태입니다. 방명록을 되살리려면 `import` / `onGuestbookToast` 콜백 / JSX **3곳**의 주석을 함께 해제하세요.
 
 ## 🛠 기술 스택
 
@@ -32,7 +31,7 @@ React + TypeScript + Vite로 만든 1페이지 모바일 청첩장입니다.
 - **Vite 7 (rolldown-vite)** — `overrides`로 rolldown 번들러 사용
 - **TailwindCSS 3** — `wedding-*` 커스텀 색상 팔레트
 - **GSAP + ScrollTrigger** — 섹션 진입 애니메이션
-- **Supabase** — 방명록(`guestbook_messages`) 저장/조회
+- **Supabase** — 방명록(`guestbook_messages`) 저장/조회 *(현재 비활성)*
 - **Naver Maps API** — 지도 임베드
 - **lucide-react** — 아이콘
 - **sharp** — 이미지 WebP 변환 스크립트
@@ -74,7 +73,7 @@ src/
 ├── App.tsx       # 인트로 ↔ 본문 전환
 └── main.tsx      # 엔트리
 public/
-├── images/       # 전부 webp — intro_1~15(인트로), c_1~25(갤러리), main_img, og_image ...
+├── images/       # 전부 webp — intro_1~15(인트로), gi_1~25(갤러리), main_img, og_image ...
 ├── audio/        # BGM 6곡 (랜덤 재생)
 └── fonts/        # NotoSerifKR
 ```
@@ -92,8 +91,8 @@ public/
 
 ## ⚠️ 알려진 이슈
 
-- `GallerySection`은 `intro_1.webp` ~ `intro_24.webp`를 참조하지만 `public/images`에는 15장만 있어 16~24번은 깨진 이미지로 표시됩니다. 사진을 추가하거나 `imageCount`를 15로 낮춰야 합니다.
-- `index.html`의 OG URL(`jjsh-261212.com`)과 `wedding.ts`의 `site.baseUrl`(GitHub Pages)이 서로 다릅니다. 배포 도메인에 맞춰 통일이 필요합니다.
+- `npm run lint` 에서 `react-hooks/set-state-in-effect` 에러가 여러 파일(`GallerySection`, `InfoSection`, `StorySection`, `BgmFloating` 등)에 남아 있습니다. 동작에는 문제가 없으나 정리 대상입니다.
+- `wedding.ts`의 `site.baseUrl` / `site.ogImageUrl`은 현재 코드 어디에서도 읽지 않는 값입니다. OG 태그는 `index.html`이, 공유 URL은 `window.location.href`가 담당합니다.
 
 ## 📝 라이선스
 
