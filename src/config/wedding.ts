@@ -88,8 +88,8 @@ export type AccountInfo = {
   
   export const WEDDING: WeddingConfig = {
     site: {
-      baseUrl: "https://hjj5946-upply.github.io/20261212wedding/",
-      ogImageUrl: "https://hjj5946-upply.github.io/20261212wedding/images/og.webp",
+      baseUrl: "https://jjsh-261212.com/",
+      ogImageUrl: "https://jjsh-261212.com/images/og_image.webp",
     },
   
     copy: {

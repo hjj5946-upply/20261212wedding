@@ -74,7 +74,7 @@ src/
 ├── App.tsx       # 인트로 ↔ 본문 전환
 └── main.tsx      # 엔트리
 public/
-├── images/       # intro_1~15.(jpg|webp), main_img, og_image ...
+├── images/       # 전부 webp — intro_1~15(인트로), c_1~25(갤러리), main_img, og_image ...
 ├── audio/        # BGM 6곡 (랜덤 재생)
 └── fonts/        # NotoSerifKR
 ```

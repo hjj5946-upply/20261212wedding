@@ -50,8 +50,10 @@ npm run img:webp  # public/images jpg/png → webp (1080px, quality 78)
 ## 주의사항
 
 - `RsvpSection.tsx`는 살아 있지만 `Invitation.tsx`에서 주석 처리되어 **화면에 없습니다.** RSVP 관련 요청을 받으면 먼저 활성화 여부를 확인하세요.
-- `GallerySection`의 `IMAGE_COUNT`(현재 15)는 `public/images`의 실제 `intro_*.webp` 장수와 반드시 일치해야 합니다. 사진을 추가/삭제하면 이 값도 함께 고치세요.
-- `index.html`의 OG 도메인(`jjsh-261212.com`)과 `wedding.ts`의 `site.baseUrl`(GitHub Pages)이 불일치합니다. 배포 관련 작업 시 어느 쪽이 정답인지 사용자에게 확인하세요.
+- `GallerySection`은 갤러리 전용 사진 `c_1~c_25.webp`를 씁니다(`IMAGE_PREFIX = "c"`, `IMAGE_COUNT = 25`). 인트로의 `intro_*.webp`와는 별개입니다. 사진을 추가/삭제하면 `IMAGE_COUNT`를 `public/images`의 실제 `${IMAGE_PREFIX}_*.webp` 장수와 반드시 맞추세요 — 크게 두면 없는 번호가 404 + 깨진 타일이 됩니다.
+- **배포 도메인은 `https://jjsh-261212.com` 입니다.** `index.html`의 OG/트위터 태그와 `wedding.ts`의 `site.baseUrl`/`ogImageUrl`이 모두 이 주소를 씁니다. 도메인이 나오면 다시 묻지 말고 이 값을 쓰세요.
+- 참고: `site.baseUrl`/`site.ogImageUrl`은 현재 **어디에서도 읽히지 않습니다**(공유는 `Invitation.tsx`가 `window.location.href`를 사용, OG는 `index.html`이 처리). 값이 틀려도 화면 동작에는 영향이 없습니다.
 - 새 사진을 추가하면 `npm run img:webp`로 WebP를 생성하고, 코드에서는 `.webp`를 참조합니다.
-- `public/images`에는 변환 원본(jpg/png)이 함께 있지만, `vite.config.ts`의 `prunePublicSources` 플러그인이 **같은 이름의 `.webp`가 있는 원본을 `dist`에서 제외**합니다(약 -70MB). 그래서 코드가 원본 확장자를 직접 참조하면 배포본에서 깨집니다. 예외는 `KEEP_IMAGES`(현재 `og_image.jpg` — OG 메타가 절대 URL로 참조)뿐입니다.
+- `public/images`는 이제 **`.webp`만** 있습니다(변환 원본 jpg/png는 전부 삭제, 필요하면 git 이력에서 복구). 코드는 전부 `.webp`를 참조하며 `index.html`의 OG/트위터 이미지도 `og_image.webp`입니다.
+- 원본을 다시 넣게 되면 `vite.config.ts`의 `prunePublicSources` 플러그인이 **같은 이름의 `.webp`가 있는 원본을 `dist`에서 제외**한다는 점에 주의하세요. 원본 확장자를 절대 URL로 참조해야 하는 자산이 생기면 `KEEP_IMAGES`(현재 비어 있음)에 추가해야 합니다.
 - 우클릭 차단과 핀치 줌 차단이 `App.tsx`에 의도적으로 들어가 있습니다(사진 보호 목적). 제거하지 마세요.

@@ -10,14 +10,15 @@ import react from "@vitejs/plugin-react";
  *
  * 규칙: dist/images 안에서 "같은 이름의 .webp가 존재하는" jpg/jpeg/png 는 제외.
  *  - 코드는 전부 .webp 를 참조하므로 화면에는 영향 없음
- *  - KEEP_IMAGES: 외부에서 절대 URL로 직접 참조되는 파일은 반드시 남긴다
+ *  - KEEP_IMAGES: 외부에서 절대 URL로 직접 참조되는 원본이 생기면 여기에 추가한다
  *  - PRUNE_FILES: 선언만 있고 실제로 쓰이지 않는 자산 (되살리려면 이 목록에서 제거)
  *
  * 원본 파일 자체는 손대지 않으므로 `npm run img:webp` 는 그대로 동작한다.
  */
 function prunePublicSources(): Plugin {
   // index.html 의 og:image / twitter:image 가 절대 URL로 직접 가리키는 파일
-  const KEEP_IMAGES = new Set(["og_image.jpg"]);
+  // (현재는 og:image 도 .webp 를 가리키므로 예외 없음. 원본 확장자를 직접 참조하게 되면 여기 추가할 것)
+  const KEEP_IMAGES = new Set<string>([]);
 
   // .font-noto-serif 클래스가 코드에서 쓰이지 않아 다운로드되지 않는 폰트(5.8MB)
   const PRUNE_FILES = ["fonts/NotoSerifKR-VariableFont_wght.woff2"];

@@ -9,14 +9,16 @@ import { asset } from "../utils/asset";
 
 type ViewMode = "grid" | "single";
 
-// ⚠️ public/images 의 실제 intro_*.webp 장수와 일치해야 한다.
-//    (24로 두면 16~24번은 존재하지 않아 404 요청 + 깨진 타일이 생긴다)
-const IMAGE_COUNT = 15;
+// 갤러리 사진 소스 (인트로 사진과 별개인 갤러리 전용 사진 c_1~c_25).
+// ⚠️ IMAGE_COUNT 는 public/images 의 실제 `${IMAGE_PREFIX}_*.webp` 장수와 일치해야 한다.
+//    (장수보다 크게 두면 없는 번호는 404 요청 + 깨진 타일이 생긴다)
+const IMAGE_PREFIX = "c";
+const IMAGE_COUNT = 25;
 const GRID_PREVIEW_COUNT = 12;
 
 // 목록은 고정값이므로 모듈 상수로 한 번만 만든다
 const IMAGES = Array.from({ length: IMAGE_COUNT }, (_, idx) => ({
-  src: asset(`images/intro_${idx + 1}.webp`),
+  src: asset(`images/${IMAGE_PREFIX}_${idx + 1}.webp`),
   alt: `gallery-${idx + 1}`,
 }));
 
