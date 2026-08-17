@@ -51,6 +51,10 @@ npm run img:webp  # public/images jpg/png → webp (1080px, quality 78)
 
 - `RsvpSection.tsx`와 `GuestbookSection.tsx`는 파일이 살아 있지만 `Invitation.tsx`에서 주석 처리되어 **화면에 없습니다.** RSVP·방명록 관련 요청을 받으면 먼저 활성화 여부를 확인하세요.
 - 방명록을 되살리려면 `Invitation.tsx`의 **3곳**(`import`, `onGuestbookToast` 콜백, JSX) 주석을 함께 해제해야 합니다. `noUnusedLocals: true`라 하나만 풀면 빌드가 깨집니다.
+- 인트로 사진은 `intro_1~intro_44.webp`가 **후보 풀**이고, 페이지를 열 때마다 셔플해서 **앞 20장만** 실제로 씁니다(`IntroHost.tsx`의 `TOTAL_FILES = 44`, `FRAMES_PER_RUN = 20`). 선택되지 않은 파일은 요청조차 하지 않으므로 `FRAMES_PER_RUN`이 곧 인트로 전송량입니다(20장 ≈ 3.4MB).
+  - 파일을 추가/삭제하면 `TOTAL_FILES`를 실제 장수와 맞추세요.
+  - 재생 관련 계산은 전부 `FRAME_COUNT`(= 이번에 고른 장수)를 써야 합니다. `TOTAL_FILES`로 모듈러 연산하면 없는 인덱스를 가리켜 프레임이 비거나 크래시합니다.
+  - 순서가 매번 달라지므로 `index.html`에서 특정 인트로 사진을 preload 해도 첫 프레임이 아닙니다(그래서 제거했습니다).
 - `GallerySection`은 갤러리 전용 사진 `gi_1~gi_25.webp`를 씁니다(`IMAGE_PREFIX = "gi"`, `IMAGE_COUNT = 25`). 인트로의 `intro_*.webp`와는 별개입니다. 사진을 추가/삭제하면 `IMAGE_COUNT`를 `public/images`의 실제 `${IMAGE_PREFIX}_*.webp` 장수와 반드시 맞추세요 — 크게 두면 없는 번호가 404 + 깨진 타일이 됩니다.
 - **배포 도메인은 `https://jjsh-261212.com` 입니다.** `index.html`의 OG/트위터 태그와 `wedding.ts`의 `site.baseUrl`/`ogImageUrl`이 모두 이 주소를 씁니다. 도메인이 나오면 다시 묻지 말고 이 값을 쓰세요.
 - 참고: `site.baseUrl`/`site.ogImageUrl`은 현재 **어디에서도 읽히지 않습니다**(공유는 `Invitation.tsx`가 `window.location.href`를 사용, OG는 `index.html`이 처리). 값이 틀려도 화면 동작에는 영향이 없습니다.

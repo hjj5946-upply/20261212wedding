@@ -13,10 +13,33 @@ function pad2(n: number) {
 function clamp0(n: number) {
   return Math.max(0, n);
 }
+
+const DAY_MS = 86_400_000;
+const KST_OFFSET_MS = 9 * 60 * 60 * 1000; // Asia/Seoul (DST 없음)
+
+/** 하객의 기기 타임존과 무관하게 "한국 시간 기준" 연/월/일을 읽는다. */
+function kstYmd(d: Date) {
+  const k = new Date(d.getTime() + KST_OFFSET_MS);
+  return { year: k.getUTCFullYear(), month: k.getUTCMonth() + 1, day: k.getUTCDate() };
+}
+
+/** 해당 시각이 속한 한국 날짜의 자정(00:00 KST)을 epoch ms로 반환. */
+function kstStartOfDay(d: Date) {
+  return Math.floor((d.getTime() + KST_OFFSET_MS) / DAY_MS) * DAY_MS - KST_OFFSET_MS;
+}
+
+/**
+ * D-day는 "한국 날짜 기준 며칠 남았는지"(자정 → 자정)로 센다.
+ * 예식 시각(13:20)까지의 잔여 시간을 86400으로 나누면 오후에 접속한 하객에게
+ * 하루가 깎여 보이므로(예: 117일 → 116일) 날짜 차이로 계산한다.
+ * 시/분/초는 D-day가 하루 줄어들 때까지(=한국 시간 다음 자정)를 세고,
+ * 예식 당일에는 예식 시각까지를 센다.
+ */
 function diffParts(target: Date, now: Date) {
-  const ms = clamp0(target.getTime() - now.getTime());
-  const totalSec = Math.floor(ms / 1000);
-  const days = Math.floor(totalSec / 86400);
+  const days = clamp0(Math.round((kstStartOfDay(target) - kstStartOfDay(now)) / DAY_MS));
+  const tickTo = days > 0 ? kstStartOfDay(now) + DAY_MS : target.getTime();
+
+  const totalSec = Math.floor(clamp0(tickTo - now.getTime()) / 1000);
   const hours = Math.floor((totalSec % 86400) / 3600);
   const minutes = Math.floor((totalSec % 3600) / 60);
   const seconds = totalSec % 60;
@@ -65,9 +88,9 @@ function InfoSectionBase({ data }: Props) {
   // 0: 대기, 1: 인트로 재생, 5: 본문
   const [step, setStep] = useState<0 | 1 | 5>(0);
 
-  const year = weddingDate.getFullYear();
-  const month = weddingDate.getMonth() + 1;
-  const day = weddingDate.getDate();
+  // ✅ 기기 타임존이 아니라 한국 시간 기준으로 읽는다.
+  //    (해외 접속 시 getDate()가 12월 11일로 밀려 달력 표시가 틀어졌다)
+  const { year, month, day } = useMemo(() => kstYmd(weddingDate), [weddingDate]);
 
   // ✅ year/month가 바뀌면 달력도 다시 생성되어야 함
   const cal = useMemo(() => buildCalendarGrid(year, month), [year, month]);

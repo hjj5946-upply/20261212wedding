@@ -4,27 +4,54 @@ import { playBgm, isBgmPlaying  } from "../utils/bgm";
 
 export type IntroStyle = "montage" | "filmstrip" | "game" | "gate";
 
-const TOTAL_IMAGES = 15;
+// ⚠️ public/images 의 실제 `intro_*.webp` 장수와 일치해야 한다 (후보 풀)
+const TOTAL_FILES = 44;
+// 한 번 열 때 실제로 쓰는 장수. 선택되지 않은 파일은 요청/디코드 자체를 하지 않으므로
+// 이 값이 곧 인트로의 전송량이다. (44장 전부 쓰면 7.5MB → 20장이면 약 3.4MB)
+const FRAMES_PER_RUN = 20;
 
-// 목록은 고정값이므로 모듈 상수로 한 번만 만든다
-const INTRO_FRAMES = Array.from({ length: TOTAL_IMAGES }, (_, i) => ({
-  id: i + 1,
-  src: asset(`images/intro_${i + 1}.webp`),
-}));
+/** Fisher-Yates 셔플 (원본은 건드리지 않음) */
+function shuffle<T>(input: T[]): T[] {
+  const a = input.slice();
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j] as T, a[i] as T];
+  }
+  return a;
+}
+
+// 목록은 렌더 중에 바뀌면 안 되므로 모듈 상수로 한 번만 만든다.
+// 셔플 + 앞에서 20장만 잘라내므로 "페이지를 열 때마다" 44장 중 어느 20장이
+// 어떤 순서로 나올지가 새로 정해지고, 재생 중에는 흔들리지 않는다.
+const INTRO_FRAMES = shuffle(
+  Array.from({ length: TOTAL_FILES }, (_, i) => ({
+    id: i + 1,
+    src: asset(`images/intro_${i + 1}.webp`),
+  }))
+).slice(0, FRAMES_PER_RUN);
+
+// 아래 로직은 전부 "이번에 고른 장수" 기준이어야 한다.
+// (TOTAL_FILES(44)로 계산하면 존재하지 않는 인덱스를 가리켜 프레임이 비거나 크래시한다)
+const FRAME_COUNT = INTRO_FRAMES.length;
 
 /** 지금 전환에 참여하는 프레임인지 (직전 / 현재 / 다음) */
 function isNearCurrent(idx: number, current: number) {
   return (
     idx === current ||
-    idx === (current + 1) % TOTAL_IMAGES ||
-    idx === (current - 1 + TOTAL_IMAGES) % TOTAL_IMAGES
+    idx === (current + 1) % FRAME_COUNT ||
+    idx === (current - 1 + FRAME_COUNT) % FRAME_COUNT
   );
 }
 
+// 화면에 가장 먼저 필요한 앞부분은 순차로 확실히 준비한다
+const PRELOAD_HEAD = 4;
+// 나머지는 소량씩만 병렬로. 44장을 한 번에 요청하면 모바일 회선에서
+// 서로 경합해 정작 초반 프레임 준비가 늦어진다.
+const PRELOAD_CONCURRENCY = 5;
+
 /**
- * 프레임 전환이 180ms 간격이라 디코딩을 미리 끝내둬야 끊김이 없다.
- * 첫 두 장은 순서대로(가장 먼저 화면에 필요) 나머지는 병렬로 디코딩한다.
- * 기존에는 15장을 전부 순차 await 해서 뒤쪽 프레임 준비가 늦었다.
+ * 프레임 전환이 100~180ms 간격이라 디코딩을 미리 끝내둬야 끊김이 없다.
+ * 앞 몇 장은 순서대로, 나머지는 "재생 순서대로" 동시 개수를 제한해 디코딩한다.
  */
 function usePreloadImages(urls: string[]) {
   useEffect(() => {
@@ -44,8 +71,23 @@ function usePreloadImages(urls: string[]) {
     };
 
     (async () => {
-      for (const url of urls.slice(0, 2)) await decode(url);
-      await Promise.all(urls.slice(2).map(decode));
+      for (const url of urls.slice(0, PRELOAD_HEAD)) {
+        if (cancelled) return;
+        await decode(url);
+      }
+
+      const rest = urls.slice(PRELOAD_HEAD);
+      let cursor = 0;
+
+      const worker = async () => {
+        while (!cancelled) {
+          const url = rest[cursor++];
+          if (url === undefined) return;
+          await decode(url);
+        }
+      };
+
+      await Promise.all(Array.from({ length: PRELOAD_CONCURRENCY }, worker));
     })();
 
     return () => {
@@ -79,7 +121,7 @@ function MontageIntro({ onDone }: { onDone: () => void }) {
   useEffect(() => {
     const isMobile = window.matchMedia("(max-width: 768px)").matches;
 
-    const totalImages = TOTAL_IMAGES;
+    const totalImages = FRAME_COUNT;
 
     const BASE_MS = isMobile ? 180 : 180; // 초반 속도
     const FAST_MS = isMobile ? 100 : 100;   // 가속 속도
