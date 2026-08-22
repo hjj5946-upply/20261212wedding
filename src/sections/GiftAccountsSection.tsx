@@ -3,7 +3,7 @@ import type { WeddingConfig, AccountInfo } from "../config/wedding";
 import { Section } from "../components/Section";
 import { SectionTitle } from "../components/SectionTitle";
 import { Button } from "../components/Button";
-import { asset } from "../utils/asset";
+// import { asset } from "../utils/asset"; // 카카오페이 버튼 복구 시 함께 해제
 
 type Props = {
   data: WeddingConfig;
@@ -83,6 +83,7 @@ function AccountList({
                 </Button>
               </div>
 
+              {/* 카카오페이 버튼 — 나중에 다시 사용 예정 (주석 해제 시 상단 asset import도 함께 복구)
               {a.kakaoPayUrl ? (
                 <Button
                   variant="secondary"
@@ -100,6 +101,7 @@ function AccountList({
                   />
                 </Button>
               ) : null}
+              */}
             </div>
 
 

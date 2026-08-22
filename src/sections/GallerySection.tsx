@@ -285,7 +285,7 @@ function GallerySectionBase() {
                     setActiveIdx(idx);
                     setMode("single");
                   }}
-                  className="gallery-item aspect-[3/4] overflow-hidden rounded-2xl border border-neutral-200 bg-neutral-100"
+                  className="gallery-item aspect-[3/4] overflow-hidden rounded-2xl bg-neutral-100"
                   aria-label={`open image ${idx + 1}`}
                   type="button"
                 >
@@ -321,7 +321,7 @@ function GallerySectionBase() {
           <div className="mt-6">
             <div className="mx-auto max-w-md">
               <div
-                className="relative aspect-[3/4] overflow-hidden rounded-2xl border border-neutral-200 bg-neutral-100"
+                className="relative aspect-[3/4] overflow-hidden rounded-2xl bg-neutral-100"
                 onTouchStart={onTouchStart}
                 onTouchMove={onTouchMove}
                 onTouchEnd={onTouchEnd}
