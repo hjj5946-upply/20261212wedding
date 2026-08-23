@@ -1,4 +1,5 @@
 import { Modal } from "./Modal";
+import { PhotoGuard } from "./PhotoGuard";
 
 export function ImageModal({
   open,
@@ -17,8 +18,9 @@ export function ImageModal({
 
   return (
     <Modal open={open} title={title} onClose={onClose}>
-      <div className="overflow-hidden rounded-2xl border border-neutral-200">
+      <div className="relative overflow-hidden rounded-2xl border border-neutral-200">
         <img src={src} alt={alt ?? title} className="w-full" />
+        <PhotoGuard />
       </div>
     </Modal>
   );

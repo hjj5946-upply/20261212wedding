@@ -17,12 +17,53 @@
 @tailwind utilities;
 
 @layer base {
+  html {
+    /*
+     * 인앱 브라우저(카카오·네이버 등)는 본문 글자를 임의로 확대(text autosizing)해서
+     * 스크롤 도중 레이아웃이 튀게 만든다. 100%로 고정한다.
+     */
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+  }
+
+  html,
+  body {
+    /*
+     * 가로 넘침 차단은 html에도 같이 걸어야 한다.
+     * body에만 걸면 iOS WebView(카카오 인앱 브라우저)에서 body가 스크롤 컨테이너로
+     * 승격되면서 관성 스크롤이 끊기고 fixed 요소가 떨린다.
+     */
+    overflow-x: hidden;
+    /* 카카오 인앱 브라우저의 당겨서 새로고침 / 끝단 바운스로 스크롤이 끊기는 것 방지 */
+    overscroll-behavior-y: none;
+  }
+
   body {
     font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, Roboto, sans-serif;
     background: #ffffff;
     color: #111827;
-    touch-action: manipulation;
-    overflow-x: hidden;
+    /*
+     * pan-y: 브라우저는 세로 스크롤만 처리한다 → 핀치 줌·더블탭 줌이 JS 없이 차단된다.
+     * (예전에는 document에 non-passive touchmove 리스너를 걸어 막았는데, 그 리스너 때문에
+     *  모든 터치 이동이 메인 스레드 응답을 기다려야 해서 인앱 브라우저 스크롤이 뚝뚝 끊겼다.
+     *  네이버 지도는 draggable/pinchZoom 전부 false라 pan-y로 잃는 제스처가 없다.)
+     */
+    touch-action: pan-y;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  /*
+   * 사진 저장·드래그 차단.
+   * iOS WKWebView(카카오 인앱)는 -webkit-touch-callout: none 이면 길게 누르기 메뉴가 안 뜬다.
+   * Android WebView는 이것만으로 부족해서 PhotoGuard 오버레이를 같이 쓴다.
+   */
+  img,
+  canvas,
+  video {
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    user-select: none;
+    -webkit-user-drag: none;
   }
 }
 

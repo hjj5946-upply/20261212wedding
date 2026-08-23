@@ -135,10 +135,16 @@ export function Invitation() {
     if (!giftSection) return;
 
     let threshold = giftSection.offsetTop - 200;
+    let needsMeasure = false;
     let raf = 0;
 
     const update = () => {
       raf = 0;
+      // 측정(offsetTop)은 강제 레이아웃을 유발하므로 rAF 안에서 프레임당 한 번만 한다.
+      if (needsMeasure) {
+        needsMeasure = false;
+        threshold = giftSection.offsetTop - 200;
+      }
       setShowCTA(window.scrollY > threshold);
     };
 
@@ -147,9 +153,11 @@ export function Invitation() {
       raf = requestAnimationFrame(update);
     };
 
-    // 이미지 로드/폰트 적용으로 섹션 위치가 밀리면 임계값을 다시 잰다
+    // 이미지 로드/폰트 적용으로 섹션 위치가 밀리면 임계값을 다시 잰다.
+    // ⚠️ 카카오 인앱 브라우저는 스크롤 중에 상·하단 바가 접히면서 body 크기가 계속
+    //    바뀐다. 콜백에서 바로 재는 대신 플래그만 세워 rAF로 넘긴다(레이아웃 스래싱 방지).
     const ro = new ResizeObserver(() => {
-      threshold = giftSection.offsetTop - 200;
+      needsMeasure = true;
       onScroll();
     });
     ro.observe(document.body);

@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { asset } from "../utils/asset";
 import { playBgm, isBgmPlaying  } from "../utils/bgm";
+import { PhotoGuard } from "../components/PhotoGuard";
 
 export type IntroStyle = "montage" | "filmstrip" | "game" | "gate";
 
@@ -206,6 +207,7 @@ function MontageIntro({ onDone }: { onDone: () => void }) {
             ].join(" ")}
           />
         ))}
+        <PhotoGuard />
       </div>
 
       {/* 배경 서서히 검정으로 덮음 - 3초에 걸쳐 천천히 */}

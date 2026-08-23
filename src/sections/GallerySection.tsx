@@ -7,6 +7,7 @@ import { Section } from "../components/Section";
 import { SectionTitle } from "../components/SectionTitle";
 import { LayoutGrid, RectangleVertical } from "lucide-react";
 import { asset } from "../utils/asset";
+import { PhotoGuard } from "../components/PhotoGuard";
 
 type ViewMode = "grid" | "single";
 
@@ -285,7 +286,7 @@ function GallerySectionBase() {
                     setActiveIdx(idx);
                     setMode("single");
                   }}
-                  className="gallery-item aspect-[3/4] overflow-hidden rounded-2xl bg-neutral-100"
+                  className="gallery-item relative aspect-[3/4] overflow-hidden rounded-2xl bg-neutral-100"
                   aria-label={`open image ${idx + 1}`}
                   type="button"
                 >
@@ -295,6 +296,7 @@ function GallerySectionBase() {
                     className="h-full w-full object-cover transition-transform duration-300 hover:scale-105"
                     loading="lazy"
                   />
+                  <PhotoGuard />
                 </button>
               ))}
             </div>
@@ -336,6 +338,9 @@ function GallerySectionBase() {
                   decoding="async"
                   draggable={false}
                 />
+
+                {/* 사진 위 투명 레이어(저장 차단). 좌우 버튼은 뒤에 렌더되어 위에 온다. */}
+                <PhotoGuard />
 
                 <button
                   type="button"
