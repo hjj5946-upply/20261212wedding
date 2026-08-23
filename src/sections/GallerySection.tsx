@@ -8,6 +8,7 @@ import { SectionTitle } from "../components/SectionTitle";
 import { LayoutGrid, RectangleVertical } from "lucide-react";
 import { asset } from "../utils/asset";
 import { PhotoGuard } from "../components/PhotoGuard";
+import { PhotoLightbox } from "../components/PhotoLightbox";
 
 type ViewMode = "grid" | "single";
 
@@ -88,6 +89,8 @@ function GallerySectionBase() {
   const [mode, setMode] = useState<ViewMode>("grid");
   const [expanded, setExpanded] = useState(false);
   const [activeIdx, setActiveIdx] = useState(0);
+  // 1장 보기에서 사진을 한 번 더 누르면 열리는 전체화면 뷰어(원본 전체 + 확대)
+  const [lightboxOpen, setLightboxOpen] = useState(false);
 
   const gridVisible = expanded ? images : images.slice(0, GRID_PREVIEW_COUNT);
 
@@ -204,9 +207,12 @@ function GallerySectionBase() {
 
   // 스와이프 처리 (single)
   const touch = useRef<{ startX: number; lastX: number; dragging: boolean } | null>(null);
+  // 스와이프로 끝난 제스처는 뒤따라 오는 click 으로 뷰어가 열리지 않게 표시해 둔다
+  const swipedRef = useRef(false);
 
   const onTouchStart = (e: React.TouchEvent) => {
     const x = e.touches[0]?.clientX ?? 0;
+    swipedRef.current = false;
     touch.current = { startX: x, lastX: x, dragging: true };
   };
   const onTouchMove = (e: React.TouchEvent) => {
@@ -218,20 +224,22 @@ function GallerySectionBase() {
     const dx = touch.current.lastX - touch.current.startX;
     touch.current.dragging = false;
     if (Math.abs(dx) < 40) return;
+    swipedRef.current = true;
     if (dx < 0) goNext();
     else goPrev();
   };
 
   // 키보드 (single, PC)
   useEffect(() => {
-    if (mode !== "single") return;
+    // 뷰어가 열려 있으면 방향키는 뷰어가 처리한다(둘 다 반응하면 두 장씩 넘어간다)
+    if (mode !== "single" || lightboxOpen) return;
     const onKey = (e: KeyboardEvent) => {
       if (e.key === "ArrowLeft") goPrev();
       if (e.key === "ArrowRight") goNext();
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [mode, goPrev, goNext]);
+  }, [mode, lightboxOpen, goPrev, goNext]);
 
   // mode 전환 시 activeIdx 보정
   useEffect(() => {
@@ -333,6 +341,16 @@ function GallerySectionBase() {
                 onTouchStart={onTouchStart}
                 onTouchMove={onTouchMove}
                 onTouchEnd={onTouchEnd}
+                onClick={() => {
+                  // 스와이프 직후의 click 은 무시하고, 탭일 때만 뷰어를 연다
+                  if (swipedRef.current) {
+                    swipedRef.current = false;
+                    return;
+                  }
+                  setLightboxOpen(true);
+                }}
+                role="button"
+                aria-label="사진 크게 보기"
               >
                 {/*
                  * object-cover: 박스를 항상 꽉 채운다. 사진 비율이 박스와 달라도
@@ -354,7 +372,10 @@ function GallerySectionBase() {
 
                 <button
                   type="button"
-                  onClick={goPrev}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    goPrev();
+                  }}
                   className="absolute left-2 top-1/2 -translate-y-1/2 rounded-full border border-neutral-200 bg-white/90 px-3 py-2 text-sm font-semibold text-neutral-800 shadow-sm"
                   aria-label="previous image"
                 >
@@ -362,7 +383,10 @@ function GallerySectionBase() {
                 </button>
                 <button
                   type="button"
-                  onClick={goNext}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    goNext();
+                  }}
                   className="absolute right-2 top-1/2 -translate-y-1/2 rounded-full border border-neutral-200 bg-white/90 px-3 py-2 text-sm font-semibold text-neutral-800 shadow-sm"
                   aria-label="next image"
                 >
@@ -376,6 +400,19 @@ function GallerySectionBase() {
               </div>
             </div>
           </div>
+        )}
+
+        {/* ── 전체화면 뷰어 (원본 전체 + 확대) ── */}
+        {mode === "single" && lightboxOpen && (
+          <PhotoLightbox
+            images={images}
+            index={activeIdx}
+            onIndexChange={(next) => {
+              targetIdxRef.current = next;
+              setActiveIdx(next);
+            }}
+            onClose={() => setLightboxOpen(false)}
+          />
         )}
       </div>
     </Section>
