@@ -4,6 +4,7 @@ import { gsap } from "gsap";
 import type { WeddingConfig } from "../config/wedding";
 import { asset } from "../utils/asset";
 import { PhotoGuard } from "../components/PhotoGuard";
+import { useStableViewportHeight } from "../utils/useStableViewportHeight";
 import { isBgmPlaying, playBgm } from "../utils/bgm";
 
 type Props = {
@@ -46,9 +47,17 @@ function useSnowCanvas<T extends HTMLElement>(
 
     const resize = () => {
       const rect = container.getBoundingClientRect();
-      cw = Math.max(1, Math.floor(rect.width));
-      ch = Math.max(1, Math.floor(rect.height));
-      dpr = Math.max(1, window.devicePixelRatio || 1);
+      const nextCw = Math.max(1, Math.floor(rect.width));
+      const nextCh = Math.max(1, Math.floor(rect.height));
+      const nextDpr = Math.max(1, window.devicePixelRatio || 1);
+
+      // canvas.width 에 대입하면 크기가 같아도 버퍼가 새로 잡히고 화면이 지워진다.
+      // 인앱 브라우저는 바가 접힐 때마다 ResizeObserver 를 때리므로 반드시 걸러낸다.
+      if (nextCw === cw && nextCh === ch && nextDpr === dpr) return;
+
+      cw = nextCw;
+      ch = nextCh;
+      dpr = nextDpr;
 
       canvas.width = Math.floor(cw * dpr);
       canvas.height = Math.floor(ch * dpr);
@@ -219,6 +228,10 @@ const HERO_IMG = asset("images/main_img.webp");
 function HeroSectionBase({ data: _data }: Props) {
   const heroImg = HERO_IMG;
 
+  // 뷰포트 단위(100svh)로 두면 카카오 인앱 브라우저에서 바가 접힐 때마다
+  // 섹션 높이가 변해 배경/원본 이미지가 같이 늘었다 줄었다 한다. px 로 고정한다.
+  const stableHeight = useStableViewportHeight();
+
   const sectionRef = useRef<HTMLElement | null>(null);
   const snowRef = useRef<HTMLCanvasElement | null>(null);
   const imgRef = useRef<HTMLImageElement | null>(null);
@@ -278,7 +291,11 @@ function HeroSectionBase({ data: _data }: Props) {
   }, []);
 
   return (
-    <section ref={sectionRef} className="relative h-[100svh] w-full overflow-hidden">
+    <section
+      ref={sectionRef}
+      className="relative h-[100svh] w-full overflow-hidden"
+      style={{ height: `${stableHeight}px` }}
+    >
 
       {/* 배경 이미지 */}
       {/* <img

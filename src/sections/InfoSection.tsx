@@ -1,6 +1,8 @@
-import { memo, useEffect, useMemo, useRef, useState } from "react";
+import { memo, useEffect, useMemo, useState } from "react";
 import type { WeddingConfig } from "../config/wedding";
 import { Section } from "../components/Section";
+import { useInView } from "../utils/useInView";
+import { useStableViewportHeight } from "../utils/useStableViewportHeight";
 
 type Props = { data: WeddingConfig };
 
@@ -82,8 +84,11 @@ function dateTextClass(weekday: number, day: number | null) {
 function InfoSectionBase({ data }: Props) {
   const weddingDate = useMemo(() => new Date(data.ceremony.dateISO), [data.ceremony.dateISO]);
 
-  const rootRef = useRef<HTMLDivElement | null>(null);
-  const [inView, setInView] = useState(false);
+  // 이탈 판정이 "완전히 화면 밖"이라 인앱 브라우저의 뷰포트 리사이즈로 뒤집히지 않는다.
+  const { ref: rootRef, inView } = useInView<HTMLDivElement>(0.55);
+
+  // min-h-screen(=100vh)을 그대로 두면 바가 접힐 때 섹션이 늘었다 줄었다 한다.
+  const stableHeight = useStableViewportHeight();
 
   // 0: 대기, 1: 인트로 재생, 5: 본문
   const [step, setStep] = useState<0 | 1 | 5>(0);
@@ -94,19 +99,6 @@ function InfoSectionBase({ data }: Props) {
 
   // ✅ year/month가 바뀌면 달력도 다시 생성되어야 함
   const cal = useMemo(() => buildCalendarGrid(year, month), [year, month]);
-
-  // 섹션 진입/이탈 감지 (다시 들어오면 인트로 재시작)
-  useEffect(() => {
-    const el = rootRef.current;
-    if (!el) return;
-
-    const io = new IntersectionObserver(([entry]) => setInView(entry.isIntersecting), {
-      threshold: 0.55,
-    });
-
-    io.observe(el);
-    return () => io.disconnect();
-  }, []);
 
   // ✅ 인트로 길이를 "문자 수 기반"으로 계산해서 끝나자마자 본문으로 전환
   useEffect(() => {
@@ -144,6 +136,7 @@ function InfoSectionBase({ data }: Props) {
           "relative w-full min-h-screen overflow-hidden",
           "bg-white", // ✅ 내용화면은 처음부터 끝까지 흰색 베이스
         ].join(" ")}
+        style={{ minHeight: `${stableHeight}px` }}
       >
         {/* ✅ 인트로: 그린 배경은 오버레이에만 존재 */}
         <div
@@ -177,6 +170,7 @@ function InfoSectionBase({ data }: Props) {
             "transition-all duration-800 ease-out", // ✅ 1100 -> 800 (더 자연스럽게 빠름)
             step === 5 ? "opacity-100 translate-y-0" : "opacity-0 translate-y-3",
           ].join(" ")}
+          style={{ minHeight: `${stableHeight}px` }}
         >
           <div className="w-full max-w-md px-5 text-center">
             {/* 타이틀 */}
