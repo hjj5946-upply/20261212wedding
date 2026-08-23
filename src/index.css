@@ -24,6 +24,22 @@
     touch-action: manipulation;
     overflow-x: hidden;
   }
+
+  /*
+   * 사진 저장·드래그 차단.
+   * iOS WKWebView(카카오 인앱)는 -webkit-touch-callout: none 이면 길게 누르기 메뉴가 안 뜬다.
+   * Android WebView는 이것만으로 부족해서 PhotoGuard 오버레이를 같이 쓴다.
+   * ⚠️ 레이아웃/스크롤에 영향 없는 속성만 넣는다. html·body의 overflow나 touch-action은
+   *    건드리지 말 것 (전에 여기서 전역 스크롤이 깨졌다).
+   */
+  img,
+  canvas,
+  video {
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    user-select: none;
+    -webkit-user-drag: none;
+  }
 }
 
 /* ── PC에서 모바일 뷰로 보이도록 ── */

@@ -4,6 +4,7 @@ import { Section } from "../components/Section";
 import { SectionTitle } from "../components/SectionTitle";
 import { asset } from "../utils/asset";
 import { useInView } from "../utils/useInView";
+import { PhotoGuard } from "../components/PhotoGuard";
 
 type Props = { data: WeddingConfig };
 
@@ -30,7 +31,7 @@ function StoryPhoto({
   return (
     <div className={`h-full overflow-hidden ${rounded} border border-neutral-200 ${bg} shadow-sm`}>
       {/* ✅ padding은 이미지 영역에만 적용 */}
-      <div className={`h-full w-full ${padding}`}>
+      <div className={`relative h-full w-full ${padding}`}>
         <img
           src={asset(src)}
           alt={title}
@@ -38,6 +39,7 @@ function StoryPhoto({
           loading="lazy"
           draggable={false}
         />
+        <PhotoGuard />
       </div>
     </div>
   );
