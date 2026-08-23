@@ -3,7 +3,6 @@ import React, { memo, useEffect, useRef } from "react";
 import { gsap } from "gsap";
 import type { WeddingConfig } from "../config/wedding";
 import { asset } from "../utils/asset";
-import { PhotoGuard } from "../components/PhotoGuard";
 import { isBgmPlaying, playBgm } from "../utils/bgm";
 
 type Props = {
@@ -311,9 +310,6 @@ function HeroSectionBase({ data: _data }: Props) {
         decoding="async"
         fetchPriority="high"
       />
-
-      {/* 길게 눌러 저장 차단 (인앱 브라우저 대응). 이 섹션엔 조작 UI가 없다. */}
-      <PhotoGuard className="z-[6]" />
 
       {/* 눈 캔버스 */}
       <div className="pointer-events-none absolute inset-x-0 top-0 z-[5] h-[90%] overflow-hidden">

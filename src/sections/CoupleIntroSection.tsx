@@ -6,7 +6,6 @@ import { Section } from "../components/Section";
 import { SectionTitle } from "../components/SectionTitle";
 import { asset } from "../utils/asset";
 import { useInView } from "../utils/useInView";
-import { PhotoGuard } from "../components/PhotoGuard";
 
 type Props = { data: WeddingConfig };
 
@@ -58,7 +57,6 @@ function PhotoCard({
               loading="lazy"
             />
           )}
-          <PhotoGuard />
         </div>
       </div>
 
