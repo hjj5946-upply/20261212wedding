@@ -323,11 +323,21 @@ function GallerySectionBase() {
           <div className="mt-6">
             <div className="mx-auto max-w-md">
               <div
-                className="relative aspect-[3/4] overflow-hidden rounded-2xl bg-neutral-100"
+                /*
+                 * 16/25(=0.64) — 갤러리 사진 25장의 비율은 0.615~0.776 으로 제각각이고
+                 * 중앙값이 0.667(2:3)이다. 박스는 항상 꽉 채우는(object-cover) 정책이라
+                 * 이 값은 "어느 쪽을 덜 잘라낼지"를 정한다. 중앙값보다 살짝 세로로 길게
+                 * 잡아 세로 사진의 위아래 잘림을 줄였다. 가로 폭은 그대로라 양옆 여백은 불변.
+                 */
+                className="relative aspect-[16/25] overflow-hidden rounded-2xl bg-neutral-100"
                 onTouchStart={onTouchStart}
                 onTouchMove={onTouchMove}
                 onTouchEnd={onTouchEnd}
               >
+                {/*
+                 * object-cover: 박스를 항상 꽉 채운다. 사진 비율이 박스와 달라도
+                 * 위아래/양옆에 빈 공간이 생기지 않는다(대신 넘치는 쪽이 잘린다).
+                 */}
                 <img
                   ref={singleImgRef}
                   src={images[activeIdx]?.src}
