@@ -1,5 +1,5 @@
 // src/components/PhotoLightbox.tsx
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { ChevronLeft, ChevronRight, X } from "lucide-react";
 
@@ -14,9 +14,9 @@ const DOUBLE_TAP_MS = 300;
 const SWIPE_PX = 50; // 좌우로 이 이상 끌면 다음/이전 사진
 const CLOSE_PX = 90; // 아래로 이 이상 끌면 닫기
 const FADE_MS = 180; // 열고 닫을 때 페이드
-const SLIDE_MS = 200; // 사진 넘김 슬라이드
-const SNAP_MS = 160; // 덜 끌었을 때 되돌아오는 시간
-const DRAG_FOLLOW = 0.9; // 손가락을 따라가는 비율(살짝 무겁게)
+const SLIDE_MS = 260; // 사진 넘김 슬라이드
+const SNAP_MS = 180; // 덜 끌었을 때 되돌아오는 시간
+const SLIDE_EASE = "cubic-bezier(0.22, 0.61, 0.36, 1)";
 
 type Gesture = {
   mode: "none" | "pan" | "pinch";
@@ -54,6 +54,13 @@ function preload(src: string) {
  * 사진 원본 전체를 보여주는 전체화면 뷰어.
  *
  * - `object-contain` 이라 잘리는 곳 없이 사진 전체가 보인다(갤러리 타일/1장 보기는 cover).
+ * - 넘김은 **3장짜리 캐러셀**이다. [이전][현재][다음] 을 나란히 깔아두고 트랙 전체를
+ *   한 방향으로 밀기 때문에, 미는 방향에서 다음 사진이 그대로 따라 들어온다.
+ *   (예전에는 한 장짜리 img 를 밀어낸 뒤 src 를 바꾸고 반대편에서 다시 넣었는데,
+ *    브라우저가 "밀려난 위치 → 반대편으로 순간이동"을 같은 프레임에서 합쳐버려
+ *    나갔던 쪽에서 되돌아오는 것처럼 보였다. 트랙 방식에는 순간이동 자체가 없다.)
+ * - 넘김이 끝나면 index 를 옮기고 트랙을 가운데 칸으로 되돌린다. 그 자리에 같은 사진이
+ *   다시 놓이므로 화면에는 아무 변화도 보이지 않는다.
  * - 확대: 핀치 / 더블탭 / 휠. App.tsx 가 문서 전체의 멀티터치 touchmove 를 막고 있어
  *   브라우저 기본 핀치 줌이 동작하지 않는다. 그래서 여기서 직접 계산한다.
  * - 배율/이동값은 transform 으로만 다루고 React state 로 올리지 않는다(제스처 중 리렌더 방지).
@@ -73,14 +80,23 @@ export function PhotoLightbox({
   onClose: () => void;
 }) {
   const containerRef = useRef<HTMLDivElement | null>(null);
+  const trackRef = useRef<HTMLDivElement | null>(null);
   const imgRef = useRef<HTMLImageElement | null>(null);
+
+  const total = images.length;
+  const many = total > 1;
+
+  // 트랙에 깔리는 슬라이드(원본 배열의 인덱스). 여러 장이면 [이전][현재][다음] 이라 현재는 1번 칸.
+  const slots = useMemo(() => {
+    if (!many) return [0];
+    return [(index - 1 + total) % total, index, (index + 1) % total];
+  }, [index, many, total]);
+  const centerSlot = many ? 1 : 0;
 
   // 현재 확대/이동 상태 (렌더와 무관하게 즉시 갱신되어야 한다)
   const view = useRef({ scale: 1, x: 0, y: 0 });
-  // 좌우 넘김용 오프셋. 확대 이동값(view.x)과 섞이지 않게 따로 둔다.
+  // 트랙의 좌우 오프셋. 확대 이동값(view.x)과 섞이지 않게 따로 둔다.
   const dragRef = useRef(0);
-  // 다음 사진이 들어올 방향(px). index 가 바뀐 뒤 그 위치에서 0 으로 밀어 넣는다.
-  const enterFromRef = useRef(0);
   const slidingRef = useRef(false);
 
   const gesture = useRef<Gesture>({
@@ -117,18 +133,38 @@ export function PhotoLightbox({
     window.setTimeout(onClose, FADE_MS);
   }, [onClose]);
 
-  /** transform 트랜지션 켜기(ms) / 끄기(0) */
-  const transition = useCallback((ms: number) => {
+  /** 확대용 transform 트랜지션 켜기(ms) / 끄기(0) */
+  const imgTransition = useCallback((ms: number) => {
     const el = imgRef.current;
     if (!el) return;
     el.style.transition = ms > 0 ? `transform ${ms}ms ease-out` : "none";
   }, []);
 
-  const apply = useCallback(() => {
+  /**
+   * 트랙 트랜지션 켜기(ms) / 끄기(0).
+   * ⚠️ 0 일 때는 강제 리플로우로 "트랜지션 없음"을 확정시킨 뒤 transform 을 바꿔야 한다.
+   *    그러지 않으면 브라우저가 같은 프레임의 두 변경을 합쳐서, 되돌아가는 애니메이션이 보인다.
+   */
+  const trackTransition = useCallback((ms: number) => {
+    const el = trackRef.current;
+    if (!el) return;
+    el.style.transition = ms > 0 ? `transform ${ms}ms ${SLIDE_EASE}` : "none";
+    if (ms === 0) void el.offsetWidth;
+  }, []);
+
+  const applyTrack = useCallback(() => {
+    const el = trackRef.current;
+    const box = containerRef.current;
+    if (!el || !box) return;
+    const w = box.clientWidth;
+    el.style.transform = `translate3d(${-w * centerSlot + dragRef.current}px, 0, 0)`;
+  }, [centerSlot]);
+
+  const applyImg = useCallback(() => {
     const el = imgRef.current;
     if (!el) return;
     const { scale, x, y } = view.current;
-    el.style.transform = `translate3d(${x + dragRef.current}px, ${y}px, 0) scale(${scale})`;
+    el.style.transform = `translate3d(${x}px, ${y}px, 0) scale(${scale})`;
 
     const z = scale > 1.01;
     if (z !== zoomedRef.current) {
@@ -160,23 +196,26 @@ export function PhotoLightbox({
       view.current.y = focalY - ((focalY - view.current.y) * s1) / s0;
       view.current.scale = s1;
       clampOffset();
-      transition(0);
-      apply();
+      imgTransition(0);
+      applyImg();
     },
-    [apply, clampOffset, transition]
+    [applyImg, clampOffset, imgTransition]
   );
 
   const resetZoom = useCallback(() => {
     view.current = { scale: 1, x: 0, y: 0 };
-    transition(SNAP_MS);
-    apply();
-  }, [apply, transition]);
+    imgTransition(SNAP_MS);
+    applyImg();
+  }, [applyImg, imgTransition]);
 
-  /** 옆으로 밀어서 다음/이전 사진으로 (스와이프 · 화살표 공용) */
+  /**
+   * 옆으로 밀어서 다음/이전 사진으로 (스와이프 · 화살표 · 키보드 공용).
+   * 트랙을 진행 방향으로 한 칸(=화면 폭)만 밀면, 그 방향에 이미 깔려 있는 사진이 따라 들어온다.
+   */
   const slide = useCallback(
     (delta: 1 | -1) => {
-      if (images.length < 2 || slidingRef.current) return;
-      const next = (index + delta + images.length) % images.length;
+      if (!many || slidingRef.current) return;
+      const next = (index + delta + total) % total;
       const box = containerRef.current;
       if (!box) {
         onIndexChange(next);
@@ -184,53 +223,57 @@ export function PhotoLightbox({
       }
 
       slidingRef.current = true;
-      const w = box.clientWidth;
 
       // 확대 상태였다면 원배율로 되돌리고 넘긴다
       view.current = { scale: 1, x: 0, y: 0 };
+      imgTransition(SNAP_MS);
+      applyImg();
 
-      // ① 지금 사진을 진행 방향으로 밀어낸다
-      transition(SLIDE_MS);
-      dragRef.current = delta === 1 ? -w : w;
-      apply();
+      // 다음 사진 = 트랙을 왼쪽으로, 이전 사진 = 오른쪽으로
+      trackTransition(SLIDE_MS);
+      dragRef.current = -delta * box.clientWidth;
+      applyTrack();
 
-      // ② 다 밀리면 src 를 바꾸고, 반대편에서 들어오게 한다(아래 index 이펙트)
-      enterFromRef.current = delta === 1 ? w : -w;
+      // 다 밀린 뒤 index 를 옮긴다(아래 레이아웃 이펙트가 트랙을 가운데로 되돌린다)
       window.setTimeout(() => onIndexChange(next), SLIDE_MS);
     },
-    [apply, images.length, index, onIndexChange, transition]
+    [applyImg, applyTrack, imgTransition, index, many, onIndexChange, total, trackTransition]
   );
 
-  // 사진이 바뀌면: 확대 초기화 + 들어오는 슬라이드
-  useEffect(() => {
+  // 사진이 바뀌면(그리고 처음 열릴 때): 확대 초기화 + 트랙을 가운데 칸으로.
+  // 페인트 전에 끝나야 이전 슬라이드가 한 프레임 비치지 않는다 → useLayoutEffect.
+  useLayoutEffect(() => {
     view.current = { scale: 1, x: 0, y: 0 };
-    dragRef.current = enterFromRef.current;
-    enterFromRef.current = 0;
-    transition(0);
-    apply();
+    imgTransition(0);
+    applyImg();
 
-    if (dragRef.current === 0) {
-      slidingRef.current = false;
-      return;
-    }
+    dragRef.current = 0;
+    trackTransition(0);
+    applyTrack();
+    slidingRef.current = false;
+  }, [index, applyImg, applyTrack, imgTransition, trackTransition]);
 
-    const id = requestAnimationFrame(() => {
-      transition(SLIDE_MS);
-      dragRef.current = 0;
-      apply();
-      window.setTimeout(() => {
-        slidingRef.current = false;
-      }, SLIDE_MS);
-    });
-    return () => cancelAnimationFrame(id);
-  }, [index, apply, transition]);
-
-  // 앞/뒤 사진 미리 받아두기 (넘길 때 빈 화면이 보이지 않게)
+  // 화면 회전/리사이즈: 칸 폭이 바뀌므로 트랙 위치를 다시 잡는다
   useEffect(() => {
-    if (images.length < 2) return;
-    preload(images[(index + 1) % images.length]!.src);
-    preload(images[(index - 1 + images.length) % images.length]!.src);
-  }, [index, images]);
+    const onResize = () => {
+      if (slidingRef.current) return;
+      trackTransition(0);
+      applyTrack();
+    };
+    window.addEventListener("resize", onResize);
+    window.addEventListener("orientationchange", onResize);
+    return () => {
+      window.removeEventListener("resize", onResize);
+      window.removeEventListener("orientationchange", onResize);
+    };
+  }, [applyTrack, trackTransition]);
+
+  // 한 칸 더 바깥 사진까지 미리 받아두기 (연속으로 넘겨도 빈 화면이 없게)
+  useEffect(() => {
+    if (total < 2) return;
+    preload(images[(index + 2) % total]!.src);
+    preload(images[(index - 2 + total) % total]!.src);
+  }, [index, images, total]);
 
   // 뷰어가 열려 있는 동안 뒤 페이지 스크롤 잠금
   useEffect(() => {
@@ -264,9 +307,9 @@ export function PhotoLightbox({
     };
 
     const snapBack = () => {
-      transition(SNAP_MS);
+      trackTransition(SNAP_MS);
       dragRef.current = 0;
-      apply();
+      applyTrack();
     };
 
     const onTouchStart = (e: TouchEvent) => {
@@ -296,7 +339,9 @@ export function PhotoLightbox({
       g.startY = t.clientY;
       g.startTx = view.current.x;
       g.startTy = view.current.y;
-      transition(0); // 손가락을 따라갈 때는 트랜지션이 없어야 붙어 움직인다
+      // 손가락을 따라갈 때는 트랜지션이 없어야 붙어 움직인다
+      imgTransition(0);
+      trackTransition(0);
     };
 
     const onTouchMove = (e: TouchEvent) => {
@@ -313,7 +358,7 @@ export function PhotoLightbox({
         view.current.y = g.focalY - ((g.focalY - g.startTy) * s1) / g.startScale;
         view.current.scale = s1;
         clampOffset();
-        apply();
+        applyImg();
         return;
       }
 
@@ -328,14 +373,14 @@ export function PhotoLightbox({
         view.current.x = g.startTx + dx;
         view.current.y = g.startTy + dy;
         clampOffset();
-        apply();
+        applyImg();
         return;
       }
 
-      // 원배율: 손가락을 따라 사진이 같이 밀린다 (세로로 긋는 중이면 놔둔다)
-      if (Math.abs(dx) > Math.abs(dy)) {
-        dragRef.current = dx * DRAG_FOLLOW;
-        apply();
+      // 원배율: 트랙이 손가락을 그대로 따라온다 (세로로 긋는 중이면 놔둔다)
+      if (many && Math.abs(dx) > Math.abs(dy)) {
+        dragRef.current = dx;
+        applyTrack();
       }
     };
 
@@ -380,7 +425,7 @@ export function PhotoLightbox({
 
       if (view.current.scale > 1) return;
 
-      if (Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > SWIPE_PX) {
+      if (many && Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > SWIPE_PX) {
         slide(dx < 0 ? 1 : -1);
       } else if (dy > CLOSE_PX) {
         snapBack();
@@ -410,9 +455,18 @@ export function PhotoLightbox({
       box.removeEventListener("touchcancel", onTouchEnd);
       box.removeEventListener("wheel", onWheel);
     };
-  }, [apply, clampOffset, requestClose, resetZoom, slide, transition, zoomTo]);
-
-  const current = images[index];
+  }, [
+    applyImg,
+    applyTrack,
+    clampOffset,
+    imgTransition,
+    many,
+    requestClose,
+    resetZoom,
+    slide,
+    trackTransition,
+    zoomTo,
+  ]);
 
   const arrowCls = [
     "absolute top-1/2 z-10 inline-flex h-10 w-10 -translate-y-1/2 items-center justify-center",
@@ -433,20 +487,33 @@ export function PhotoLightbox({
       aria-modal="true"
       aria-label="사진 크게 보기"
     >
-      <div
-        ref={containerRef}
-        className="absolute inset-0 flex touch-none items-center justify-center overflow-hidden"
-      >
-        <img
-          ref={imgRef}
-          src={current?.src}
-          alt={current?.alt}
-          className="max-h-full max-w-full select-none object-contain will-change-transform"
-          draggable={false}
-          decoding="async"
-        />
-        {/* 길게 눌러 저장 차단. 버튼들은 뒤에 렌더되어 위에 온다. */}
-        <PhotoGuard />
+      <div ref={containerRef} className="absolute inset-0 touch-none overflow-hidden">
+        {/* 슬라이드 트랙: [이전][현재][다음] 을 가로로 이어 붙이고 통째로 민다 */}
+        <div ref={trackRef} className="absolute inset-0 flex will-change-transform">
+          {slots.map((imgIdx, slot) => (
+            <div
+              /*
+               * 사진 인덱스를 key 로 준다. 넘길 때 [23,24,0] → [24,0,1] 처럼 두 칸이 겹치므로
+               * React 가 이미 로드된 노드를 **이동**시켜 재사용한다(다시 만들면 한 프레임 깜빡인다).
+               * 2장뿐이면 이전/다음이 같은 인덱스라 key 가 겹치므로 그때만 칸 번호를 쓴다.
+               */
+              key={total > 2 ? imgIdx : slot}
+              className="relative flex h-full w-full flex-none items-center justify-center"
+            >
+              <img
+                // 확대/이동은 가운데(현재) 사진에만 적용된다
+                ref={slot === centerSlot ? imgRef : undefined}
+                src={images[imgIdx]!.src}
+                alt={images[imgIdx]!.alt}
+                className="max-h-full max-w-full select-none object-contain will-change-transform"
+                draggable={false}
+                decoding="async"
+              />
+              {/* 길게 눌러 저장 차단. 버튼들은 트랙 밖에 있어 위에 온다. */}
+              <PhotoGuard />
+            </div>
+          ))}
+        </div>
       </div>
 
       <button
@@ -459,7 +526,7 @@ export function PhotoLightbox({
         <X size={22} />
       </button>
 
-      {images.length > 1 && (
+      {many && (
         <>
           <button
             type="button"

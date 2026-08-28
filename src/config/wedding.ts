@@ -56,6 +56,13 @@ export type AccountInfo = {
       groomName: string;
       brideName: string;
       tagline: string;
+      /** 혼주 성함 · 서열 (MessageSection 의 "OOO · OOO의 장남 OOO" 표기에 쓰인다) */
+      groomFather?: string;
+      groomMother?: string;
+      groomRank?: string;
+      brideFather?: string;
+      brideMother?: string;
+      brideRank?: string;
     };
 
     groomInfo?: CoupleInfo;
@@ -107,6 +114,12 @@ export type AccountInfo = {
       groomName: "홍정준",
       brideName: "신송희",
       tagline: "소중한 분들을 초대합니다.",
+      groomFather: "홍태환",
+      groomMother: "노흥순",
+      groomRank: "장남",
+      brideFather: "신명범",
+      brideMother: "오미영",
+      brideRank: "장녀",
     },
 
     groomInfo: {

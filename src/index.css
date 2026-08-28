@@ -17,12 +17,38 @@
 @tailwind utilities;
 
 @layer base {
+  /*
+   * ⚠️ 다크모드를 따라가지 않는다.
+   * 기기 설정이 다크여도 청첩장은 항상 아래 라이트 팔레트로 그린다.
+   * - `color-scheme: only light` : UA 기본 색(입력창·스크롤바)과 안드로이드 크롬/
+   *   삼성 인터넷의 "자동 다크 테마" 강제 반전을 함께 막는다.
+   * - html/body 배경을 명시 : 색을 지정하지 않은 영역이 UA 기본 다크 배경으로
+   *   비치는 것을 막는다(일부 기기에서 배경만 검게 나오던 원인).
+   */
+  :root {
+    color-scheme: only light;
+  }
+
+  html {
+    background: #ffffff;
+    color: #111827;
+  }
+
   body {
     font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, Roboto, sans-serif;
     background: #ffffff;
     color: #111827;
     touch-action: manipulation;
     overflow-x: hidden;
+  }
+
+  /* 다크 선호 기기에서도 값이 바뀌지 않도록 한 번 더 못박는다 */
+  @media (prefers-color-scheme: dark) {
+    html,
+    body {
+      background: #ffffff;
+      color: #111827;
+    }
   }
 
   /*
@@ -46,6 +72,13 @@
 @media (min-width: 431px) {
   body {
     background-color: #d6d3ce;
+  }
+
+  /* 다크 선호 기기에서도 프레임 바깥 배경은 동일하게 */
+  @media (prefers-color-scheme: dark) {
+    body {
+      background-color: #d6d3ce;
+    }
   }
 
   #root {

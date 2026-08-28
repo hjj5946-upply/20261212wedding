@@ -32,15 +32,16 @@ type Props = { data: WeddingConfig };
 
 // 본문 (고정 문구이므로 렌더마다 다시 만들지 않는다)
 const INVITE_MESSAGE =
-  `설렘으로 시작해서\n` +
-  `이제는 습관처럼 서로를 찾습니다.\n` +
-  `매일 봐도 여전히 좋은, 그런 사이입니다.\n\n` +
+  `설렘으로 시작한 만남이\n` +
+  `이제는 서로를 먼저 찾는 하루가 되었습니다.\n` +
+  `매일 마주해도 여전히 좋은 사이입니다.\n\n` +
   `거창한 이유는 없습니다.\n` +
-  `그냥 이 사람과 살면 계속 재밌을 것 같아서\n` +
-  `결혼하기로 했습니다.\n\n` +
-  `바쁘신 와중에도 귀한 걸음 해주시면\n` +
+  `이 사람과 함께라면 앞으로의 날들이\n` +
+  `더욱 즐거울 것이라 믿어\n` +
+  `평생을 함께하기로 약속하였습니다.\n\n` +
+  `바쁘신 와중에도 귀한 걸음 해주신다면\n` +
   `저희 두 사람, 그 마음 오래 기억하며\n` +
-  `재밌게 잘 살겠습니다.`;
+  `서로 아끼고 즐겁게 잘 살겠습니다.`;
 
 // 컴포넌트 밖으로 빼서 렌더마다 새 컴포넌트 타입이 생기지 않게 한다
 function WeddingDivider() {
@@ -150,15 +151,28 @@ function MessageSectionBase({ data }: Props) {
           {INVITE_MESSAGE}
         </p>
 
-        {/* 신랑 · 신부: data는 여기서만 사용됩니다. */}
+        {/* 혼주 · 신랑 · 신부: data는 여기서만 사용됩니다. */}
         <div
           className={[
-            "mt-8 text-base font-medium text-neutral-900",
+            "mt-8 space-y-1.5 text-base font-medium text-neutral-900",
             "transition-all duration-700 ease-out delay-350",
             revealed ? "opacity-100 translate-y-0" : "opacity-0 translate-y-3",
           ].join(" ")}
         >
-          신랑 {data.couple.groomName} · 신부 {data.couple.brideName}
+          <p>
+            {/* 부모 성함은 기존 크기 그대로, 본인 이름만 한 단계 크게 */}
+            <span className="text-[15px] text-neutral-500">
+              {data.couple.groomFather} · {data.couple.groomMother}의 {data.couple.groomRank}
+            </span>
+            <span className="ml-6 text-lg">{data.couple.groomName}</span>
+          </p>
+          <p>
+            {/* 부모 성함은 기존 크기 그대로, 본인 이름만 한 단계 크게 */}
+            <span className="text-[15px] text-neutral-500">
+              {data.couple.brideFather} · {data.couple.brideMother}의 {data.couple.brideRank}
+            </span>
+            <span className="ml-6 text-lg">{data.couple.brideName}</span>
+          </p>
         </div>
       </div>
     </Section>
