@@ -133,9 +133,9 @@ function GiftAccountsSectionBase({ data, onCopy }: Props) {
         {/* 화환 거절 안내 */}
         <div className="mt-4 rounded-2xl bg-neutral-50 border border-neutral-200 px-4 py-3">
           <p className="text-center text-xs text-neutral-600 leading-relaxed">
-            공간이 협소하오니
+            예식장 로비가 협소하여
             <br />
-            축하 화환은 정중히 사양하며
+            축하 화환은 정중히 사양하오니
             <br />
             따뜻한 마음만 받겠습니다.
           </p>

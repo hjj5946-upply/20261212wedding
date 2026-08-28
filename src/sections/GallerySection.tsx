@@ -1,5 +1,5 @@
 // src/sections/GallerySection.tsx
-import { memo, useCallback, useEffect, useRef, useState } from "react";
+import { memo, useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 import { flushSync } from "react-dom";
 import { gsap } from "gsap";
 
@@ -19,11 +19,37 @@ const IMAGE_PREFIX = "gi";
 const IMAGE_COUNT = 25;
 const GRID_PREVIEW_COUNT = 12;
 
+/**
+ * 가로로 긴 사진의 번호(`gi_<번호>.webp`).
+ * 갤러리 칸은 세로 비율이라 object-cover 로 채우면 위아래가 심하게 잘린다.
+ * 여기 적힌 사진만 전체가 보이도록(contain) 두고, 남는 위아래는 히어로 섹션과 같은 방식으로
+ * 같은 사진을 흐리게 깔아 채운다. 사진을 교체해 비율이 달라지면 이 목록도 손봐야 한다.
+ */
+const LETTERBOX_NUMBERS = new Set([19]);
+
 // 목록은 고정값이므로 모듈 상수로 한 번만 만든다
 const IMAGES = Array.from({ length: IMAGE_COUNT }, (_, idx) => ({
   src: asset(`images/${IMAGE_PREFIX}_${idx + 1}.webp`),
   alt: `gallery-${idx + 1}`,
+  letterbox: LETTERBOX_NUMBERS.has(idx + 1),
 }));
+
+/**
+ * 가로 사진의 남는 위아래를 채우는 흐린 배경.
+ * 같은 URL 이라 이미지 요청은 한 번만 나간다(히어로 섹션과 동일한 패턴).
+ */
+function BlurFill({ src }: { src: string }) {
+  return (
+    <img
+      src={src}
+      alt=""
+      aria-hidden
+      className="absolute inset-0 h-full w-full scale-110 object-cover opacity-80 blur-xl"
+      decoding="async"
+      draggable={false}
+    />
+  );
+}
 
 // single 모드 전환 타이밍 (짧게 유지해야 빠른 스와이프에서 답답하지 않다)
 const OUT_MS = 0.18;
@@ -241,6 +267,23 @@ function GallerySectionBase() {
     return () => window.removeEventListener("keydown", onKey);
   }, [mode, lightboxOpen, goPrev, goNext]);
 
+  // ── 보기 방식 전환 시 스크롤 보정 ─────────────────────
+  // 그리드(최대 25장)와 1장 보기는 섹션 높이가 크게 다르다. 스크롤 위치를 그대로 두면
+  // 그리드 아래쪽 사진을 눌렀을 때 화면이 다음 섹션(마음 전하는 곳)까지 밀려 내려가서,
+  // 정작 고른 사진이 화면 밖에 있게 된다. 전환 직후 갤러리를 다시 화면 위로 맞춘다.
+  const firstModeRef = useRef(true);
+
+  useLayoutEffect(() => {
+    if (firstModeRef.current) {
+      // 첫 렌더(그리드)에서는 스크롤을 건드리지 않는다
+      firstModeRef.current = false;
+      return;
+    }
+    // 레이아웃이 이미 새 높이로 확정된 시점이라 위치 계산이 정확하다.
+    // 애니메이션 없이 즉시 이동해야 접힌 만큼 화면이 튀지 않는다.
+    document.getElementById("gallery")?.scrollIntoView({ block: "start", behavior: "auto" });
+  }, [mode]);
+
   // mode 전환 시 activeIdx 보정
   useEffect(() => {
     if (mode !== "single") return;
@@ -298,10 +341,15 @@ function GallerySectionBase() {
                   aria-label={`open image ${idx + 1}`}
                   type="button"
                 >
+                  {img.letterbox && <BlurFill src={img.src} />}
                   <img
                     src={img.src}
                     alt={img.alt}
-                    className="h-full w-full object-cover transition-transform duration-300 hover:scale-105"
+                    className={[
+                      "h-full w-full transition-transform duration-300 hover:scale-105",
+                      // 가로 사진은 잘라내지 않고 전체를 보여준다(뒤의 BlurFill 위에 얹히도록 relative)
+                      img.letterbox ? "relative object-contain" : "object-cover",
+                    ].join(" ")}
                     loading="lazy"
                   />
                   <PhotoGuard />
@@ -356,11 +404,15 @@ function GallerySectionBase() {
                  * object-cover: 박스를 항상 꽉 채운다. 사진 비율이 박스와 달라도
                  * 위아래/양옆에 빈 공간이 생기지 않는다(대신 넘치는 쪽이 잘린다).
                  */}
+                {images[activeIdx]?.letterbox && <BlurFill src={images[activeIdx]!.src} />}
                 <img
                   ref={singleImgRef}
                   src={images[activeIdx]?.src}
                   alt={images[activeIdx]?.alt}
-                  className="h-full w-full object-cover will-change-transform"
+                  className={[
+                    "h-full w-full will-change-transform",
+                    images[activeIdx]?.letterbox ? "relative object-contain" : "object-cover",
+                  ].join(" ")}
                   // 지금 보고 있는 사진이므로 lazy 로드하면 전환이 늦어진다
                   loading="eager"
                   decoding="async"
