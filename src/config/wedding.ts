@@ -194,7 +194,7 @@ export type AccountInfo = {
         date: "2018년 ~ 2024년",
         title: "함께한 날들",
         description: "웃음과 행복이 가득했던 우리의 이야기",
-        image: "images/welove.webp",
+        image: "images/every.webp",
         photo: { fit: "cover", padding: "p-0", bg: "bg-neutral-50" },
       },
       {
