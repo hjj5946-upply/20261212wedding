@@ -45,7 +45,7 @@ function PhotoCard({
         <div className="relative aspect-[3/4] w-full overflow-hidden rounded-xl bg-neutral-100">
           {info.photoUrl ? (
             <img
-              src={info.photoUrl}
+              src={asset(info.photoUrl)}
               alt={`${info.name}`}
               className="h-full w-full object-cover"
               loading="lazy"

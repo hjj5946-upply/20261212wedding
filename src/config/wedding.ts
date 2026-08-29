@@ -128,6 +128,7 @@ export type AccountInfo = {
       mbti: "ISTJ",
       hobby: "여행, 게임",
       introduction: "속은 따듯하고 언제나 긍정적인 사람입니다.",
+      photoUrl: "images/profile_jun.webp",
     },
 
     brideInfo: {
@@ -136,6 +137,7 @@ export type AccountInfo = {
       mbti: "ISFJ",
       hobby: "여행, 게임",
       introduction: "따뜻하고 세심한 마음을 가진 사람입니다.",
+      photoUrl: "images/profile_song.webp",
     },
     
     ceremony: {

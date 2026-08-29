@@ -8,7 +8,6 @@ const BASE = import.meta.env.BASE_URL || "/";
 const TRACKS = [
   BASE + encodeURI("audio/Rubber Bazooka.mp3"),
   BASE + encodeURI("audio/Can't Stop The Feeling.mp3"),
-  BASE + encodeURI("audio/Came Here for Love.mp3"),
   BASE + encodeURI("audio/Sugar.mp3"),
   BASE + encodeURI("audio/Love.mp3"),
   BASE + encodeURI("audio/Kiss Me.mp3"),
