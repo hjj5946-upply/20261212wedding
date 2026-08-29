@@ -166,8 +166,8 @@ export type AccountInfo = {
     ],
     brideAccounts: [
         { bank: "카카오뱅크", number: "3333-06-7583309", holder: "신송희", relation: "신부", kakaoPayUrl: "https://link.kakaopay.com/__/kAMNmIW" },
-        { bank: "신한은행", number: "110-234-567890", holder: "신명범", relation: "신부 아버지" },
-        { bank: "우리은행", number: "1002-345-678901", holder: "오미영", relation: "신부 어머니" },
+        { bank: "농협은행", number: "221093-56-062603", holder: "신명범", relation: "신부 아버지" },
+        { bank: "농협은행", number: "165-02-119795", holder: "오미영", relation: "신부 어머니" },
     ],
   
     gallery: [],
