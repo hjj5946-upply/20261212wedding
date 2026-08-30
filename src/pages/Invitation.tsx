@@ -80,6 +80,12 @@ export function Invitation() {
   //   if (error) throw error;
   // };
 
+  // ✅ 본문은 언제나 히어로(최상단)부터 시작한다.
+  //    인트로 중에는 문서가 짧아 브라우저/앵커 복원이 뒤늦게 끼어들 수 있어 마운트 직후 한 번 더 고정한다.
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
+
   useEffect(() => {
     const timer = setTimeout(() => setFadeIn(true), 200);
     return () => clearTimeout(timer);

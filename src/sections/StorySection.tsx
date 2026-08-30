@@ -16,6 +16,8 @@ function StoryPhoto({
   bg = "bg-white",
   rounded = "rounded-2xl",
   objectPosition = "object-center",
+  focusX,
+  focusY,
 }: {
   title: string;
   src: string;
@@ -24,9 +26,18 @@ function StoryPhoto({
   bg?: string;
   rounded?: string;
   objectPosition?: string;
+  focusX?: string;
+  focusY?: string;
 }) {
 
   const fitClass = fit === "contain" ? "object-contain" : "object-cover";
+
+  // ✅ focusX/focusY가 있으면 % 단위로 미세 조절한다(인라인 스타일이 클래스보다 우선).
+  //    Tailwind의 object-top/center/bottom은 0/50/100%뿐이라 중간값을 못 준다.
+  const focusStyle =
+    focusX || focusY
+      ? { objectPosition: `${focusX ?? "50%"} ${focusY ?? "50%"}` }
+      : undefined;
 
   return (
     <div className={`h-full overflow-hidden ${rounded} border border-neutral-200 ${bg} shadow-sm`}>
@@ -36,6 +47,7 @@ function StoryPhoto({
           src={asset(src)}
           alt={title}
           className={`h-full w-full ${fitClass} ${objectPosition}`}
+          style={focusStyle}
           loading="lazy"
           draggable={false}
         />
@@ -164,6 +176,8 @@ function StorySectionBase({ data }: Props) {
                             bg={item.photo?.bg}
                             rounded={item.photo?.rounded}
                             objectPosition={item.photo?.objectPosition}
+                            focusX={item.photo?.focusX}
+                            focusY={item.photo?.focusY}
                           />
                         </div>
                       ) : (
@@ -202,6 +216,8 @@ function StorySectionBase({ data }: Props) {
                             bg={item.photo?.bg}
                             rounded={item.photo?.rounded}
                             objectPosition={item.photo?.objectPosition}
+                            focusX={item.photo?.focusX}
+                            focusY={item.photo?.focusY}
                           />
                         </div>
                       )}

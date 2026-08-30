@@ -32,6 +32,14 @@ export type AccountInfo = {
       bg?: string;                     
       rounded?: string;                
       objectPosition?: string;         
+
+      // ✅ 사진 위아래(세로) 미세 조절. "0%"~"100%" 값을 직접 넣는다.
+      //    0%  = 사진 위쪽이 보임(사진이 아래로 내려감)
+      //    100% = 사진 아래쪽이 보임(사진이 위로 올라감)
+      //    5% 단위로 바꿔가며 맞추면 된다. objectPosition 클래스보다 우선한다.
+      focusY?: string;
+      // ✅ 좌우 미세 조절이 필요할 때만 사용(기본 50% = 가운데)
+      focusX?: string;
     };
   };
 
@@ -187,7 +195,8 @@ export type AccountInfo = {
         title: "설레는 시작",
         description: "서로에게 특별한 사람이 되어가는 순간",
         image: "images/lovestart.webp",
-        photo: { fit: "cover", padding: "p-0", bg: "bg-white", objectPosition: "object-top" },
+        // 세로 사진이라 가로 프레임에서 많이 잘린다 → focusY로 반지 부분이 보이게 내린다.
+        photo: { fit: "cover", padding: "p-0", bg: "bg-white", focusY: "70%" },
       },
       {
         icon: "🌸",
