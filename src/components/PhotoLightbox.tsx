@@ -4,6 +4,7 @@ import { createPortal } from "react-dom";
 import { ChevronLeft, ChevronRight, X } from "lucide-react";
 
 import { PhotoGuard } from "./PhotoGuard";
+import { useBackClose } from "../utils/useBackClose";
 
 export type LightboxImage = { src: string; alt: string };
 
@@ -132,6 +133,9 @@ export function PhotoLightbox({
     setVisible(false);
     window.setTimeout(onClose, FADE_MS);
   }, [onClose]);
+
+  // 안드로이드/iOS 기본 뒤로가기로 페이지를 벗어나지 않고 이 뷰어만 닫는다
+  useBackClose(true, requestClose);
 
   /** 확대용 transform 트랜지션 켜기(ms) / 끄기(0) */
   const imgTransition = useCallback((ms: number) => {

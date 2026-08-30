@@ -1,5 +1,7 @@
 import { useEffect, useId, useRef } from "react";
 
+import { useBackClose } from "../utils/useBackClose";
+
 export function Modal({
   open,
   title,
@@ -37,6 +39,9 @@ export function Modal({
       window.removeEventListener("keydown", onKeyDown);
     };
   }, [open, onClose]);
+
+  // 안드로이드/iOS 기본 뒤로가기로 페이지를 벗어나지 않고 이 모달만 닫는다
+  useBackClose(open, onClose);
 
   if (!open) return null;
 
