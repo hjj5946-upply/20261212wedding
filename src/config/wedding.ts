@@ -137,7 +137,7 @@ export type AccountInfo = {
       mbti: "ISFJ",
       hobby: "여행, 게임",
       introduction: "따뜻하고 세심한 마음을 가진 사람입니다.",
-      photoUrl: "images/profile_song.webp",
+      photoUrl: "images/profile_song_2.webp",
     },
     
     ceremony: {
