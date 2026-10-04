@@ -82,6 +82,9 @@ export type AccountInfo = {
       venueName: string;
       venueAddress: string;
       venueDetail?: string;
+      parkingNotice?: string;
+      /** parkingNotice 안에서 강조(연두 초록)할 문구 */
+      parkingHighlight?: string;
       naverMapUrl: string;
       kakaoMapUrl: string;
       tmapUrl: string;
@@ -156,6 +159,9 @@ export type AccountInfo = {
       venueLat: 37.539146,
       venueLng: 127.069655,
       venueDetail: "",
+      parkingNotice:
+        "도로변 첫 번째 예식장 건물과 혼동하지 마시고,\n다음 건물인 까사그랑데 센트로 뒷편 주차장을 이용해 주시기 바랍니다.",
+      parkingHighlight: "까사그랑데 센트로",
       naverMapUrl:"https://map.naver.com/p/search/%EA%B9%8C%EC%82%AC%EA%B7%B8%EB%9E%91%EB%8D%B0?c=17.08,0,0,0,dh",
       kakaoMapUrl:"https://map.kakao.com/",
       tmapUrl:"https://www.tmap.co.kr/my_tmap/my_map_tip/map_tip.do#"

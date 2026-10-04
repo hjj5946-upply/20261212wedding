@@ -152,8 +152,24 @@ function NaverMap({
   );
 }
 
+/** 문구 안의 강조 단어만 연두 초록으로 감싼다. */
+function highlightNotice(text: string, keyword?: string) {
+  if (!keyword) return text;
+
+  return text.split(keyword).flatMap((chunk, i) =>
+    i === 0
+      ? [chunk]
+      : [
+          <strong key={i} className="font-semibold text-wedding-green-400">
+            {keyword}
+          </strong>,
+          chunk,
+        ]
+  );
+}
+
 function LocationSectionBase({ data, onOpenMap, onCopy }: Props) {
-  const { venueName, venueAddress } = data.ceremony as any;
+  const { venueName, venueAddress, parkingNotice, parkingHighlight } = data.ceremony;
 
   // 가능하면 config에 좌표를 넣어두는 걸 추천 (없으면 검색 링크로 fallback)
   const venueLat = (data.ceremony as any).venueLat as number | undefined;
@@ -188,6 +204,12 @@ function LocationSectionBase({ data, onOpenMap, onCopy }: Props) {
           <div className="font-medium text-neutral-900">{venueName}</div>
           <div className="mt-1 text-neutral-600">{venueAddress}</div>
         </div> */}
+
+        {parkingNotice ? (
+          <p className="mt-4 whitespace-pre-line text-center text-[13px] leading-relaxed text-neutral-600">
+            {highlightNotice(parkingNotice, parkingHighlight)}
+          </p>
+        ) : null}
 
         <div className="mt-4 grid grid-cols-2 gap-2">
           <Button variant="secondary" fullWidth onClick={onOpenMap}>
