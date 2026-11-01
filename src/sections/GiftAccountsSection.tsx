@@ -1,4 +1,4 @@
-import { memo, useEffect, useState } from "react";
+import { memo, useState } from "react";
 import type { WeddingConfig, AccountInfo } from "../config/wedding";
 import { Section } from "../components/Section";
 import { SectionTitle } from "../components/SectionTitle";
@@ -10,19 +10,6 @@ type Props = {
   onCopy: (text: string) => void; // Invitation의 copyText 사용(Toast 1곳 유지)
 };
 
-function maskAccountNumber(num: string) {
-  const digits = num.replace(/\D/g, "");
-  if (digits.length <= 6) return num;
-
-  let i = 0;
-  const keep = digits.length - 6;
-  return num.replace(/\d/g, (m) => {
-    const out = i < keep ? m : "*";
-    i += 1;
-    return out;
-  });
-}
-
 function AccountList({
   accounts,
   onCopy,
@@ -30,19 +17,9 @@ function AccountList({
   accounts: AccountInfo[];
   onCopy: (text: string) => void;
 }) {
-  const [revealIndex, setRevealIndex] = useState<number | null>(null);
-
-  useEffect(() => {
-    if (revealIndex === null) return;
-    const t = setTimeout(() => setRevealIndex(null), 10000);
-    return () => clearTimeout(t);
-  }, [revealIndex]);
-
   return (
     <div className="space-y-3">
       {accounts.map((a, idx) => {
-        const isRevealed = revealIndex === idx;
-        const shownNumber = isRevealed ? a.number : maskAccountNumber(a.number);
         const copyText = `${a.bank} ${a.number} (${a.holder})`;
 
         return (
@@ -57,7 +34,7 @@ function AccountList({
             </div>
 
             <div className="mt-1 text-sm text-neutral-700">
-              {a.bank} {shownNumber}
+              {a.bank} {a.number}
             </div>
 
             {a.memo ? (
@@ -65,23 +42,14 @@ function AccountList({
             ) : null}
 
             <div className="mt-3 space-y-2">
-              <div className="grid grid-cols-2 gap-2">
-                <Button
-                  variant="secondary"
-                  type="button"
-                  onClick={() => setRevealIndex(isRevealed ? null : idx)}
-                >
-                  {isRevealed ? "가리기" : "계좌 보기"}
-                </Button>
-
-                <Button
-                  variant="primary"
-                  type="button"
-                  onClick={() => onCopy(copyText)}
-                >
-                  복사
-                </Button>
-              </div>
+              <Button
+                variant="primary"
+                type="button"
+                className="w-full"
+                onClick={() => onCopy(copyText)}
+              >
+                복사
+              </Button>
 
               {/* 카카오페이 버튼 — 나중에 다시 사용 예정 (주석 해제 시 상단 asset import도 함께 복구)
               {a.kakaoPayUrl ? (
@@ -103,13 +71,6 @@ function AccountList({
               ) : null}
               */}
             </div>
-
-
-            {isRevealed ? (
-              <div className="mt-2 text-[11px] text-neutral-400">
-                보안상 10초 후 자동으로 가려집니다.
-              </div>
-            ) : null}
           </div>
         );
       })}
